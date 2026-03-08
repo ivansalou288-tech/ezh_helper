@@ -158,11 +158,46 @@
             font-size: 2.5em;
         }
 
+        /* Навигация */
+        .admin-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            padding: 0 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(145deg, #7c4dff, #b388ff);
+            color: white;
+            border-color: #b388ff;
+            box-shadow: 0 4px 15px rgba(179, 136, 255, 0.3);
+        }
+
         /* Стили для контейнера чатов */
         .chats-container {
-            max-width: 100%; /* На всю ширину */
+            max-width: 100%;
             margin: 0 auto;
-            padding: 10px 0; /* Уменьшил вертикальные отступы */
+            padding: 10px 0;
         }
 
         .chats-header {
@@ -198,17 +233,17 @@
 
         .chats-grid {
             display: grid;
-            grid-template-columns: 1fr; /* Одна колонка на всю ширину */
+            grid-template-columns: 1fr;
             gap: 10px;
             margin-bottom: 30px;
-            padding: 0 10px; /* Уменьшил боковые отступы */
+            padding: 0 10px;
         }
 
         .chat-card {
             background: linear-gradient(135deg, rgba(15, 15, 35, 0.9), rgba(25, 25, 55, 0.8));
             border: 1px solid rgba(0, 255, 255, 0.2);
             border-radius: 30px;
-            padding: 15px 20px; /* Увеличил внутренние отступы */
+            padding: 15px 20px;
             backdrop-filter: blur(15px);
             transition: all 0.3s ease;
             cursor: pointer;
@@ -218,7 +253,7 @@
                 0 4px 20px rgba(0, 255, 255, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.1);
             width: 100%;
-            min-height: 60px; /* Добавил минимальную высоту */
+            min-height: 60px;
         }
 
         .chat-card::before {
@@ -252,7 +287,7 @@
         .chat-header {
             display: flex;
             align-items: center;
-            margin-bottom: 0; /* Убираем отступ */
+            margin-bottom: 0;
         }
 
         .chat-avatar {
@@ -320,7 +355,201 @@
         }
 
         .chat-stats {
-            display: none; /* Скрываем статистику */
+            display: none;
+        }
+
+        /* Стили для администраторов */
+        .admins-container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 10px 0;
+        }
+
+        .admins-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 0 15px;
+        }
+
+        .admins-title {
+            font-size: 1.5em;
+            color: #b388ff;
+            font-weight: 600;
+        }
+
+        .add-admin-btn {
+            background: linear-gradient(145deg, #7c4dff, #b388ff);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(179, 136, 255, 0.3);
+        }
+
+        .add-admin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(179, 136, 255, 0.4);
+        }
+
+        .admins-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 30px;
+            padding: 0 10px;
+        }
+
+        .admin-card {
+            background: linear-gradient(135deg, rgba(15, 15, 35, 0.9), rgba(25, 25, 55, 0.8));
+            border: 1px solid rgba(179, 136, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(15px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 4px 20px rgba(179, 136, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-card:hover {
+            background: linear-gradient(135deg, rgba(20, 20, 45, 0.95), rgba(35, 35, 75, 0.9));
+            border-color: rgba(179, 136, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 30px rgba(179, 136, 255, 0.2),
+                0 0 20px rgba(179, 136, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .admin-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .admin-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #b388ff, #7c4dff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2em;
+            margin-right: 15px;
+            box-shadow: 
+                0 0 15px rgba(179, 136, 255, 0.4),
+                0 3px 10px rgba(124, 77, 255, 0.3);
+        }
+
+        .admin-info {
+            flex: 1;
+        }
+
+        .admin-name {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 4px;
+            text-shadow: 0 0 8px rgba(179, 136, 255, 0.4);
+        }
+
+        .admin-id {
+            color: rgba(179, 136, 255, 0.6);
+            font-size: 0.85em;
+            font-weight: 400;
+        }
+
+        .admin-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .admin-status.active {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .admin-status.inactive {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+
+        .admin-permissions {
+            margin: 15px 0;
+        }
+
+        .permissions-title {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+        }
+
+        .permission-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .permission-tag {
+            background: rgba(179, 136, 255, 0.1);
+            color: #b388ff;
+            border: 1px solid rgba(179, 136, 255, 0.3);
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.75em;
+            font-weight: 500;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .admin-btn {
+            padding: 8px 16px;
+            border-radius: 15px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+            border: 1px solid rgba(33, 150, 243, 0.3);
+        }
+
+        .edit-btn:hover {
+            background: rgba(33, 150, 243, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .delete-btn {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+
+        .delete-btn:hover {
+            background: rgba(244, 67, 54, 0.3);
+            transform: translateY(-1px);
         }
 
         .empty-state {
@@ -346,17 +575,17 @@
         }
 
         @media (max-width: 768px) {
-            .chats-grid {
+            .chats-grid, .admins-grid {
                 grid-template-columns: 1fr;
             }
             
-            .chats-header {
+            .chats-header, .admins-header {
                 flex-direction: column;
                 gap: 15px;
                 align-items: stretch;
             }
             
-            .add-chat-btn {
+            .add-chat-btn, .add-admin-btn {
                 width: 100%;
             }
         }
@@ -382,14 +611,32 @@
     <div class="main-content">
         <h1>Admin Panel</h1>
         
+        <!-- Навигационное меню -->
+        <nav class="admin-nav">
+            <button class="nav-btn active" data-section="chats">📱 Чаты</button>
+            <button class="nav-btn" data-section="admins" id="adminsNavBtn">👥 Администраторы</button>
+        </nav>
+        
         <!-- Контейнер чатов -->
-        <div class="chats-container">
+        <div class="chats-container" id="chatsSection">
             <div class="chats-header">
                 <h2 class="chats-title">📱 Доступные чаты</h2>
             </div>
             
             <div id="chatsContent">
                 <div class="loading">Загрузка чатов...</div>
+            </div>
+        </div>
+        
+        <!-- Контейнер администраторов -->
+        <div class="admins-container" id="adminsSection" style="display: none;">
+            <div class="admins-header">
+                <h2 class="admins-title">👥 Администраторы</h2>
+                <button class="add-admin-btn" id="addAdminBtn">+ Добавить администратора</button>
+            </div>
+            
+            <div id="adminsContent">
+                <div class="loading">Загрузка администраторов...</div>
             </div>
         </div>
     </div>
@@ -494,6 +741,39 @@
             return msg;
         }
 
+        // Навигация
+        function switchSection(sectionName) {
+            const sections = ['chats', 'admins'];
+            const navBtns = document.querySelectorAll('.nav-btn');
+            
+            sections.forEach(section => {
+                const sectionEl = document.getElementById(section + 'Section');
+                if (sectionEl) {
+                    sectionEl.style.display = section === sectionName ? 'block' : 'none';
+                }
+            });
+            
+            navBtns.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.section === sectionName);
+            });
+            
+            if (sectionName === 'admins') {
+                loadAdmins();
+            } else if (sectionName === 'chats') {
+                loadChats();
+            }
+        }
+
+        // Обработчики навигации
+        document.addEventListener('DOMContentLoaded', () => {
+            const navBtns = document.querySelectorAll('.nav-btn');
+            navBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    switchSection(btn.dataset.section);
+                });
+            });
+        });
+
         updateUserProfile();
 
         // Функции для работы с чатами
@@ -558,12 +838,7 @@
             card.className = 'chat-card';
             card.onclick = () => openChat(chat.chat_id);
 
-            // Создаем аватарку
             const chatInitial = chat.chat_title ? chat.chat_title.charAt(0).toUpperCase() : '?';
-            
-            console.log('Creating chat card for:', chat);
-            console.log('Chat initial:', chatInitial);
-            console.log('Chat photo URL:', chat.chat_photo_url);
             
             card.innerHTML = `
                 <div class="chat-header">
@@ -585,8 +860,166 @@
         }
 
         function openChat(chatId) {
-            // Переходим на страницу управления чатом
             window.location.href = `/chat-admin.html?chat_id=${chatId}`;
+        }
+
+        // Функции для работы с администраторами
+        async function loadAdmins() {
+            const adminsContent = document.getElementById('adminsContent');
+            
+            try {
+                const response = await fetch('https://ezh-dev.ru:3000/api/admins', {
+                    method: 'GET',
+                    headers: {
+                        'X-Telegram-Init-Data': window.Telegram?.WebApp?.initData || ''
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                displayAdmins(data.admins || []);
+
+            } catch (error) {
+                console.error('Error loading admins:', error);
+                adminsContent.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👥</div>
+                        <div class="empty-state-text">Не удалось загрузить администраторов</div>
+                        <div class="empty-state-subtext">${mapErrorToRu(error.message)}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function displayAdmins(admins) {
+            const adminsContent = document.getElementById('adminsContent');
+            
+            if (!admins || admins.length === 0) {
+                adminsContent.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👥</div>
+                        <div class="empty-state-text">Нет администраторов</div>
+                        <div class="empty-state-subtext">Добавьте первого администратора с помощью кнопки выше</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const adminsGrid = document.createElement('div');
+            adminsGrid.className = 'admins-grid';
+
+            admins.forEach(admin => {
+                const adminCard = createAdminCard(admin);
+                adminsGrid.appendChild(adminCard);
+            });
+
+            adminsContent.innerHTML = '';
+            adminsContent.appendChild(adminsGrid);
+        }
+
+        function createAdminCard(admin) {
+            const card = document.createElement('div');
+            card.className = 'admin-card';
+
+            const adminInitial = 'A';
+            const statusClass = admin.is_active ? 'active' : 'inactive';
+            const statusText = admin.is_active ? 'Активен' : 'Неактивен';
+            
+            card.innerHTML = `
+                <div class="admin-header">
+                    <div class="admin-avatar">${adminInitial}</div>
+                    <div class="admin-info">
+                        <div class="admin-name">Admin ID: ${admin.user_id}</div>
+                        <div class="admin-id">Роль: ${admin.role}</div>
+                    </div>
+                    <div class="admin-status ${statusClass}">${statusText}</div>
+                </div>
+                <div class="admin-permissions">
+                    <div class="permissions-title">Права:</div>
+                    <div class="permission-tags">
+                        ${admin.permissions.map(perm => `<span class="permission-tag">${perm}</span>`).join('')}
+                    </div>
+                </div>
+                <div class="admin-actions">
+                    <button class="admin-btn edit-btn" onclick="editAdmin(${admin.id})">Редактировать</button>
+                    <button class="admin-btn delete-btn" onclick="deleteAdmin(${admin.id})">Удалить</button>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function editAdmin(adminId) {
+            // TODO: Реализовать модальное окно редактирования
+            alert('Редактирование администратора ID: ' + adminId);
+        }
+
+        async function deleteAdmin(adminId) {
+            if (!confirm('Вы уверены, что хотите удалить этого администратора?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`https://ezh-dev.ru:3000/api/admins/${adminId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-Telegram-Init-Data': window.Telegram?.WebApp?.initData || ''
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                alert(data.message);
+                loadAdmins(); // Перезагружаем список
+
+            } catch (error) {
+                console.error('Error deleting admin:', error);
+                showError(mapErrorToRu(error.message));
+            }
+        }
+
+        // Добавление администратора
+        document.getElementById('addAdminBtn').addEventListener('click', () => {
+            // TODO: Реализовать модальное окно добавления
+            const userId = prompt('Введите ID пользователя Telegram:');
+            if (!userId) return;
+
+            // Временно добавляем с базовыми правами
+            addAdmin(parseInt(userId), ['access_admin_panel']);
+        });
+
+        async function addAdmin(userId, permissions) {
+            try {
+                const response = await fetch('https://ezh-dev.ru:3000/api/admins', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Telegram-Init-Data': window.Telegram?.WebApp?.initData || ''
+                    },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        permissions: permissions
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                alert(data.message);
+                loadAdmins(); // Перезагружаем список
+
+            } catch (error) {
+                console.error('Error adding admin:', error);
+                showError(mapErrorToRu(error.message));
+            }
         }
 
         // Загружаем чаты при инициализации
