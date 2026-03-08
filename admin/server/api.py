@@ -113,44 +113,6 @@ async def get_admin_chats(request: Request, current_user: dict = Depends(verify_
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/chats/{chat_id}/add")
-async def add_chat_to_admin(chat_id: int, request: Request, current_user: dict = Depends(verify_admin)):
-    """Добавление чата в список доступных админу"""
-    try:
-        # Получаем информацию о чате из основной БД
-        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        chat_db_path = os.path.join(base_dir, 'databases', f'{-chat_id}.db')
-        
-        if not os.path.exists(chat_db_path):
-            raise HTTPException(status_code=404, detail="Chat database not found")
-        
-        conn = sqlite3.connect(chat_db_path)
-        cursor = conn.cursor()
-        
-        cursor.execute('SELECT COUNT(*) FROM users')
-        member_count = cursor.fetchone()[0]
-        
-        conn.close()
-        
-        # Добавляем в админскую таблицу
-        admin_db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'databases', 'admin.db')
-        admin_conn = sqlite3.connect(admin_db_path)
-        cursor = admin_conn.cursor()
-        
-        cursor.execute('''
-            INSERT OR REPLACE INTO admin_chats 
-            (chat_id, chat_title, member_count, last_activity)
-            VALUES (?, ?, ?, ?)
-        ''', (chat_id, f"Chat {chat_id}", member_count, datetime.now().isoformat()))
-        
-        admin_conn.commit()
-        admin_conn.close()
-        
-        return {'status': 'success'}
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
 # Раздача статики
 import os
 static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'client')

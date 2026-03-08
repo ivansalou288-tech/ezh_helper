@@ -5,6 +5,7 @@ import asyncio
 import random
 import string
 import html
+from datetime import datetime
 from config3 import *
 from aiogram.utils.markdown import hlink
 import sys
@@ -3537,6 +3538,103 @@ async def shedul_posting(message, bot: Bot):
                 await bot.send_message(chat_id=-1003101400599, text=sunday)
             if datetime.today().weekday() == 0:
                 await bot.send_message(chat_id=-1003101400599, text=monday)
+
+#? EN: Command for chat owners to bind their chat to admin panel
+#* RU: Команда для владельцев чатов для привязки чата к админ-панели
+@router.message(F.text.lower().startswith('!привязать'))
+async def bind_chat_to_admin(message: types.Message, bot: Bot):
+    """Привязывает чат к админ-панели для владельца чата"""
+    
+    # Проверяем, что команда используется в групповом чате
+    if message.chat.id == message.from_user.id:
+        await message.answer('❌ Эта команда работает только в групповых чатах!')
+        return
+    
+    # Проверяем, что чат в списке разрешенных
+    if message.chat.id not in chats:
+        await message.answer('❌ Этот чат не поддерживается!')
+        return
+    
+    try:
+        # Получаем информацию о пользователе в чате
+        chat_member = await bot.get_chat_member(message.chat.id, message.from_user.id)
+        
+        # Проверяем, что пользователь является владельцем
+        if chat_member.status != ChatMemberStatus.CREATOR:
+            await message.answer('❌ Только владелец чата может использовать эту команду!')
+            return
+        
+        # Добавляем чат в админскую базу данных
+        admin_db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'databases', 'admin.db')
+        
+        # Получаем информацию о чате
+        chat_info = await bot.get_chat(message.chat.id)
+        chat_title = chat_info.title or f"Chat {message.chat.id}"
+        chat_username = chat_info.username
+        
+        # Получаем количество пользователей
+        connection = sqlite3.connect(get_db_path(message.chat.id), check_same_thread=False)
+        cursor = connection.cursor()
+        
+        try:
+            cursor.execute('SELECT COUNT(*) FROM users')
+            member_count = cursor.fetchone()[0]
+        except:
+            member_count = 0
+        finally:
+            connection.close()
+        
+        # Подключаемся к админской базе данных
+        admin_conn = sqlite3.connect(admin_db_path)
+        admin_cursor = admin_conn.cursor()
+        
+        # Создаем таблицу если не существует
+        admin_cursor.execute('''
+            CREATE TABLE IF NOT EXISTS admin_chats (
+                chat_id INTEGER PRIMARY KEY,
+                chat_title TEXT NOT NULL,
+                chat_username TEXT,
+                member_count INTEGER DEFAULT 0,
+                last_activity TEXT,
+                is_active BOOLEAN DEFAULT 1,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # Добавляем или обновляем чат
+        admin_cursor.execute('''
+            INSERT OR REPLACE INTO admin_chats 
+            (chat_id, chat_title, chat_username, member_count, last_activity)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (message.chat.id, chat_title, chat_username, member_count, datetime.now().isoformat()))
+        
+        admin_conn.commit()
+        admin_conn.close()
+        
+        # Добавляем владельца в таблицу пользователей с абсолютными правами
+        connection = sqlite3.connect(get_db_path(message.chat.id), check_same_thread=False)
+        cursor = connection.cursor()
+        
+        # Устанавливаем максимальный ранг (абсолютные права)
+        cursor.execute('''
+            INSERT OR REPLACE INTO users (tg_id, username, name, age, nik_pubg, id_pubg, rang)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (message.from_user.id, message.from_user.username or '', 
+              message.from_user.first_name or 'Admin', 99, 'Admin', 999999, 999))
+        
+        connection.commit()
+        connection.close()
+        
+        await message.answer(
+            f'✅ Чат "{chat_title}" успешно привязан к админ-панели!\n'
+            f'👤 Владелец: {message.from_user.first_name}\n'
+            f'🔗 Теперь вы можете управлять чатом через админ-панель\n'
+            f'📊 Участников в базе: {member_count}'
+        )
+        
+    except Exception as e:
+        print(f"Error in bind_chat_to_admin: {e}")
+        await message.answer('❌ Произошла ошибка при привязке чата. Попробуйте позже.')
 
 async def main() -> None:
     try:

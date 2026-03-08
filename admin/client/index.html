@@ -363,7 +363,6 @@
         <div class="chats-container">
             <div class="chats-header">
                 <h2 class="chats-title">📱 Доступные чаты</h2>
-                <button class="add-chat-btn" onclick="addNewChat()">+ Добавить чат</button>
             </div>
             
             <div id="chatsContent">
@@ -566,41 +565,6 @@
             // Здесь можно добавить логику перехода к управлению чатом
             console.log('Open chat:', chatId);
             showError('Функция управления чатом будет доступна в следующем обновлении');
-        }
-
-        async function addNewChat() {
-            const chatId = prompt('Введите ID чата для добавления:');
-            
-            if (!chatId || isNaN(chatId)) {
-                showError('Пожалуйста, введите корректный ID чата');
-                return;
-            }
-
-            try {
-                const response = await fetch(`https://ezh-dev.ru:3000/api/chats/${parseInt(chatId)}/add`, {
-                    method: 'POST',
-                    headers: {
-                        'X-Telegram-Init-Data': window.Telegram?.WebApp?.initData || ''
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    // Перезагружаем список чатов
-                    loadChats();
-                } else {
-                    throw new Error(result.message || 'Неизвестная ошибка');
-                }
-
-            } catch (error) {
-                console.error('Error adding chat:', error);
-                showError(mapErrorToRu(error.message));
-            }
         }
 
         // Загружаем чаты при инициализации
