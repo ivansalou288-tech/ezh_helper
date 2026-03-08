@@ -3457,59 +3457,6 @@ async def set_period(message):
         await message.reply(f'{write_em} Произошла ошибка: {str(e)}')
 
 
-@router.message()
-async def get_username(message: types.Message, bot: Bot):
-    global is_auto_unmute
-    global is_quests
-    username = message.from_user.username
-    user_id = int(message.from_user.id)
-    # print(user_id, username, message.text)
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        await bot.send_message(chat_id=1240656726,text= f'{message.from_user.username} | {message.text} | {message.chat.title}')
-        return
-    
-    # Initialize database for this chat if it doesn't exist
-    init_chat_db(message.chat.id)
-    
-    try:
-        connection = sqlite3.connect(get_db_path(message.chat.id), check_same_thread=False)
-        cursor = connection.cursor()
-        
-        # Update user data in the current chat's database
-        now = datetime.now().strftime("%H:%M:%S %d.%m.%Y")
-        cursor.execute('UPDATE users SET username = ?, last_date = ?, mess_count = mess_count+1 WHERE tg_id = ?', 
-                      (username, now, user_id))
-        connection.commit()
-        
-        # Update chat member count in the current chat's database
-        chat_mem = await bot.get_chat_member_count(chat_id=message.chat.id)
-        try:
-            cursor.execute('INSERT INTO count_users (chat_id, count) VALUES (?, ?)', (message.chat.id, chat_mem))
-        except sqlite3.IntegrityError:
-            cursor.execute('UPDATE count_users SET count = ? WHERE chat_id = ?', (chat_mem, message.chat.id))
-        connection.commit()
-        
-    except sqlite3.OperationalError:
-        pass
-    finally:
-        if 'connection' in locals():
-            connection.close()
-    
-    # Note: The old centralized tables like [{-(sost_1)}], [{-(klan)}], [{-(sost_2)}], [1003101400599}, all_users
-    # are not part of the new per-chat database structure. These would need to be handled differently
-    # if they are still required for the application's functionality.
-    
-    if is_auto_unmute == False:
-        print('auto_unmute')
-        await auto_unmute(message, bot)
-    # if is_quests == False:
-    #     print('quests')
-        # await quests_funk(message, bot)
-    if posting == False:
-        print('posting')
-        await shedul_posting(message, bot)
-    return username
 
 
 async def shedul_posting(message, bot: Bot):
@@ -3635,6 +3582,63 @@ async def bind_chat_to_admin(message: types.Message, bot: Bot):
     except Exception as e:
         print(f"Error in bind_chat_to_admin: {e}")
         await message.answer('❌ Произошла ошибка при привязке чата. Попробуйте позже.')
+
+
+@router.message()
+async def get_username(message: types.Message, bot: Bot):
+    global is_auto_unmute
+    global is_quests
+    username = message.from_user.username
+    user_id = int(message.from_user.id)
+    # print(user_id, username, message.text)
+    if message.chat.id not in chats:
+        await message.answer('кыш')
+        await bot.send_message(chat_id=1240656726,text= f'{message.from_user.username} | {message.text} | {message.chat.title}')
+        return
+    
+    # Initialize database for this chat if it doesn't exist
+    init_chat_db(message.chat.id)
+    
+    try:
+        connection = sqlite3.connect(get_db_path(message.chat.id), check_same_thread=False)
+        cursor = connection.cursor()
+        
+        # Update user data in the current chat's database
+        now = datetime.now().strftime("%H:%M:%S %d.%m.%Y")
+        cursor.execute('UPDATE users SET username = ?, last_date = ?, mess_count = mess_count+1 WHERE tg_id = ?', 
+                      (username, now, user_id))
+        connection.commit()
+        
+        # Update chat member count in the current chat's database
+        chat_mem = await bot.get_chat_member_count(chat_id=message.chat.id)
+        try:
+            cursor.execute('INSERT INTO count_users (chat_id, count) VALUES (?, ?)', (message.chat.id, chat_mem))
+        except sqlite3.IntegrityError:
+            cursor.execute('UPDATE count_users SET count = ? WHERE chat_id = ?', (chat_mem, message.chat.id))
+        connection.commit()
+        
+    except sqlite3.OperationalError:
+        pass
+    finally:
+        if 'connection' in locals():
+            connection.close()
+    
+    # Note: The old centralized tables like [{-(sost_1)}], [{-(klan)}], [{-(sost_2)}], [1003101400599}, all_users
+    # are not part of the new per-chat database structure. These would need to be handled differently
+    # if they are still required for the application's functionality.
+    
+    if is_auto_unmute == False:
+        print('auto_unmute')
+        await auto_unmute(message, bot)
+    # if is_quests == False:
+    #     print('quests')
+        # await quests_funk(message, bot)
+    if posting == False:
+        print('posting')
+        await shedul_posting(message, bot)
+    return username
+
+
 
 async def main() -> None:
     try:
