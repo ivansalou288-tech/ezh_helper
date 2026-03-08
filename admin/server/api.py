@@ -100,17 +100,28 @@ async def verify_admin(request: Request):
     try:
         # Получаем данные из Telegram WebApp init data
         init_data = request.headers.get('X-Telegram-Init-Data', '')
+        print(f"DEBUG: Init data received: {init_data[:100]}...")  # Отладка
+        
         if init_data:
             # Простая проверка (в реальном приложении нужна валидация подписи)
             for param in init_data.split('&'):
                 if param.startswith('user='):
-                    user_data = json.loads(param[5:].replace('%22', '"').replace('%20', ' '))
+                    user_json = param[5:]
+                    # Декодируем URL-encoded данные
+                    import urllib.parse
+                    user_json = urllib.parse.unquote(user_json)
+                    print(f"DEBUG: User JSON: {user_json}")  # Отладка
+                    user_data = json.loads(user_json)
                     break
-    except:
+    except Exception as e:
+        print(f"DEBUG: Error parsing init data: {e}")  # Отладка
         pass
     
     if not user_data:
-        raise HTTPException(status_code=403, detail="Access denied")
+        print("DEBUG: No user data found")  # Отладка
+        raise HTTPException(status_code=403, detail="Access denied - no user data")
+    
+    print(f"DEBUG: User authenticated: {user_data.get('id')}")  # Отладка
     
     # Разрешаем доступ всем авторизованным пользователям к списку чатов
     # Управление администраторами чатов будет проверяться отдельно
@@ -126,19 +137,31 @@ async def verify_chat_admin(chat_id: int, request: Request):
     try:
         # Получаем данные из Telegram WebApp init data
         init_data = request.headers.get('X-Telegram-Init-Data', '')
+        print(f"DEBUG: Chat admin init data: {init_data[:100]}...")  # Отладка
+        
         if init_data:
             for param in init_data.split('&'):
                 if param.startswith('user='):
-                    user_data = json.loads(param[5:].replace('%22', '"').replace('%20', ' '))
+                    user_json = param[5:]
+                    # Декодируем URL-encoded данные
+                    import urllib.parse
+                    user_json = urllib.parse.unquote(user_json)
+                    print(f"DEBUG: Chat admin user JSON: {user_json}")  # Отладка
+                    user_data = json.loads(user_json)
                     break
-    except:
+    except Exception as e:
+        print(f"DEBUG: Error parsing chat admin init data: {e}")  # Отладка
         pass
     
     if not user_data:
+        print("DEBUG: No user data found for chat admin")  # Отладка
         raise HTTPException(status_code=403, detail="Access denied")
+    
+    print(f"DEBUG: Chat admin user: {user_data.get('id')} for chat {chat_id}")  # Отладка
     
     # Супер-админ может управлять любыми чатами
     if user_data['id'] == 817325514:
+        print("DEBUG: Super admin access granted")  # Отладка
         return {
             'id': user_data['id'],
             'first_name': user_data.get('first_name', 'Admin'),
@@ -159,9 +182,11 @@ async def verify_chat_admin(chat_id: int, request: Request):
     ''', (chat_id, user_data['id']))
     
     admin_data = cursor.fetchone()
+    print(f"DEBUG: Chat admin query result: {admin_data}")  # Отладка
     
     if not admin_data or not admin_data[2]:
         conn.close()
+        print("DEBUG: User is not admin or not active")  # Отладка
         raise HTTPException(status_code=403, detail="Access denied")
     
     # Получаем права администратора чата
@@ -172,6 +197,8 @@ async def verify_chat_admin(chat_id: int, request: Request):
     
     permissions = [row[0] for row in cursor.fetchall()]
     conn.close()
+    
+    print(f"DEBUG: User permissions: {permissions}")  # Отладка
     
     return {
         'id': user_data['id'],
