@@ -198,23 +198,24 @@
 
         .chats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 25px;
+            grid-template-columns: 1fr; /* Одна колонка для мобильных */
+            gap: 15px;
             margin-bottom: 30px;
+            padding: 0 10px;
         }
 
         .chat-card {
             background: linear-gradient(135deg, rgba(15, 15, 35, 0.9), rgba(25, 25, 55, 0.8));
-            border: 1px solid rgba(0, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 25px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 15px 20px;
             backdrop-filter: blur(15px);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
             cursor: pointer;
             position: relative;
             overflow: hidden;
             box-shadow: 
-                0 8px 32px rgba(0, 255, 255, 0.1),
+                0 4px 20px rgba(0, 255, 255, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
 
@@ -227,9 +228,9 @@
             height: 100%;
             background: linear-gradient(90deg, 
                 transparent, 
-                rgba(0, 255, 255, 0.2), 
+                rgba(0, 255, 255, 0.15), 
                 transparent);
-            transition: left 0.6s ease;
+            transition: left 0.5s ease;
         }
 
         .chat-card:hover::before {
@@ -238,23 +239,23 @@
 
         .chat-card:hover {
             background: linear-gradient(135deg, rgba(20, 20, 45, 0.95), rgba(35, 35, 75, 0.9));
-            border-color: rgba(0, 255, 255, 0.6);
-            transform: translateY(-5px) scale(1.02);
+            border-color: rgba(0, 255, 255, 0.4);
+            transform: translateY(-2px);
             box-shadow: 
-                0 15px 45px rgba(0, 255, 255, 0.25),
-                0 0 30px rgba(0, 255, 255, 0.15),
+                0 8px 30px rgba(0, 255, 255, 0.2),
+                0 0 20px rgba(0, 255, 255, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         .chat-header {
             display: flex;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 0; /* Убираем отступ */
         }
 
         .chat-avatar {
-            width: 60px !important;
-            height: 60px !important;
+            width: 45px !important;
+            height: 45px !important;
             border-radius: 50% !important;
             background: linear-gradient(135deg, #00ffff, #0080ff) !important;
             display: flex !important;
@@ -262,11 +263,11 @@
             justify-content: center !important;
             color: white !important;
             font-weight: 700 !important;
-            font-size: 1.4em !important;
-            margin-right: 20px !important;
+            font-size: 1.2em !important;
+            margin-right: 15px !important;
             box-shadow: 
-                0 0 20px rgba(0, 255, 255, 0.5),
-                0 4px 15px rgba(0, 128, 255, 0.3) !important;
+                0 0 15px rgba(0, 255, 255, 0.4),
+                0 3px 10px rgba(0, 128, 255, 0.3) !important;
             position: relative !important;
             overflow: hidden !important;
             flex-shrink: 0 !important;
@@ -302,18 +303,18 @@
         }
 
         .chat-title {
-            font-size: 1.3em;
-            font-weight: 700;
+            font-size: 1.1em;
+            font-weight: 600;
             color: #ffffff;
-            margin-bottom: 8px;
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+            letter-spacing: 0.3px;
         }
 
         .chat-username {
-            color: rgba(0, 255, 255, 0.7);
-            font-size: 0.95em;
-            font-weight: 500;
+            color: rgba(0, 255, 255, 0.6);
+            font-size: 0.85em;
+            font-weight: 400;
         }
 
         .chat-stats {
