@@ -560,11 +560,7 @@
             card.innerHTML = `
                 <div class="chat-header">
                     <div class="chat-avatar">
-                        ${chat.chat_username ? 
-                            `<img src="https://api.telegram.org/file/bot8451829699:AAE_tfApKWq3r82i0U7yD98RCcQPIMmMT1Q/${getChatPhotoUrl(chat.chat_username)}" 
-                                 onerror="this.style.display='none'; this.parentElement.innerHTML='${chatInitial}'" 
-                                 alt="${chat.chat_title}">` : 
-                            chatInitial}
+                        ${chatInitial}
                     </div>
                     <div class="chat-info">
                         <div class="chat-title">${chat.chat_title}</div>
@@ -576,12 +572,6 @@
             return card;
         }
 
-        function getChatPhotoUrl(username) {
-            // В реальном приложении здесь будет логика получения URL фото чата
-            // Пока возвращаем заглушку
-            return '';
-        }
-
         function openChat(chatId) {
             // Переходим на страницу управления чатом
             window.location.href = `/chat-admin.html?chat_id=${chatId}`;
@@ -591,6 +581,12 @@
         document.addEventListener('DOMContentLoaded', () => {
             if (window.Telegram?.WebApp) {
                 loadChats();
+                
+                // Скрываем кнопку "Назад" на главной странице
+                const tg = window.Telegram?.WebApp;
+                if (tg && tg.BackButton) {
+                    tg.BackButton.hide();
+                }
             } else {
                 // Если Telegram WebApp недоступен, все равно пробуем загрузить
                 setTimeout(loadChats, 1000);
