@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎰 Модуль Kasik (Казино) - Полное руководство для разработчиков</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .breadcrumb {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .content h1 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .content h2 {
+            color: #764ba2;
+            font-size: 1.6em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+
+        .content h3 {
+            color: #667eea;
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .content h4 {
+            color: #764ba2;
+            font-size: 1.1em;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        .content p {
+            line-height: 1.8;
+            margin: 15px 0;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin: 15px 0;
+            margin-left: 30px;
+            line-height: 1.8;
+        }
+
+        .content li {
+            margin: 8px 0;
+            color: #444;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+            font-size: 0.95em;
+        }
+
+        .content pre {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .content pre code {
+            color: #333;
+            padding: 0;
+            background: none;
+            font-size: 0.9em;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 20px;
+            margin: 20px 0;
+            color: #666;
+            font-style: italic;
+        }
+
+        .content a {
+            color: #667eea;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .content a:hover {
+            border-bottom-color: #667eea;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .content table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .content table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+        }
+
+        .content table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .content hr {
+            border: none;
+            border-top: 2px solid #667eea;
+            margin: 30px 0;
+        }
+
+        .content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+            justify-content: space-between;
+        }
+
+        .nav-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .nav-button:hover {
+            background: #764ba2;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-button.prev {
+            margin-right: auto;
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+            }
+
+            .nav-button.prev {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎰 Модуль Kasik (Казино) - Полное руководство для разработчиков</h1>
+            <p style="opacity: 0.9; font-size: 1.1em;">Chat Manager Bot - Документация</p>
+        </header>
+
+        <div class="breadcrumb">
+            <a href="../html/index.html">🏠 Главная</a> / 
+            <a href="../html/index_site.html">📖 Документация</a> / 
+            <span>🎰 Модуль Kasik (Казино) - Полное руководство для разработчиков</span>
+        </div>
+
+        <div class="content">
+            
+<p><strong>Версия:</strong> 1.0<br />
+<strong>Дата:</strong> 20.12.2025<br />
+<strong>Статус:</strong> ✅ Готово к production<br />
+<strong>Язык:</strong> Python 3.10+  </p>
+<hr />
+<h2>📖 Обзор</h2>
+<p>Модуль Kasik (<code>modules/kasik.py</code>) реализует полнофункциональное казино с игровыми автоматами (слотами). Пользователи ставят коины из фармы и пытаются выиграть. Система включает кулдаун 15 минут, проверку баланса и анимированные результаты.</p>
+<h3>Основные возможности</h3>
+<p>✅ <strong>Выбор ставки</strong> - интерактивное меню с разными размерами ставок<br />
+✅ <strong>Кулдаун 15 минут</strong> - защита от спама<br />
+✅ <strong>Проверка баланса</strong> - автоматическая проверка наличия коинов<br />
+✅ <strong>Слот-машины</strong> - 3 барабана с символами<br />
+✅ <strong>Анимированные результаты</strong> - визуальное отображение вращения<br />
+✅ <strong>Мультипликаторы</strong> - разные выигрыши за разные комбинации<br />
+✅ <strong>История ставок</strong> - сохранение результатов в БД  </p>
+<hr />
+<h2>🎯 Основной обработчик</h2>
+<h3>kasik()</h3>
+<p>Основная функция для открытия интерфейса казино.</p>
+<pre class="codehilite"><code class="language-python">@dp.message_handler(Text(startswith=['! казик', '!казик'], ignore_case=True))
+async def kasik(message: types.Message):
+    &quot;&quot;&quot;
+    Открывает интерфейс казино с выбором ставки
+    &quot;&quot;&quot;
+</code></pre>
+
+<p><strong>Срабатывает когда:</strong>
+- Пользователь напишет <code>!казик</code> или <code>! казик</code></p>
+<p><strong>Логика:</strong>
+1. Проверяет, что это групповой чат
+2. Проверяет кулдаун (15 минут с последней ставки)
+3. Получает баланс мешка пользователя
+4. Открывает меню выбора ставки
+5. Пользователь выбирает размер ставки (в диапазоне от 10 до его баланса)
+6. После выбора ставки вращаются слоты
+7. Определяется результат и передаются коины</p>
+<hr />
+<h2>📊 Структура базы данных</h2>
+<h3>Таблица <code>stavki</code> (в kasik.db)</h3>
+<pre class="codehilite"><code class="language-sql">CREATE TABLE IF NOT EXISTS stavki (
+    user_id INTEGER PRIMARY KEY,
+    last_date TEXT
+)
+</code></pre>
+
+<h3>Таблица <code>kasik_history</code> (опционально)</h3>
+<pre class="codehilite"><code class="language-sql">CREATE TABLE IF NOT EXISTS kasik_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    chat_id INTEGER NOT NULL,
+    stake INTEGER NOT NULL,
+    result TEXT NOT NULL,
+    winnings INTEGER NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+</code></pre>
+
+<hr />
+<h2>💻 Примеры использования</h2>
+<h3>Пример 1: Проверка кулдауна казино</h3>
+<pre class="codehilite"><code class="language-python">def can_play_kasik(user_id: int, db_path: str) -&gt; tuple[bool, str]:
+    &quot;&quot;&quot;Проверяет, может ли пользователь играть в казино&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    try:
+        last_date_str = cursor.execute(
+            &quot;SELECT last_date FROM stavki WHERE user_id = ?&quot;,
+            (user_id,)
+        ).fetchone()[0]
+
+        last_date = datetime.strptime(last_date_str, &quot;%H:%M:%S %d.%m.%Y&quot;)
+        now = datetime.now()
+        delta = now - last_date
+
+        if delta &gt;= timedelta(minutes=15):
+            return True, &quot;Можете играть&quot;
+        else:
+            remaining = timedelta(minutes=15) - delta
+            minutes = remaining.seconds // 60
+            seconds = remaining.seconds % 60
+            return False, f&quot;Подождите {minutes}:{seconds:02d}&quot;
+    except (IndexError, TypeError):
+        return True, &quot;Первая ставка&quot;
+    finally:
+        connection.close()
+</code></pre>
+
+<h3>Пример 2: Обработка результата слотов</h3>
+<pre class="codehilite"><code class="language-python">SLOT_SYMBOLS = {
+    &quot;🍊&quot;: 10,
+    &quot;🍋&quot;: 20,
+    &quot;🍒&quot;: 30,
+    &quot;⭐&quot;: 50,
+    &quot;💎&quot;: 100
+}
+
+def generate_slot_result() -&gt; tuple[str, str, str, int]:
+    &quot;&quot;&quot;Генерирует результат слотов&quot;&quot;&quot;
+    symbols = list(SLOT_SYMBOLS.keys())
+
+    slot1 = random.choice(symbols)
+    slot2 = random.choice(symbols)
+    slot3 = random.choice(symbols)
+
+    # Расчёт выигрыша
+    if slot1 == slot2 == slot3:
+        # Все три символа совпадают - большой выигрыш
+        multiplier = 10
+    elif slot1 == slot2 or slot2 == slot3:
+        # Два символа совпадают
+        multiplier = 3
+    else:
+        # Нет совпадений
+        multiplier = 0
+
+    return slot1, slot2, slot3, multiplier
+
+# Использование
+slot1, slot2, slot3, multiplier = generate_slot_result()
+print(f&quot;Результат: {slot1} {slot2} {slot3}&quot;)
+print(f&quot;Множитель: {multiplier}x&quot;)
+
+stake = 100
+winnings = stake * multiplier
+print(f&quot;Выигрыш: {winnings} коинов&quot;)
+</code></pre>
+
+<h3>Пример 3: Сохранение результата ставки</h3>
+<pre class="codehilite"><code class="language-python">def save_kasik_result(user_id: int, chat_id: int, stake: int, 
+                      result: str, winnings: int, db_path: str) -&gt; bool:
+    &quot;&quot;&quot;Сохраняет результат ставки в историю&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS kasik_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                chat_id INTEGER NOT NULL,
+                stake INTEGER NOT NULL,
+                result TEXT NOT NULL,
+                winnings INTEGER NOT NULL,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+
+        cursor.execute(
+            '''INSERT INTO kasik_history (user_id, chat_id, stake, result, winnings)
+               VALUES (?, ?, ?, ?, ?)''',
+            (user_id, chat_id, stake, result, winnings)
+        )
+
+        # Обновляем дату последней ставки
+        cursor.execute(
+            &quot;INSERT OR REPLACE INTO stavki (user_id, last_date) VALUES (?, ?)&quot;,
+            (user_id, datetime.now().strftime(&quot;%H:%M:%S %d.%m.%Y&quot;))
+        )
+
+        connection.commit()
+        return True
+    except Exception as e:
+        print(f&quot;Ошибка: {e}&quot;)
+        return False
+    finally:
+        connection.close()
+</code></pre>
+
+<h3>Пример 4: Получение статистики казино</h3>
+<pre class="codehilite"><code class="language-python">def get_kasik_stats(user_id: int, db_path: str) -&gt; dict:
+    &quot;&quot;&quot;Получает статистику игрока в казино&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    try:
+        # Всего ставок
+        total_bets = cursor.execute(
+            &quot;SELECT COUNT(*) FROM kasik_history WHERE user_id = ?&quot;,
+            (user_id,)
+        ).fetchone()[0]
+
+        # Всего поставлено
+        total_staked = cursor.execute(
+            &quot;SELECT SUM(stake) FROM kasik_history WHERE user_id = ?&quot;,
+            (user_id,)
+        ).fetchone()[0] or 0
+
+        # Всего выиграно
+        total_winnings = cursor.execute(
+            &quot;SELECT SUM(winnings) FROM kasik_history WHERE user_id = ?&quot;,
+            (user_id,)
+        ).fetchone()[0] or 0
+
+        # Баланс
+        balance = total_winnings - total_staked
+
+        return {
+            &quot;total_bets&quot;: total_bets,
+            &quot;total_staked&quot;: total_staked,
+            &quot;total_winnings&quot;: total_winnings,
+            &quot;balance&quot;: balance,
+            &quot;roi&quot;: (balance / total_staked * 100) if total_staked &gt; 0 else 0
+        }
+    finally:
+        connection.close()
+
+# Использование
+stats = get_kasik_stats(123456, &quot;kasik.db&quot;)
+print(f&quot;Всего ставок: {stats['total_bets']}&quot;)
+print(f&quot;Выигрыш/проигрыш: {stats['balance']}&quot;)
+print(f&quot;ROI: {stats['roi']:.2f}%&quot;)
+</code></pre>
+
+<hr />
+<h2>🚀 Расширение функциональности</h2>
+<h3>Идея 1: Прогрессивный джекпот</h3>
+<pre class="codehilite"><code class="language-python">class ProgressiveJackpot:
+    def __init__(self, initial: int = 1000):
+        self.base_amount = initial
+        self.current = initial
+
+    def add_to_jackpot(self, amount: int):
+        &quot;&quot;&quot;Добавляет сумму в джекпот&quot;&quot;&quot;
+        self.current += amount
+
+    def win_jackpot(self) -&gt; int:
+        &quot;&quot;&quot;Выигрывает джекпот и сбрасывает&quot;&quot;&quot;
+        won = self.current
+        self.current = self.base_amount
+        return won
+
+    def get_jackpot(self) -&gt; int:
+        &quot;&quot;&quot;Получает текущий размер джекпота&quot;&quot;&quot;
+        return self.current
+
+# Использование
+jackpot = ProgressiveJackpot()
+jackpot.add_to_jackpot(100)  # Каждая ставка добавляет в джекпот
+if lucky:
+    won_amount = jackpot.win_jackpot()
+</code></pre>
+
+<h3>Идея 2: Бонус-раунды и мультипликаторы</h3>
+<pre class="codehilite"><code class="language-python">def calculate_bonus_multiplier(bet_count: int) -&gt; float:
+    &quot;&quot;&quot;Возвращает бонусный множитель за количество ставок подряд&quot;&quot;&quot;
+    if bet_count &lt; 5:
+        return 1.0
+    elif bet_count &lt; 10:
+        return 1.1  # +10%
+    elif bet_count &lt; 20:
+        return 1.2  # +20%
+    else:
+        return 1.3  # +30%
+
+# Использование
+multiplier = calculate_bonus_multiplier(15)
+final_winnings = int(base_winnings * multiplier)
+</code></pre>
+
+<h3>Идея 3: Система уровней и привилегий</h3>
+<pre class="codehilite"><code class="language-python">KASIK_LEVELS = {
+    1: {&quot;min_bets&quot;: 0, &quot;min_coins&quot;: 0, &quot;name&quot;: &quot;Новичок&quot;},
+    2: {&quot;min_bets&quot;: 10, &quot;min_coins&quot;: 100, &quot;name&quot;: &quot;Любитель&quot;},
+    3: {&quot;min_bets&quot;: 50, &quot;min_coins&quot;: 500, &quot;name&quot;: &quot;Профессионал&quot;},
+    4: {&quot;min_bets&quot;: 100, &quot;min_coins&quot;: 1000, &quot;name&quot;: &quot;Легенда&quot;},
+}
+
+def get_kasik_level(user_id: int, db_path: str) -&gt; tuple[int, dict]:
+    &quot;&quot;&quot;Определяет уровень игрока в казино&quot;&quot;&quot;
+    stats = get_kasik_stats(user_id, db_path)
+
+    for level_id in sorted(KASIK_LEVELS.keys(), reverse=True):
+        level_info = KASIK_LEVELS[level_id]
+        if stats['total_bets'] &gt;= level_info['min_bets']:
+            return level_id, level_info
+
+    return 1, KASIK_LEVELS[1]
+</code></pre>
+
+<hr />
+<h2>📝 Лицензия</h2>
+<p>Часть проекта WERTY | Chat-Manager Bot</p>
+<hr />
+<p><strong>Версия:</strong> 1.0<br />
+<strong>Разработано:</strong> GitHub Copilot<br />
+<strong>Последнее обновление:</strong> 20.12.2025</p>
+        </div>
+
+        <div class="content">
+            <div class="nav-buttons">
+                <a href="../html/index_site.html" class="nav-button prev">← Вернуться к документации</a>
+                <a href="../html/index.html" class="nav-button">На главную →</a>
+            </div>
+        </div>
+
+        <footer>
+            <p>Chat Manager Bot | Полная документация и структура проекта | Версия 2.0</p>
+            <p style="margin-top: 10px;">
+                <a href="../html/index.html">Главная</a> | 
+                <a href="../html/index_site.html">Документация</a> | 
+                <a href="../html/modules.html">Модули</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

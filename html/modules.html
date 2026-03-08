@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Manager Bot - Модули игры</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1em;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .module-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            border-left: 5px solid #667eea;
+        }
+
+        .module-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .module-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+        }
+
+        .module-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .module-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .module-file {
+            opacity: 0.9;
+            font-size: 0.9em;
+            font-family: monospace;
+        }
+
+        .module-body {
+            padding: 20px;
+        }
+
+        .module-desc {
+            font-size: 1em;
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .module-features {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .module-features h4 {
+            color: #667eea;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .feature-item {
+            font-size: 0.9em;
+            color: #555;
+            margin: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .feature-item:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .module-methods {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .module-methods h4 {
+            color: #667eea;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .method-item {
+            font-size: 0.85em;
+            color: #555;
+            margin: 5px 0;
+            font-family: monospace;
+            padding: 5px;
+            background: white;
+            border-radius: 3px;
+        }
+
+        .module-links {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .module-link {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .module-link:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .modules-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index_site.html" class="back-link">← Вернуться на главную</a>
+
+        <header>
+            <h1>🎮 Модули игры</h1>
+            <p class="subtitle">Полный справочник по игровым модулям Chat Manager Bot</p>
+        </header>
+
+        <div class="modules-grid">
+            <!-- BOOKMARKS -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">📌</div>
+                    <div class="module-name">Bookmarks</div>
+                    <div class="module-file">modules/bookmarks.py</div>
+                </div>
+                <div class="module-body">
+                    <div class="module-desc">Система сохранения сообщений в закладки. Пользователи могут сохранять важные сообщения и искать по ним.</div>
+                    <div class="module-features">
+                        <h4>Основные функции</h4>
+                        <div class="feature-item">Сохранение сообщений</div>
+                        <div class="feature-item">Просмотр закладок</div>
+                        <div class="feature-item">Поиск по тексту</div>
+                        <div class="feature-item">Удаление закладок</div>
+                    </div>
+                    <div class="module-methods">
+                        <h4>Методы</h4>
+                        <div class="method-item">add_bookmark(user_id, msg_id, text)</div>
+                        <div class="method-item">get_bookmarks(user_id)</div>
+                        <div class="method-item">delete_bookmark(bookmark_id)</div>
+                        <div class="method-item">search_bookmarks(user_id, query)</div>
+                    </div>
+                    <div class="module-links">
+                        <a href="../html/BOOKMARKS_FOR_DEVELOPERS.html" class="module-link">📖 Гайд</a>
+                        <a href="../modules/bookmarks.py" class="module-link">💻 Код</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FARM -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">🌾</div>
+                    <div class="module-name">Farm</div>
+                    <div class="module-file">modules/farm.py</div>
+                </div>
+                <div class="module-body">
+                    <div class="module-desc">Система заработка коинов. Пользователи получают коины каждые 4 часа и могут использовать их в играх.</div>
+                    <div class="module-features">
+                        <h4>Основные функции</h4>
+                        <div class="feature-item">Получение коинов (50-150)</div>
+                        <div class="feature-item">Проверка кулдауна</div>
+                        <div class="feature-item">Просмотр баланса</div>
+                        <div class="feature-item">История операций</div>
+                    </div>
+                    <div class="module-methods">
+                        <h4>Методы</h4>
+                        <div class="method-item">get_coins(user_id)</div>
+                        <div class="method-item">check_can_work(user_id)</div>
+                        <div class="method-item">get_user_coins(user_id)</div>
+                        <div class="method-item">add_coins(user_id, amount)</div>
+                    </div>
+                    <div class="module-links">
+                        <a href="../html/DEVELOPERS_GUIDE_FARM.html" class="module-link">📖 Гайд</a>
+                        <a href="../modules/farm.py" class="module-link">💻 Код</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CUBES -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">🎲</div>
+                    <div class="module-name">Cubes</div>
+                    <div class="module-file">modules/cubes.py</div>
+                </div>
+                <div class="module-body">
+                    <div class="module-desc">Дуэль на кубиках (PvP). Два игрока делают ставки и бросают кубик - выигрывает тот, у кого число больше.</div>
+                    <div class="module-features">
+                        <h4>Основные функции</h4>
+                        <div class="feature-item">Создание вызова</div>
+                        <div class="feature-item">Принятие вызова</div>
+                        <div class="feature-item">Бросание кубика</div>
+                        <div class="feature-item">История дуэлей</div>
+                    </div>
+                    <div class="module-methods">
+                        <h4>Методы</h4>
+                        <div class="method-item">create_duel(challenger, opponent, bet)</div>
+                        <div class="method-item">accept_duel(duel_id)</div>
+                        <div class="method-item">roll_dice(duel_id)</div>
+                        <div class="method-item">finish_duel(duel_id)</div>
+                    </div>
+                    <div class="module-links">
+                        <a href="../html/DEVELOPERS_GUIDE_CUBES.html" class="module-link">📖 Гайд</a>
+                        <a href="../modules/cubes.py" class="module-link">💻 Код</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KASIK -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">🎰</div>
+                    <div class="module-name">Kasik (Casino)</div>
+                    <div class="module-file">modules/kasik.py</div>
+                </div>
+                <div class="module-body">
+                    <div class="module-desc">Казино со слот-машинами. Игроки выбирают ставку и крутят барабаны - мультипликаторы до x100!</div>
+                    <div class="module-features">
+                        <h4>Основные функции</h4>
+                        <div class="feature-item">Выбор ставки (10-500)</div>
+                        <div class="feature-item">Крутка слотов</div>
+                        <div class="feature-item">Расчет выигрыша</div>
+                        <div class="feature-item">Статистика ставок</div>
+                    </div>
+                    <div class="module-methods">
+                        <h4>Методы</h4>
+                        <div class="method-item">play_slots(user_id, bet)</div>
+                        <div class="method-item">get_slot_result(symbols)</div>
+                        <div class="method-item">get_user_history(user_id)</div>
+                        <div class="method-item">calculate_multiplier(combo)</div>
+                    </div>
+                    <div class="module-links">
+                        <a href="../html/DEVELOPERS_GUIDE_KASIK.html" class="module-link">📖 Гайд</a>
+                        <a href="../modules/kasik.py" class="module-link">💻 Код</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GOLDEN ROULETTE -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">🎡</div>
+                    <div class="module-name">Golden Roulette</div>
+                    <div class="module-file">modules/golden_rulet.py</div>
+                </div>
+                <div class="module-body">
+                    <div class="module-desc">Золотая рулетка. Игрок делает ставку - либо удваивает коины, либо теряет всё. Система рейтинга везения!</div>
+                    <div class="module-features">
+                        <h4>Основные функции</h4>
+                        <div class="feature-item">Крутка рулетки</div>
+                        <div class="feature-item">Удвоение коинов</div>
+                        <div class="feature-item">Рейтинг везения</div>
+                        <div class="feature-item">Статистика</div>
+                    </div>
+                    <div class="module-methods">
+                        <h4>Методы</h4>
+                        <div class="method-item">spin_golden(user_id, bet)</div>
+                        <div class="method-item">calculate_odds(user_id)</div>
+                        <div class="method-item">update_luck_rating(user_id)</div>
+                        <div class="method-item">get_stats(user_id)</div>
+                    </div>
+                    <div class="module-links">
+                        <a href="../html/DEVELOPERS_GUIDE_ROULETTES.html" class="module-link">📖 Гайд</a>
+                        <a href="../modules/golden_rulet.py" class="module-link">💻 Код</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RUSSIAN ROULETTE -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">⚡</div>
+                    <div class="module-name">Russian Roulette</div>
+                    <div class="module-file">modules/rus_rulet.py</div>
+                </div>
+                <div class="module-body">
+                    <div class="module-desc">Русская рулетка. Высокий риск - получить мут на X часов, либо выиграть большой приз!</div>
+                    <div class="module-features">
+                        <h4>Основные функции</h4>
+                        <div class="feature-item">Выбор длительности</div>
+                        <div class="feature-item">Расчет шансов</div>
+                        <div class="feature-item">Автоматический мут</div>
+                        <div class="feature-item">Награды</div>
+                    </div>
+                    <div class="module-methods">
+                        <h4>Методы</h4>
+                        <div class="method-item">spin_russian(user_id, duration)</div>
+                        <div class="method-item">apply_mute(user_id, duration)</div>
+                        <div class="method-item">calculate_prize(user_id)</div>
+                        <div class="method-item">check_survival(user_id)</div>
+                    </div>
+                    <div class="module-links">
+                        <a href="../html/DEVELOPERS_GUIDE_ROULETTES.html" class="module-link">📖 Гайд</a>
+                        <a href="../modules/rus_rulet.py" class="module-link">💻 Код</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HOT-COLD -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">❄️🔥</div>
+                    <div class="module-name">Hot-Cold</div>
+                    <div class="module-file">modules/hot_cold.py</div>
+                </div>
+                <div class="module-body">
+                    <div class="module-desc">Игра "Холодно-Горячо". Бот загадывает число 1-100, игрок угадывает с подсказками. Победа = коины!</div>
+                    <div class="module-features">
+                        <h4>Основные функции</h4>
+                        <div class="feature-item">Загадывание числа</div>
+                        <div class="feature-item">Система подсказок</div>
+                        <div class="feature-item">Ограничение попыток</div>
+                        <div class="feature-item">Награды за победу</div>
+                    </div>
+                    <div class="module-methods">
+                        <h4>Методы</h4>
+                        <div class="method-item">start_game(user_id)</div>
+                        <div class="method-item">make_guess(user_id, number)</div>
+                        <div class="method-item">hint_system(actual, guess)</div>
+                        <div class="method-item">end_game(user_id, win)</div>
+                    </div>
+                    <div class="module-links">
+                        <a href="../html/DEVELOPERS_GUIDE_HOTCOLD.html" class="module-link">📖 Гайд</a>
+                        <a href="../modules/hot_cold.py" class="module-link">💻 Код</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAFIA -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">🎭</div>
+                    <div class="module-name">Mafia</div>
+                    <div class="module-file">modules/mafia.py</div>
+                </div>
+                <div class="module-body">
+                    <div class="module-desc">Ролевая игра Мафия. День/Ночь циклы, 6+ ролей, стратегия и социальная игра!</div>
+                    <div class="module-features">
+                        <h4>Роли</h4>
+                        <div class="feature-item">Мирные граждане</div>
+                        <div class="feature-item">Мафия (убивают ночью)</div>
+                        <div class="feature-item">Комиссар (проверяет)</div>
+                        <div class="feature-item">Доктор (спасает)</div>
+                    </div>
+                    <div class="module-methods">
+                        <h4>Методы</h4>
+                        <div class="method-item">create_game(chat_id)</div>
+                        <div class="method-item">join_game(game_id, user_id)</div>
+                        <div class="method-item">start_game(game_id)</div>
+                        <div class="method-item">night_phase(game_id)</div>
+                    </div>
+                    <div class="module-links">
+                        <a href="../html/DEVELOPERS_GUIDE_MAFIA.html" class="module-link">📖 Гайд</a>
+                        <a href="../modules/mafia.py" class="module-link">💻 Код</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TOURNAMENTS -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">🏆</div>
+                    <div class="module-name">Tournaments</div>
+                    <div class="module-file">modules/turnaments.py</div>
+                </div>
+                <div class="module-body">
+                    <div class="module-desc">Система турниров. Личные, групповые, лиговые турниры с таблицей лидеров и рейтингом!</div>
+                    <div class="module-features">
+                        <h4>Типы турниров</h4>
+                        <div class="feature-item">Личные (1 vs 1)</div>
+                        <div class="feature-item">Групповые</div>
+                        <div class="feature-item">Лиговые</div>
+                        <div class="feature-item">С таблицей лидеров</div>
+                    </div>
+                    <div class="module-methods">
+                        <h4>Методы</h4>
+                        <div class="method-item">create_tournament(type, name)</div>
+                        <div class="method-item">register_player(tournament_id, user_id)</div>
+                        <div class="method-item">start_tournament(tournament_id)</div>
+                        <div class="method-item">get_leaderboard(tournament_id)</div>
+                    </div>
+                    <div class="module-links">
+                        <a href="../html/DEVELOPERS_GUIDE_TOURNAMENTS.html" class="module-link">📖 Гайд</a>
+                        <a href="../modules/turnaments.py" class="module-link">💻 Код</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MESSAGE TOP -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">📊</div>
+                    <div class="module-name">Message Top</div>
+                    <div class="module-file">modules/message_top.py</div>
+                </div>
+                <div class="module-body">
+                    <div class="module-desc">Топ активных пользователей. Автоматическое отслеживание активности и рейтинг участников чата.</div>
+                    <div class="module-features">
+                        <h4>Основные функции</h4>
+                        <div class="feature-item">Подсчет сообщений</div>
+                        <div class="feature-item">Топ-10 активных</div>
+                        <div class="feature-item">История недели/месяца</div>
+                        <div class="feature-item">Награды за активность</div>
+                    </div>
+                    <div class="module-methods">
+                        <h4>Методы</h4>
+                        <div class="method-item">count_message(user_id)</div>
+                        <div class="method-item">get_top_users(limit=10)</div>
+                        <div class="method-item">get_period_stats(period)</div>
+                        <div class="method-item">reset_stats(period)</div>
+                    </div>
+                    <div class="module-links">
+                        <a href="../modules/message_top.py" class="module-link">💻 Код</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WHO IS WHO -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">🔍</div>
+                    <div class="module-name">Who is Who</div>
+                    <div class="module-file">modules/who_is_who.py</div>
+                </div>
+                <div class="module-body">
+                    <div class="module-desc">Поиск и определение пользователей. Быстрый поиск по нику, ID, в чате или всей базе данных.</div>
+                    <div class="module-features">
+                        <h4>Основные функции</h4>
+                        <div class="feature-item">Поиск по нику</div>
+                        <div class="feature-item">Поиск по ID</div>
+                        <div class="feature-item">Поиск в чате</div>
+                        <div class="feature-item">Глобальный поиск</div>
+                    </div>
+                    <div class="module-methods">
+                        <h4>Методы</h4>
+                        <div class="method-item">find_by_nickname(nickname)</div>
+                        <div class="method-item">find_by_id(user_id)</div>
+                        <div class="method-item">find_in_chat(chat_id, query)</div>
+                        <div class="method-item">global_search(query)</div>
+                    </div>
+                    <div class="module-links">
+                        <a href="../modules/who_is_who.py" class="module-link">💻 Код</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OBVINENIE -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">⚖️</div>
+                    <div class="module-name">Obvinenie (Voting)</div>
+                    <div class="module-file">modules/obvinenie.py</div>
+                </div>
+                <div class="module-body">
+                    <div class="module-desc">Система голосования. Система обвинений, голосования за или против, общественное решение о судьбе пользователя.</div>
+                    <div class="module-features">
+                        <h4>Основные функции</h4>
+                        <div class="feature-item">Создание голосования</div>
+                        <div class="feature-item">Голос за/против</div>
+                        <div class="feature-item">Автоматический расчет</div>
+                        <div class="feature-item">История голосований</div>
+                    </div>
+                    <div class="module-methods">
+                        <h4>Методы</h4>
+                        <div class="method-item">create_vote(victim_id, accuser_id)</div>
+                        <div class="method-item">vote_for(vote_id, voter_id)</div>
+                        <div class="method-item">vote_against(vote_id, voter_id)</div>
+                        <div class="method-item">calculate_result(vote_id)</div>
+                    </div>
+                    <div class="module-links">
+                        <a href="../modules/obvinenie.py" class="module-link">💻 Код</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Chat Manager Bot | Справочник по модулям игры</p>
+        </footer>
+    </div>
+</body>
+</html>

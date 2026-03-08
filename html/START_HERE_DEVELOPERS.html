@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 СПРАВОЧНИК РАЗРАБОТЧИКА - НАЧАЛО</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .breadcrumb {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .content h1 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .content h2 {
+            color: #764ba2;
+            font-size: 1.6em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+
+        .content h3 {
+            color: #667eea;
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .content h4 {
+            color: #764ba2;
+            font-size: 1.1em;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        .content p {
+            line-height: 1.8;
+            margin: 15px 0;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin: 15px 0;
+            margin-left: 30px;
+            line-height: 1.8;
+        }
+
+        .content li {
+            margin: 8px 0;
+            color: #444;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+            font-size: 0.95em;
+        }
+
+        .content pre {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .content pre code {
+            color: #333;
+            padding: 0;
+            background: none;
+            font-size: 0.9em;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 20px;
+            margin: 20px 0;
+            color: #666;
+            font-style: italic;
+        }
+
+        .content a {
+            color: #667eea;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .content a:hover {
+            border-bottom-color: #667eea;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .content table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .content table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+        }
+
+        .content table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .content hr {
+            border: none;
+            border-top: 2px solid #667eea;
+            margin: 30px 0;
+        }
+
+        .content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+            justify-content: space-between;
+        }
+
+        .nav-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .nav-button:hover {
+            background: #764ba2;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-button.prev {
+            margin-right: auto;
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+            }
+
+            .nav-button.prev {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 СПРАВОЧНИК РАЗРАБОТЧИКА - НАЧАЛО</h1>
+            <p style="opacity: 0.9; font-size: 1.1em;">Chat Manager Bot - Документация</p>
+        </header>
+
+        <div class="breadcrumb">
+            <a href="../html/index.html">🏠 Главная</a> / 
+            <a href="../html/index_site.html">📖 Документация</a> / 
+            <span>🚀 СПРАВОЧНИК РАЗРАБОТЧИКА - НАЧАЛО</span>
+        </div>
+
+        <div class="content">
+            
+<p><strong>Дата:</strong> 20.12.2025 | <strong>Версия:</strong> 2.0 | <strong>Статус:</strong> ✅ ОПТИМИЗИРОВАНО</p>
+<hr />
+<h2>🌟 ЧТО ЭТО?</h2>
+<p>Это быстрый старт для разработчиков Chat-Manager Bot.</p>
+<p><strong>⭐ ГЛАВНЫЙ СПРАВОЧНИК:</strong></p>
+<h3><strong><a href="../CODE_REFERENCE.html">../CODE_REFERENCE.html</a></strong> - ПОЛНЫЙ СПРАВОЧНИК ВСЕ В ОДНОМ ФАЙЛЕ</h3>
+<hr />
+<h2>📋 ОСНОВНЫЕ ГАЙДЫ ПО МОДУЛЯМ</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Модуль</th>
+<th>Файл</th>
+<th>Описание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>⭐ ЯДРО</td>
+<td><a href="DEVELOPERS_GUIDE_MAIN.html">DEVELOPERS_GUIDE_MAIN.html</a></td>
+<td>config.py, main_bot.py, utils.py</td>
+</tr>
+<tr>
+<td>1</td>
+<td>📌 Bookmarks</td>
+<td><a href="BOOKMARKS_FOR_DEVELOPERS.html">BOOKMARKS_FOR_DEVELOPERS.html</a></td>
+<td>Система закладок</td>
+</tr>
+<tr>
+<td>2</td>
+<td>🌾 Farm</td>
+<td><a href="DEVELOPERS_GUIDE_FARM.html">DEVELOPERS_GUIDE_FARM.html</a></td>
+<td>Система коинов</td>
+</tr>
+<tr>
+<td>3</td>
+<td>🎲 Cubes</td>
+<td><a href="DEVELOPERS_GUIDE_CUBES.html">DEVELOPERS_GUIDE_CUBES.html</a></td>
+<td>Дуэль на кубиках</td>
+</tr>
+<tr>
+<td>4</td>
+<td>🎰 Kasik</td>
+<td><a href="DEVELOPERS_GUIDE_KASIK.html">DEVELOPERS_GUIDE_KASIK.html</a></td>
+<td>Казино</td>
+</tr>
+<tr>
+<td>5</td>
+<td>🎡 Roulettes</td>
+<td><a href="DEVELOPERS_GUIDE_ROULETTES.html">DEVELOPERS_GUIDE_ROULETTES.html</a></td>
+<td>Рулетки</td>
+</tr>
+<tr>
+<td>6</td>
+<td>🎮 Hot-Cold</td>
+<td><a href="DEVELOPERS_GUIDE_HOTCOLD.html">DEVELOPERS_GUIDE_HOTCOLD.html</a></td>
+<td>Угадывание</td>
+</tr>
+<tr>
+<td>7</td>
+<td>🎭 Mafia</td>
+<td><a href="DEVELOPERS_GUIDE_MAFIA.html">DEVELOPERS_GUIDE_MAFIA.html</a></td>
+<td>Ролевая игра</td>
+</tr>
+<tr>
+<td>8</td>
+<td>🏆 Tournaments</td>
+<td><a href="DEVELOPERS_GUIDE_TOURNAMENTS.html">DEVELOPERS_GUIDE_TOURNAMENTS.html</a></td>
+<td>Турниры</td>
+</tr>
+<tr>
+<td>9</td>
+<td>🔍 Utils</td>
+<td><a href="DEVELOPERS_GUIDE_UTILS.html">DEVELOPERS_GUIDE_UTILS.html</a></td>
+<td>Утилиты</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>🎯 ВЫБЕРИТЕ ВАШЕ НАПРАВЛЕНИЕ</h2>
+<h3>🎯 Я совсем новичок (2-4 недели)</h3>
+<ol>
+<li><strong>Сейчас:</strong> <a href="../CODE_REFERENCE.html">../CODE_REFERENCE.html</a> - 10 мин просмотра</li>
+<li><strong>День 1-2:</strong> <a href="DEVELOPERS_GUIDE_MAIN.html">DEVELOPERS_GUIDE_MAIN.html</a> - ядро</li>
+<li><strong>Неделя 1:</strong> Farm → Bookmarks → Hot-Cold  </li>
+<li><strong>Неделя 2:</strong> Cubes → Kasik → Roulettes</li>
+<li><strong>Неделя 3:</strong> Mafia → Tournaments</li>
+<li><strong>Неделя 4:</strong> Интеграция и проекты</li>
+</ol>
+<p>Используйте <a href="DEVELOPERS_GUIDE_INDEX.html">DEVELOPERS_GUIDE_INDEX.html</a> для деталей</p>
+<h3>⚡ Я опытный разработчик (1-2 дня)</h3>
+<ol>
+<li><strong>30 мин:</strong> <a href="../CODE_REFERENCE.html">../CODE_REFERENCE.html</a></li>
+<li><strong>1 час:</strong> Выберите нужный модуль из таблицы</li>
+<li><strong>30 мин:</strong> Проверьте интеграцию в main_bot.py</li>
+<li><strong>Начните разработку</strong></li>
+</ol>
+<h3>🔍 Мне нужен конкретный модуль</h3>
+<p>Найдите в таблице выше и откройте файл. Все примеры готовы к использованию.</p>
+<hr />
+<h2>🔗 БЫСТРЫЕ ССЫЛКИ</h2>
+<h3>Главная навигация</h3>
+<ul>
+<li><strong><a href="../CODE_REFERENCE.html">../CODE_REFERENCE.html</a></strong> ⭐ НАЧНИТЕ ОТСЮДА</li>
+<li><strong><a href="DEVELOPERS_GUIDE_INDEX.html">DEVELOPERS_GUIDE_INDEX.html</a></strong> - Маршруты обучения</li>
+</ul>
+<h3>По категориям</h3>
+<ul>
+<li><strong>Ядро:</strong> <a href="DEVELOPERS_GUIDE_MAIN.html">DEVELOPERS_GUIDE_MAIN.html</a></li>
+<li><strong>Data:</strong> <a href="BOOKMARKS_FOR_DEVELOPERS.html">BOOKMARKS_FOR_DEVELOPERS.html</a></li>
+<li><strong>Economy:</strong> <a href="DEVELOPERS_GUIDE_FARM.html">DEVELOPERS_GUIDE_FARM.html</a></li>
+<li><strong>Games:</strong> Cubes, Kasik, Roulettes, Hot-Cold, Mafia</li>
+<li><strong>System:</strong> <a href="DEVELOPERS_GUIDE_TOURNAMENTS.html">DEVELOPERS_GUIDE_TOURNAMENTS.html</a></li>
+<li><strong>Utils:</strong> <a href="DEVELOPERS_GUIDE_UTILS.html">DEVELOPERS_GUIDE_UTILS.html</a></li>
+</ul>
+<hr />
+<h2>💡 СОВЕТ</h2>
+<p><strong>Если не знаете с чего начать:</strong></p>
+<p>Откройте <a href="../CODE_REFERENCE.html">../CODE_REFERENCE.html</a> - это полный справочник в одном файле с навигацией, примерами и всем что нужно!</p>
+<hr />
+<p><em>Последнее обновление: 20.12.2025</em></p>
+        </div>
+
+        <div class="content">
+            <div class="nav-buttons">
+                <a href="../html/index_site.html" class="nav-button prev">← Вернуться к документации</a>
+                <a href="../html/index.html" class="nav-button">На главную →</a>
+            </div>
+        </div>
+
+        <footer>
+            <p>Chat Manager Bot | Полная документация и структура проекта | Версия 2.0</p>
+            <p style="margin-top: 10px;">
+                <a href="../html/index.html">Главная</a> | 
+                <a href="../html/index_site.html">Документация</a> | 
+                <a href="../html/modules.html">Модули</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

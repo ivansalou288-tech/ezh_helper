@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Модули Who-Is-Who и Message Top - Полное руководство для разработчиков</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .breadcrumb {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .content h1 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .content h2 {
+            color: #764ba2;
+            font-size: 1.6em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+
+        .content h3 {
+            color: #667eea;
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .content h4 {
+            color: #764ba2;
+            font-size: 1.1em;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        .content p {
+            line-height: 1.8;
+            margin: 15px 0;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin: 15px 0;
+            margin-left: 30px;
+            line-height: 1.8;
+        }
+
+        .content li {
+            margin: 8px 0;
+            color: #444;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+            font-size: 0.95em;
+        }
+
+        .content pre {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .content pre code {
+            color: #333;
+            padding: 0;
+            background: none;
+            font-size: 0.9em;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 20px;
+            margin: 20px 0;
+            color: #666;
+            font-style: italic;
+        }
+
+        .content a {
+            color: #667eea;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .content a:hover {
+            border-bottom-color: #667eea;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .content table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .content table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+        }
+
+        .content table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .content hr {
+            border: none;
+            border-top: 2px solid #667eea;
+            margin: 30px 0;
+        }
+
+        .content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+            justify-content: space-between;
+        }
+
+        .nav-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .nav-button:hover {
+            background: #764ba2;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-button.prev {
+            margin-right: auto;
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+            }
+
+            .nav-button.prev {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔍 Модули Who-Is-Who и Message Top - Полное руководство для разработчиков</h1>
+            <p style="opacity: 0.9; font-size: 1.1em;">Chat Manager Bot - Документация</p>
+        </header>
+
+        <div class="breadcrumb">
+            <a href="../html/index.html">🏠 Главная</a> / 
+            <a href="../html/index_site.html">📖 Документация</a> / 
+            <span>🔍 Модули Who-Is-Who и Message Top - Полное руководство для разработчиков</span>
+        </div>
+
+        <div class="content">
+            
+<p><strong>Версия:</strong> 1.0<br />
+<strong>Дата:</strong> 20.12.2025<br />
+<strong>Статус:</strong> ✅ Готово к production<br />
+<strong>Язык:</strong> Python 3.10+  </p>
+<hr />
+<h2>📖 Обзор</h2>
+<p>Два утилитарных модуля для работы с информацией о пользователях и сообщениях:</p>
+<ol>
+<li><strong>Who-Is-Who</strong> (<code>modules/who_is_who.py</code>) - поиск пользователя по описанию</li>
+<li><strong>Message Top</strong> (<code>modules/message_top.py</code>) - топ пользователей по активности в чате</li>
+</ol>
+<hr />
+<h2>🔍 Who-Is-Who (Кто это?)</h2>
+<h3>Обзор</h3>
+<p>Модуль позволяет быстро найти пользователя по его описанию или никнейму. Поиск проводится среди пользователей, зарегистрированных в чате.</p>
+<h3>Основной обработчик</h3>
+<pre class="codehilite"><code class="language-python">@dp.message_handler(Text(startswith=[&quot;бот кто&quot;], ignore_case=True))
+async def who_is_who(message: types.Message):
+    &quot;&quot;&quot;
+    Команда для поиска пользователя по описанию
+    Формат: бот кто {описание}
+    &quot;&quot;&quot;
+</code></pre>
+
+<p><strong>Срабатывает когда:</strong>
+- Пользователь напишет <code>бот кто {описание}</code></p>
+<p><strong>Логика:</strong>
+1. Парсит описание из сообщения
+2. Получает таблицу пользователей для чата
+3. Ищет совпадение в <code>nik</code> (ник), <code>username</code> (юзернейм) или <code>first_name</code> (имя)
+4. Возвращает найденного пользователя с его информацией</p>
+<h3>Примеры использования</h3>
+<h4>Пример 1: Поиск по нику</h4>
+<pre class="codehilite"><code class="language-python">def search_user_by_nic(chat_id: int, search_nic: str, db_path: str) -&gt; dict:
+    &quot;&quot;&quot;Ищет пользователя по нику&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    table_name = str(-(chat_id))
+
+    try:
+        result = cursor.execute(
+            f&quot;SELECT tg_id, nik, username, first_name FROM [{table_name}] WHERE nik LIKE ?&quot;,
+            (f&quot;%{search_nic}%&quot;,)
+        ).fetchone()
+
+        if result:
+            return {
+                &quot;user_id&quot;: result[0],
+                &quot;nik&quot;: result[1],
+                &quot;username&quot;: result[2],
+                &quot;first_name&quot;: result[3],
+                &quot;found&quot;: True
+            }
+        else:
+            return {&quot;found&quot;: False}
+    finally:
+        connection.close()
+
+# Использование
+result = search_user_by_nic(-1001234567890, &quot;Ivan&quot;, &quot;Base_bot.db&quot;)
+if result[&quot;found&quot;]:
+    print(f&quot;Найден: {result['nik']} (@{result['username']})&quot;)
+</code></pre>
+
+<h4>Пример 2: Поиск по юзернейму</h4>
+<pre class="codehilite"><code class="language-python">def search_user_by_username(chat_id: int, username: str, db_path: str) -&gt; dict:
+    &quot;&quot;&quot;Ищет пользователя по юзернейму&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    table_name = str(-(chat_id))
+
+    # Убираем @ если присутствует
+    if username.startswith(&quot;@&quot;):
+        username = username[1:]
+
+    try:
+        result = cursor.execute(
+            f&quot;SELECT tg_id, nik, username, first_name FROM [{table_name}] WHERE username = ?&quot;,
+            (username,)
+        ).fetchone()
+
+        if result:
+            return {
+                &quot;user_id&quot;: result[0],
+                &quot;nik&quot;: result[1],
+                &quot;username&quot;: result[2],
+                &quot;first_name&quot;: result[3],
+                &quot;found&quot;: True
+            }
+        else:
+            return {&quot;found&quot;: False}
+    finally:
+        connection.close()
+</code></pre>
+
+<h4>Пример 3: Расширенный поиск</h4>
+<pre class="codehilite"><code class="language-python">def advanced_search(chat_id: int, keywords: list[str], db_path: str) -&gt; list[dict]:
+    &quot;&quot;&quot;Поиск по нескольким ключевым словам&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    table_name = str(-(chat_id))
+    results = []
+
+    try:
+        for keyword in keywords:
+            matches = cursor.execute(
+                f&quot;SELECT tg_id, nik, username FROM [{table_name}] &quot;
+                &quot;WHERE nik LIKE ? OR username LIKE ? OR first_name LIKE ?&quot;,
+                (f&quot;%{keyword}%&quot;, f&quot;%{keyword}%&quot;, f&quot;%{keyword}%&quot;)
+            ).fetchall()
+
+            for user_id, nik, username in matches:
+                results.append({
+                    &quot;user_id&quot;: user_id,
+                    &quot;nik&quot;: nik,
+                    &quot;username&quot;: username
+                })
+
+        return results
+    finally:
+        connection.close()
+</code></pre>
+
+<hr />
+<h2>📊 Message Top (Топ сообщений)</h2>
+<h3>Обзор</h3>
+<p>Модуль показывает рейтинг пользователей по количеству отправленных сообщений в чате. Поддерживает разные сортировки и ограничение количества результатов.</p>
+<h3>Основные обработчики</h3>
+<pre class="codehilite"><code class="language-python">@dp.message_handler(Text(startswith=[&quot;топ вся&quot;, &quot;!топ сообщений&quot;], ignore_case=True))
+async def show_messages_top_all_time(message: types.Message):
+    &quot;&quot;&quot;
+    Показывает топ пользователей по сообщениям за всё время
+    Формат: !топ сообщений [количество]
+    &quot;&quot;&quot;
+</code></pre>
+
+<p><strong>Примеры использования:</strong></p>
+<pre class="codehilite"><code>!топ сообщений          # Топ 10 (по умолчанию)
+!топ сообщений 20       # Топ 20
+топ вся                 # Топ 10
+топ вся 50              # Топ 50
+</code></pre>
+
+<h3>Примеры использования</h3>
+<h4>Пример 1: Получение топ сообщений</h4>
+<pre class="codehilite"><code class="language-python">def get_messages_top(chat_id: int, limit: int = 10, db_path: str = &quot;Base_bot.db&quot;) -&gt; list[tuple]:
+    &quot;&quot;&quot;Получает топ пользователей по количеству сообщений&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    table_name = str(-(chat_id))
+
+    try:
+        # Пытаемся найти колонку с количеством сообщений
+        columns_info = cursor.execute(f&quot;PRAGMA table_info([{table_name}])&quot;).fetchall()
+        column_names = [col[1] for col in columns_info]
+
+        # Ищем колонку для подсчёта сообщений
+        message_column = None
+        for candidate in (&quot;mess_count&quot;, &quot;message_count&quot;, &quot;messages_count&quot;, &quot;msg_count&quot;, &quot;messages&quot;):
+            if candidate in column_names:
+                message_column = candidate
+                break
+
+        if not message_column:
+            return []
+
+        # Получаем топ
+        top = cursor.execute(
+            f&quot;SELECT nik, {message_column} FROM [{table_name}] ORDER BY {message_column} DESC LIMIT ?&quot;,
+            (limit,)
+        ).fetchall()
+
+        return top
+    finally:
+        connection.close()
+
+# Использование
+top = get_messages_top(-1001234567890, limit=10)
+for idx, (nik, msg_count) in enumerate(top, 1):
+    print(f&quot;{idx}. {nik}: {msg_count} сообщений&quot;)
+</code></pre>
+
+<h4>Пример 2: Форматированный топ</h4>
+<pre class="codehilite"><code class="language-python">def format_messages_top(chat_id: int, limit: int = 10, db_path: str = &quot;Base_bot.db&quot;) -&gt; str:
+    &quot;&quot;&quot;Форматирует топ для отправки в сообщение&quot;&quot;&quot;
+    top = get_messages_top(chat_id, limit, db_path)
+
+    if not top:
+        return &quot;📊 Данных нет&quot;
+
+    message = &quot;📊 &lt;b&gt;Топ по сообщениям&lt;/b&gt;\n\n&quot;
+
+    medals = [&quot;🥇&quot;, &quot;🥈&quot;, &quot;🥉&quot;]
+
+    for idx, (nik, msg_count) in enumerate(top, 1):
+        medal = medals[idx - 1] if idx &lt;= 3 else f&quot;{idx}️⃣&quot;
+        message += f&quot;{medal} &lt;b&gt;{nik}&lt;/b&gt; — {msg_count} сообщений\n&quot;
+
+    return message
+</code></pre>
+
+<h4>Пример 3: Статистика активности</h4>
+<pre class="codehilite"><code class="language-python">def get_activity_stats(chat_id: int, db_path: str = &quot;Base_bot.db&quot;) -&gt; dict:
+    &quot;&quot;&quot;Получает статистику активности в чате&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    table_name = str(-(chat_id))
+
+    try:
+        # Находим колонку сообщений
+        columns_info = cursor.execute(f&quot;PRAGMA table_info([{table_name}])&quot;).fetchall()
+        column_names = [col[1] for col in columns_info]
+
+        message_column = None
+        for candidate in (&quot;mess_count&quot;, &quot;message_count&quot;, &quot;messages_count&quot;, &quot;msg_count&quot;, &quot;messages&quot;):
+            if candidate in column_names:
+                message_column = candidate
+                break
+
+        if not message_column:
+            return {}
+
+        # Получаем статистику
+        stats = cursor.execute(
+            f&quot;SELECT COUNT(*), SUM({message_column}), AVG({message_column}), MAX({message_column}) FROM [{table_name}]&quot;
+        ).fetchone()
+
+        users_count, total_messages, avg_messages, max_messages = stats
+
+        return {
+            &quot;total_users&quot;: users_count or 0,
+            &quot;total_messages&quot;: total_messages or 0,
+            &quot;avg_messages_per_user&quot;: round(avg_messages, 2) if avg_messages else 0,
+            &quot;max_messages&quot;: max_messages or 0,
+            &quot;activity_level&quot;: &quot;Высокая&quot; if (total_messages or 0) / max(users_count or 1, 1) &gt; 50 else &quot;Средняя&quot;
+        }
+    finally:
+        connection.close()
+
+# Использование
+stats = get_activity_stats(-1001234567890)
+print(f&quot;Всего пользователей: {stats['total_users']}&quot;)
+print(f&quot;Всего сообщений: {stats['total_messages']}&quot;)
+print(f&quot;Среднее на пользователя: {stats['avg_messages_per_user']}&quot;)
+</code></pre>
+
+<h4>Пример 4: Трендинг пользователей</h4>
+<pre class="codehilite"><code class="language-python">def get_trending_users(chat_id: int, limit: int = 5, db_path: str = &quot;Base_bot.db&quot;) -&gt; list:
+    &quot;&quot;&quot;Получает пользователей с наибольшим ростом активности&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    table_name = str(-(chat_id))
+
+    try:
+        # Можно добавить колонку last_week_messages для отслеживания роста
+        # Пока просто получаем самых активных
+        trending = cursor.execute(
+            f&quot;SELECT nik, mess_count FROM [{table_name}] ORDER BY mess_count DESC LIMIT ?&quot;,
+            (limit,)
+        ).fetchall()
+
+        return trending
+    finally:
+        connection.close()
+</code></pre>
+
+<hr />
+<h2>🏗️ Структура таблиц</h2>
+<h3>Таблица чата (например <code>[123456789]</code> для chat_id = -123456789)</h3>
+<pre class="codehilite"><code class="language-sql">CREATE TABLE [123456789] (
+    tg_id INTEGER PRIMARY KEY,
+    username TEXT,
+    first_name TEXT,
+    nik TEXT,
+    mess_count INTEGER DEFAULT 0,
+    -- и другие колонки...
+)
+</code></pre>
+
+<hr />
+<h2>🚀 Расширение функциональности</h2>
+<h3>Идея 1: Недельный рейтинг</h3>
+<pre class="codehilite"><code class="language-python">def add_weekly_tracking(chat_id: int, db_path: str = &quot;Base_bot.db&quot;):
+    &quot;&quot;&quot;Добавляет отслеживание недельной активности&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    table_name = str(-(chat_id))
+
+    # Добавляем колонки если их нет
+    cursor.execute(f&quot;ALTER TABLE [{table_name}] ADD COLUMN week_messages INTEGER DEFAULT 0&quot;)
+    cursor.execute(f&quot;ALTER TABLE [{table_name}] ADD COLUMN week_reset_date TEXT&quot;)
+
+    connection.commit()
+    connection.close()
+</code></pre>
+
+<h3>Идея 2: Медали за достижения</h3>
+<pre class="codehilite"><code class="language-python">def get_user_medals(chat_id: int, user_nik: str, db_path: str = &quot;Base_bot.db&quot;) -&gt; list[str]:
+    &quot;&quot;&quot;Получает медали пользователя&quot;&quot;&quot;
+    top = get_messages_top(chat_id, limit=100, db_path=db_path)
+
+    medals = []
+
+    # Находим позицию пользователя
+    for idx, (nik, msg_count) in enumerate(top, 1):
+        if nik == user_nik:
+            if idx == 1:
+                medals.append(&quot;🥇 Король чата&quot;)
+            elif idx == 2:
+                medals.append(&quot;🥈 Второй по активности&quot;)
+            elif idx == 3:
+                medals.append(&quot;🥉 Третий по активности&quot;)
+            elif idx &lt;= 10:
+                medals.append(&quot;⭐ Топ 10&quot;)
+
+            # Количество сообщений
+            if msg_count &gt;= 1000:
+                medals.append(&quot;💬 1000+ сообщений&quot;)
+            elif msg_count &gt;= 500:
+                medals.append(&quot;💬 500+ сообщений&quot;)
+
+    return medals
+</code></pre>
+
+<h3>Идея 3: Сравнение пользователей</h3>
+<pre class="codehilite"><code class="language-python">def compare_users(chat_id: int, user1_nik: str, user2_nik: str, db_path: str = &quot;Base_bot.db&quot;) -&gt; dict:
+    &quot;&quot;&quot;Сравнивает активность двух пользователей&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    table_name = str(-(chat_id))
+
+    try:
+        user1_data = cursor.execute(
+            f&quot;SELECT nik, mess_count FROM [{table_name}] WHERE nik = ?&quot;,
+            (user1_nik,)
+        ).fetchone()
+
+        user2_data = cursor.execute(
+            f&quot;SELECT nik, mess_count FROM [{table_name}] WHERE nik = ?&quot;,
+            (user2_nik,)
+        ).fetchone()
+
+        if not user1_data or not user2_data:
+            return {}
+
+        diff = user1_data[1] - user2_data[1]
+
+        return {
+            &quot;user1&quot;: {&quot;nik&quot;: user1_data[0], &quot;messages&quot;: user1_data[1]},
+            &quot;user2&quot;: {&quot;nik&quot;: user2_data[0], &quot;messages&quot;: user2_data[1]},
+            &quot;difference&quot;: abs(diff),
+            &quot;leader&quot;: user1_data[0] if diff &gt; 0 else user2_data[0]
+        }
+    finally:
+        connection.close()
+</code></pre>
+
+<hr />
+<h2>🐛 Решение проблем</h2>
+<h3>Проблема: "Топ не показывает данные"</h3>
+<p><strong>Решение:</strong> Проверьте наличие колонки сообщений</p>
+<pre class="codehilite"><code class="language-python"># Убедитесь что таблица имеет одну из этих колонок:
+# mess_count, message_count, messages_count, msg_count, messages
+</code></pre>
+
+<h3>Проблема: "Поиск не находит пользователя"</h3>
+<p><strong>Решение:</strong> Проверьте правильность формата команды</p>
+<pre class="codehilite"><code class="language-python"># ✅ Правильно
+бот кто Иван
+бот кто @username
+бот кто 123456  # По ID
+
+# ❌ Неправильно
+бот кто        # Без параметра
+</code></pre>
+
+<hr />
+<h2>📝 Лицензия</h2>
+<p>Часть проекта WERTY | Chat-Manager Bot</p>
+<hr />
+<p><strong>Версия:</strong> 1.0<br />
+<strong>Разработано:</strong> GitHub Copilot<br />
+<strong>Последнее обновление:</strong> 20.12.2025</p>
+        </div>
+
+        <div class="content">
+            <div class="nav-buttons">
+                <a href="../html/index_site.html" class="nav-button prev">← Вернуться к документации</a>
+                <a href="../html/index.html" class="nav-button">На главную →</a>
+            </div>
+        </div>
+
+        <footer>
+            <p>Chat Manager Bot | Полная документация и структура проекта | Версия 2.0</p>
+            <p style="margin-top: 10px;">
+                <a href="../html/index.html">Главная</a> | 
+                <a href="../html/index_site.html">Документация</a> | 
+                <a href="../html/modules.html">Модули</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

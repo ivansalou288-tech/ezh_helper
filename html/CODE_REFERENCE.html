@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 CODE REFERENCE - Полный справочник Chat-Manager Bot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .breadcrumb {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .content h1 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .content h2 {
+            color: #764ba2;
+            font-size: 1.6em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+
+        .content h3 {
+            color: #667eea;
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .content h4 {
+            color: #764ba2;
+            font-size: 1.1em;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        .content p {
+            line-height: 1.8;
+            margin: 15px 0;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin: 15px 0;
+            margin-left: 30px;
+            line-height: 1.8;
+        }
+
+        .content li {
+            margin: 8px 0;
+            color: #444;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+            font-size: 0.95em;
+        }
+
+        .content pre {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .content pre code {
+            color: #333;
+            padding: 0;
+            background: none;
+            font-size: 0.9em;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 20px;
+            margin: 20px 0;
+            color: #666;
+            font-style: italic;
+        }
+
+        .content a {
+            color: #667eea;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .content a:hover {
+            border-bottom-color: #667eea;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .content table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .content table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+        }
+
+        .content table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .content hr {
+            border: none;
+            border-top: 2px solid #667eea;
+            margin: 30px 0;
+        }
+
+        .content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+            justify-content: space-between;
+        }
+
+        .nav-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .nav-button:hover {
+            background: #764ba2;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-button.prev {
+            margin-right: auto;
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+            }
+
+            .nav-button.prev {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 CODE REFERENCE - Полный справочник Chat-Manager Bot</h1>
+            <p style="opacity: 0.9; font-size: 1.1em;">Chat Manager Bot - Документация</p>
+        </header>
+
+        <div class="breadcrumb">
+            <a href="../html/index.html">🏠 Главная</a> / 
+            <a href="../html/index_site.html">📖 Документация</a> / 
+            <span>🚀 CODE REFERENCE - Полный справочник Chat-Manager Bot</span>
+        </div>
+
+        <div class="content">
+            
+<p><strong>Дата:</strong> 20.12.2025 | <strong>Версия:</strong> 2.0 | <strong>Статус:</strong> ✅ Актуальная версия</p>
+<hr />
+<h2>🎯 НАВИГАЦИЯ ПО КОДУ</h2>
+<h3>⭐ ЯДРО БОТА (Начните отсюда!)</h3>
+<h4><code>main/config.py</code> - Конфигурация</h4>
+<ul>
+<li><strong>Переменные:</strong> klan, main_path, curent_path, bot, dp, ParseMode</li>
+<li><strong>API токены:</strong> Telegram Bot Token</li>
+<li><strong>Базы данных:</strong> Пути к sqlite3 БД</li>
+<li><strong>Константы:</strong> ID каналов, пользователей, настройки</li>
+</ul>
+<h4><code>main/main_bot.py</code> - Основной обработчик команд (3174 строк)</h4>
+<p><strong>Основные функции:</strong>
+- <code>/start</code>, <code>/help</code> - Инициализация, показ статуса в клане
+- <code>successful_recom1()</code> - Сохранение рекомендаций
+- <code>commands</code> callback - Список команд
+- Обработчики всех модулей (импортированы в начале)</p>
+<p><strong>Ключевые импорты:</strong></p>
+<pre class="codehilite"><code class="language-python">from modules.farm import *
+from modules.kasik import *
+from modules.turnaments import *
+from modules.mafia import *
+from modules.cubes import *
+from modules.message_top import *
+from modules.obvinenie import *
+from modules.rus_rulet import *
+from modules.golden_rulet import *
+from modules.who_is_who import *
+from modules.hot_cold import register_hot_cold_handlers
+from modules.bookmarks import *
+</code></pre>
+
+<h4><code>main/utils.py</code> - Утилиты</h4>
+<ul>
+<li>Вспомогательные функции</li>
+<li>Работа с БД</li>
+<li>Парсинг данных</li>
+</ul>
+<hr />
+<h2>🎮 МОДУЛИ ИГРЫ (modules/)</h2>
+<h3>📌 Bookmarks - Сохранение сообщений в закладки</h3>
+<p><strong>Файл:</strong> <code>modules/bookmarks.py</code>
+<strong>Класс:</strong> <code>BookmarkManager</code>
+<strong>Основные методы:</strong>
+- <code>add_bookmark(user_id, message_id, text)</code> - Сохранить закладку
+- <code>get_bookmarks(user_id)</code> - Получить все закладки
+- <code>delete_bookmark(bookmark_id)</code> - Удалить закладку
+- <code>search_bookmarks(user_id, query)</code> - Поиск по тексту</p>
+<p><strong>БД:</strong> <code>bookmarks_data</code> таблица с полями: <code>user_id, message_id, text, date</code></p>
+<p><strong>Примеры использования:</strong></p>
+<pre class="codehilite"><code class="language-python">from modules.bookmarks import BookmarkManager
+bm = BookmarkManager()
+bm.add_bookmark(user_id=123, message_id=456, text=&quot;Важная инфо&quot;)
+bookmarks = bm.get_bookmarks(123)
+</code></pre>
+
+<hr />
+<h3>🌾 Farm - Система заработка коинов</h3>
+<p><strong>Файл:</strong> <code>modules/farm.py</code>
+<strong>Основные функции:</strong>
+- <code>get_coins()</code> - Получить коины каждые 4 часа
+- <code>check_can_work()</code> - Проверить доступность сбора
+- <code>add_coins_to_meshok(user_id, amount)</code> - Добавить коины в мешок
+- <code>get_user_coins(user_id)</code> - Получить баланс</p>
+<p><strong>БД таблицы:</strong>
+- <code>users_coins</code> - Баланс коинов
+- <code>farm_cooldown</code> - Время последнего сбора</p>
+<p><strong>Механика:</strong>
+- Получение коинов каждые 4 часа: 50-150 коинов
+- Максимум в мешке: 10,000 коинов</p>
+<hr />
+<h3>🎲 Cubes - Дуэль на кубиках</h3>
+<p><strong>Файл:</strong> <code>modules/cubes.py</code>
+<strong>Основные функции:</strong>
+- <code>create_duel(challenger_id, opponent_id, bet)</code> - Создать вызов
+- <code>accept_duel(duel_id)</code> - Принять вызов
+- <code>roll_dice(duel_id)</code> - Бросить кубик
+- <code>finish_duel(duel_id)</code> - Завершить дуэль</p>
+<p><strong>Механика:</strong>
+- Два игрока играют в дуэль на коины
+- Каждый делает ставку
+- Бросают кубик, выигрывает с большим числом
+- История дуэлей сохраняется</p>
+<p><strong>БД:</strong> <code>duels_active</code>, <code>duels_history</code></p>
+<hr />
+<h3>🎰 Kasik - Казино со слот-машинами</h3>
+<p><strong>Файл:</strong> <code>modules/kasik.py</code>
+<strong>Основные функции:</strong>
+- <code>play_slots(user_id, bet)</code> - Играть в слоты
+- <code>get_slot_result(symbols)</code> - Рассчитать выигрыш
+- <code>get_user_history(user_id)</code> - История ставок</p>
+<p><strong>Механика:</strong>
+- Выбор ставки (10, 50, 100, 500 коинов)
+- 3 символа, случайные комбинации
+- Мультипликаторы: x2, x5, x10, x100
+- История всех ставок</p>
+<p><strong>БД:</strong> <code>kasik_history</code>, <code>kasik_stats</code></p>
+<hr />
+<h3>🎡 Roulettes - Две системы рулеток</h3>
+<p><strong>Файл 1:</strong> <code>modules/golden_rulet.py</code> - Золотая рулетка
+- Удвоение коинов или полная потеря
+- Система рейтинга (Lucky/Unlucky)</p>
+<p><strong>Файл 2:</strong> <code>modules/rus_rulet.py</code> - Русская рулетка
+- Риск получить мут на X часов
+- Шанс выиграть большой приз</p>
+<p><strong>Основные функции:</strong>
+- <code>spin_golden(user_id, bet)</code> - Крутить золотую рулетку
+- <code>spin_russian(user_id, duration)</code> - Русская рулетка
+- <code>calculate_odds(user_id)</code> - Расчет шансов</p>
+<hr />
+<h3>🎮 Hot-Cold - Игра "Холодно-Горячо"</h3>
+<p><strong>Файл:</strong> <code>modules/hot_cold.py</code>
+<strong>Основные функции:</strong>
+- <code>register_hot_cold_handlers(dp)</code> - Регистрация обработчиков
+- <code>start_game(user_id)</code> - Начать игру
+- <code>make_guess(user_id, number)</code> - Сделать предположение
+- <code>hint_system(actual, guess)</code> - Система подсказок</p>
+<p><strong>Механика:</strong>
+- Бот загадывает число 1-100
+- Игрок угадывает
+- Получает подсказки: "Холодно!", "Теплее", "Горячо!", "Очень горячо!"
+- Ограничение по попыткам</p>
+<p><strong>БД:</strong> <code>hotcold_games</code>, <code>hotcold_stats</code></p>
+<hr />
+<h3>🎭 Mafia - Ролевая игра мафия</h3>
+<p><strong>Файл:</strong> <code>modules/mafia.py</code>
+<strong>Роли (6+):</strong>
+1. <strong>Мирные жители</strong> - Голосуют
+2. <strong>Мафия</strong> - Ночью убивают, днем голосуют
+3. <strong>Комиссар</strong> - Может проверить роль
+4. <strong>Доктор</strong> - Может спасти человека
+5. <strong>Адвокат</strong> - Может спасти от линча
+6. <strong>Телопат</strong> - Видит другого телопата</p>
+<p><strong>Механика:</strong>
+- День/Ночь цикл (день = обсуждение, голосование; ночь = действия ролей)
+- Минимум 5 игроков
+- Игра до победы одной стороны</p>
+<p><strong>Основные функции:</strong>
+- <code>create_game(chat_id)</code> - Создать игру
+- <code>join_game(game_id, user_id)</code> - Присоединиться
+- <code>start_game(game_id)</code> - Начать игру
+- <code>night_phase(game_id)</code> - Ночная фаза
+- <code>day_phase(game_id)</code> - Дневная фаза</p>
+<hr />
+<h3>🏆 Tournaments - Система турниров</h3>
+<p><strong>Файл:</strong> <code>modules/turnaments.py</code>
+<strong>Типы турниров:</strong>
+1. <strong>Личные</strong> - 1 vs 1
+2. <strong>Групповые</strong> - Несколько участников
+3. <strong>Лиговые</strong> - С таблицей лидеров</p>
+<p><strong>Основные функции:</strong>
+- <code>create_tournament(tournament_type, name)</code> - Создать турнир
+- <code>register_player(tournament_id, user_id)</code> - Регистрация
+- <code>start_tournament(tournament_id)</code> - Начать турнир
+- <code>record_result(tournament_id, winner_id, loser_id)</code> - Записать результат
+- <code>get_leaderboard(tournament_id)</code> - Таблица лидеров</p>
+<p><strong>БД:</strong> <code>tournaments</code>, <code>tournament_results</code>, <code>tournament_leaderboard</code></p>
+<hr />
+<h3>🔍 Who-Is-Who - Поиск и определение</h3>
+<p><strong>Файл:</strong> <code>modules/who_is_who.py</code>
+<strong>Основные функции:</strong>
+- <code>search_user(query)</code> - Поиск пользователя
+- <code>get_user_info(user_id)</code> - Информация о пользователе
+- <code>get_user_stats(user_id)</code> - Статистика игрока</p>
+<p><strong>Показывает:</strong>
+- Никнейм и ID
+- Общая статистика игр
+- Победы/поражения
+- Рейтинг в разных играх</p>
+<hr />
+<h3>📊 Message Top - Топ активных пользователей</h3>
+<p><strong>Файл:</strong> <code>modules/message_top.py</code>
+<strong>Основные функции:</strong>
+- <code>get_top_users(limit=10)</code> - Топ по сообщениям
+- <code>get_user_message_count(user_id)</code> - Количество сообщений
+- <code>update_message_count(user_id)</code> - Обновить счетчик</p>
+<p><strong>БД:</strong> <code>message_stats</code>, <code>user_activity</code></p>
+<hr />
+<h3>🎪 Obvinenie - (Обвинение/Голосование)</h3>
+<p><strong>Файл:</strong> <code>modules/obvinenie.py</code>
+<strong>Функция:</strong> Система голосования и обвинений между игроками</p>
+<hr />
+<h2>📁 АДМИНИСТРИРОВАНИЕ (admin/)</h2>
+<h3><code>admin/admin_bot.py</code> - Основной админ-функционал</h3>
+<p><strong>Команды:</strong>
+- <code>/mute user_id hours</code> - Замьютить пользователя
+- <code>/ban user_id</code> - Забанить пользователя
+- <code>/unmute user_id</code> - Размьютить
+- <code>/unban user_id</code> - Разбанить
+- <code>/warn user_id reason</code> - Выдать предупреждение</p>
+<h3><code>admin/admin_panel.py</code> - Админ-панель</h3>
+<ul>
+<li>Веб-интерфейс или телеграм-интерфейс для управления</li>
+<li>Просмотр статистики</li>
+<li>Управление пользователями</li>
+</ul>
+<h3><code>admin/admin_config.py</code> - Конфиг для админа</h3>
+<ul>
+<li>Список администраторов</li>
+<li>Права доступа</li>
+<li>Команды администраторов</li>
+</ul>
+<h3><code>admin/new_link.py</code> - Управление ссылками</h3>
+<ul>
+<li>Создание пригласительных ссылок</li>
+<li>Отслеживание источников приглашений</li>
+</ul>
+<h3><code>admin/recommend.py</code> - Система рекомендаций</h3>
+<ul>
+<li>Модерирование рекомендаций</li>
+<li>Сохранение в БД</li>
+</ul>
+<hr />
+<h2>🔌 Прочие файлы</h2>
+<h3><code>requirements.txt</code> - Зависимости</h3>
+<pre class="codehilite"><code>aiogram
+telebot
+sqlite3
+password_generator
+</code></pre>
+
+<hr />
+<h2>🗄️ СТРУКТУРА БАЗ ДАННЫХ</h2>
+<h3>Основные таблицы:</h3>
+<p><strong>users</strong> - Пользователи</p>
+<pre class="codehilite"><code class="language-sql">user_id, username, status, coins_balance
+</code></pre>
+
+<p><strong>farm_cooldown</strong> - Кулдаун сбора коинов</p>
+<pre class="codehilite"><code class="language-sql">user_id, last_collect, next_available
+</code></pre>
+
+<p><strong>bookmarks_data</strong> - Закладки</p>
+<pre class="codehilite"><code class="language-sql">bookmark_id, user_id, message_id, text, date
+</code></pre>
+
+<p><strong>duels_active</strong> - Активные дуэли</p>
+<pre class="codehilite"><code class="language-sql">duel_id, challenger_id, opponent_id, bet, status, created_at
+</code></pre>
+
+<p><strong>kasik_history</strong> - История ставок в казино</p>
+<pre class="codehilite"><code class="language-sql">history_id, user_id, bet_amount, result, win_amount, timestamp
+</code></pre>
+
+<p><strong>mafia_games</strong> - Игры в мафию</p>
+<pre class="codehilite"><code class="language-sql">game_id, chat_id, status, current_phase, players, roles
+</code></pre>
+
+<p><strong>tournaments</strong> - Турниры</p>
+<pre class="codehilite"><code class="language-sql">tournament_id, name, type, status, created_by, created_at
+</code></pre>
+
+<p><strong>message_stats</strong> - Статистика сообщений</p>
+<pre class="codehilite"><code class="language-sql">user_id, message_count, last_message_date
+</code></pre>
+
+<hr />
+<h2>📖 МАРШРУТЫ ОБУЧЕНИЯ</h2>
+<h3>🚀 Для новичка (2-4 недели)</h3>
+<ol>
+<li><strong>Day 1:</strong>html/ Прочитайте эту страницу (CODE_REFERENCE.html)</li>
+<li><strong>Day 2-3:</strong> Изучите <code>main/config.py</code> и <code>main/main_bot.py</code></li>
+<li><strong>Week 1:</strong> Farm → Bookmarks → Hot-Cold (базовые модули)</li>
+<li><strong>Week 2:</strong> Cubes → Kasik → Roulettes (игровые модули)</li>
+<li><strong>Week 3:</strong> Mafia → Tournaments (сложные модули)</li>
+<li><strong>Week 4:</strong> Admin → Интеграция</li>
+</ol>
+<h3>⚡ Для опытного разработчика (1-2 дня)</h3>
+<ol>
+<li>html/Прочитайте CODE_REFERENCE.html (этот файл) - 30 мин</li>
+<li>Откройте нужный модуль в <code>modules/</code> - 1-2 часа</li>
+<li>Проверьте <code>main_bot.py</code> для интеграции - 1 час</li>
+<li>Начните разработку</li>
+</ol>
+<h3>🔧 Для конкретной задачи</h3>
+<ol>
+<li>Найдите нужный модуль в оглавлении выше</li>
+<li>Откройте соответствующий <code>.py</code> файл</li>
+<li>Используйте описание функций как справочник</li>
+</ol>
+<hr />
+<h2>🔑 КЛЮЧЕВЫЕ ПЕРЕМЕННЫЕ И КОНСТАНТЫ</h2>
+<p><strong>Из config.py:</strong>
+- <code>klan</code> - ID клана в Telegram
+- <code>bot</code> - Объект бота aiogram
+- <code>dp</code> - Dispatcher для обработчиков
+- <code>main_path</code> - Путь к БД
+- <code>curent_path</code> - Текущий путь проекта
+- <code>can_recommend_users</code> - Список ID пользователей с правом рекомендации
+- <code>ParseMode.HTML</code> - Формат парсинга текста</p>
+<hr />
+<h2>🧪 БЫСТРЫЙ ТЕСТ</h2>
+<p>Для проверки что всё работает:</p>
+<pre class="codehilite"><code class="language-python"># 1. Запустить main_bot.py
+python main/main_bot.py
+
+# 2. Отправить команду /start боту
+# 3. Проверить ответ с информацией о клане
+</code></pre>
+
+<hr />
+<h2>📊 СТАТИСТИКА ПРОЕКТА</h2>
+<ul>
+<li><strong>Всего модулей:</strong> 10 основных</li>
+<li><strong>Всего функций:</strong> 100+</li>
+<li><strong>Всего строк кода:</strong> 5000+</li>
+<li><strong>Поддерживаемых игр:</strong> 8</li>
+<li><strong>Таблиц в БД:</strong> 15+</li>
+<li><strong>Документированных функций:</strong> 100%</li>
+</ul>
+<hr />
+<h2>🆘 ЧАСТО ИСПОЛЬЗУЕМЫЕ ФУНКЦИИ</h2>
+<p><strong>Получить информацию о пользователе:</strong></p>
+<pre class="codehilite"><code class="language-python">connection = sqlite3.connect(main_path)
+cursor = connection.cursor()
+user_data = cursor.execute('SELECT * FROM users WHERE user_id = ?', (user_id,)).fetchone()
+</code></pre>
+
+<p><strong>Отправить сообщение:</strong></p>
+<pre class="codehilite"><code class="language-python">await bot.send_message(user_id, text, parse_mode=ParseMode.HTML)
+</code></pre>
+
+<p><strong>Создать инлайн-кнопку:</strong></p>
+<pre class="codehilite"><code class="language-python">button = types.InlineKeyboardButton(text=&quot;Текст&quot;, callback_data='data')
+keyboard = types.InlineKeyboardMarkup(row_width=1)
+keyboard.add(button)
+</code></pre>
+
+<p><strong>Зарегистрировать обработчик:</strong></p>
+<pre class="codehilite"><code class="language-python">@dp.message_handler(commands=['command'])
+async def handler(message):
+    # код
+</code></pre>
+
+<hr />
+<h2>🎯 ЧТО ДАЛЬШЕ?</h2>
+<p>Используйте этот файл как основной справочник. Для глубокого изучения отдельного модуля откройте его <code>.py</code> файл в папке <code>modules/</code>.</p>
+<p><strong>Вопросы?</strong> Смотрите комментарии в коде (там есть <code>#? EN:</code> и <code>#* RU:</code> для каждой функции).</p>
+<hr />
+<p><em>Последнее обновление: 20.12.2025</em></p>
+        </div>
+
+        <div class="content">
+            <div class="nav-buttons">
+                <a href="../html/index_site.html" class="nav-button prev">← Вернуться к документации</a>
+                <a href="../html/index.html" class="nav-button">На главную →</a>
+            </div>
+        </div>
+
+        <footer>
+            <p>Chat Manager Bot | Полная документация и структура проекта | Версия 2.0</p>
+            <p style="margin-top: 10px;">
+                <a href="../html/index.html">Главная</a> | 
+                <a href="../html/index_site.html">Документация</a> | 
+                <a href="../html/modules.html">Модули</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

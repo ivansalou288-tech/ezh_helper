@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎲 Модуль Cubes (Дуэль на кубиках) - Полное руководство для разработчиков</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .breadcrumb {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .content h1 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .content h2 {
+            color: #764ba2;
+            font-size: 1.6em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+
+        .content h3 {
+            color: #667eea;
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .content h4 {
+            color: #764ba2;
+            font-size: 1.1em;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        .content p {
+            line-height: 1.8;
+            margin: 15px 0;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin: 15px 0;
+            margin-left: 30px;
+            line-height: 1.8;
+        }
+
+        .content li {
+            margin: 8px 0;
+            color: #444;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+            font-size: 0.95em;
+        }
+
+        .content pre {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .content pre code {
+            color: #333;
+            padding: 0;
+            background: none;
+            font-size: 0.9em;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 20px;
+            margin: 20px 0;
+            color: #666;
+            font-style: italic;
+        }
+
+        .content a {
+            color: #667eea;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .content a:hover {
+            border-bottom-color: #667eea;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .content table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .content table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+        }
+
+        .content table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .content hr {
+            border: none;
+            border-top: 2px solid #667eea;
+            margin: 30px 0;
+        }
+
+        .content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+            justify-content: space-between;
+        }
+
+        .nav-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .nav-button:hover {
+            background: #764ba2;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-button.prev {
+            margin-right: auto;
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+            }
+
+            .nav-button.prev {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎲 Модуль Cubes (Дуэль на кубиках) - Полное руководство для разработчиков</h1>
+            <p style="opacity: 0.9; font-size: 1.1em;">Chat Manager Bot - Документация</p>
+        </header>
+
+        <div class="breadcrumb">
+            <a href="../html/index.html">🏠 Главная</a> / 
+            <a href="../html/index_site.html">📖 Документация</a> / 
+            <span>🎲 Модуль Cubes (Дуэль на кубиках) - Полное руководство для разработчиков</span>
+        </div>
+
+        <div class="content">
+            
+<p><strong>Версия:</strong> 1.0<br />
+<strong>Дата:</strong> 20.12.2025<br />
+<strong>Статус:</strong> ✅ Готово к production<br />
+<strong>Язык:</strong> Python 3.10+  </p>
+<hr />
+<h2>📋 Содержание</h2>
+<ol>
+<li><a href="#обзор">Обзор</a></li>
+<li><a href="#архитектура">Архитектура</a></li>
+<li><a href="#api-системы-дуэлей">API системы дуэлей</a></li>
+<li><a href="#структура-базы-данных">Структура базы данных</a></li>
+<li><a href="#обработчики-сообщений">Обработчики сообщений</a></li>
+<li><a href="#примеры-использования">Примеры использования</a></li>
+<li><a href="#интеграция">Интеграция</a></li>
+<li><a href="#тестирование">Тестирование</a></li>
+<li><a href="#расширение-функциональности">Расширение функциональности</a></li>
+</ol>
+<hr />
+<h2>📖 Обзор</h2>
+<p>Модуль Cubes (<code>modules/cubes.py</code>) реализует систему дуэлей между двумя игроками на кубиках. Один игрок вызывает другого на дуэль, вызванный может согласиться или отказаться, а затем кубики определяют победителя. Поддерживает ставки на коины из фармы.</p>
+<h3>Основные возможности</h3>
+<p>✅ <strong>Система вызовов</strong> - один игрок вызывает другого на дуэль<br />
+✅ <strong>Время на ответ</strong> - 90 секунд чтобы согласиться или отказаться<br />
+✅ <strong>Ставки</strong> - возможность играть на коины из мешка<br />
+✅ <strong>Броски кубиков</strong> - случайный результат для каждого игрока<br />
+✅ <strong>Определение победителя</strong> - автоматический расчёт по результатам<br />
+✅ <strong>Передача коинов</strong> - автоматическое перечисление выигрыша/проигрыша<br />
+✅ <strong>История дуэлей</strong> - опциональное сохранение результатов  </p>
+<hr />
+<h2>🏗️ Архитектура</h2>
+<h3>Структура модуля</h3>
+<pre class="codehilite"><code>modules/cubes.py
+├── Класс _CubesDuel
+│   ├── duel_id: str
+│   ├── chat_id: int
+│   ├── inviter_id: int
+│   ├── opponent_id: int
+│   ├── inviter_name: str
+│   ├── opponent_name: str
+│   ├── invite_message_id: int
+│   ├── created_at: float
+│   └── stake: int
+│
+├── Хранилище дуэлей
+│   ├── _PENDING_BY_CHAT[chat_id] -&gt; duel_id
+│   └── _PENDING_BY_ID[duel_id] -&gt; _CubesDuel
+│
+├── Обработчики
+│   ├── cubes_handler() - инициирует дуэль
+│   ├── accept_duel_handler() - согласиться с дуэлью
+│   ├── reject_duel_handler() - отклонить дуэль
+│   └── Автоматическое удаление истёкших дуэлей
+│
+└── Вспомогательные функции
+    ├── _user_link() - создание HTML-ссылки на пользователя
+    ├── _is_expired() - проверка истечения дуэли
+    ├── _parse_stake() - парсинг размера ставки
+    └── _ensure_farma_row_and_get_meshok() - проверка баланса
+</code></pre>
+
+<h3>Поток данных</h3>
+<pre class="codehilite"><code>Игрок A пишет &quot;!кубы 100&quot; для вызова B
+         ↓
+    cubes_handler()
+         ↓
+    Создание объекта _CubesDuel
+         ↓
+    Сохранение в _PENDING_BY_ID и _PENDING_BY_CHAT
+         ↓
+    Отправка сообщения с кнопками согласиться/отказаться
+         ↓
+    90 секунд ожидания на ответ
+         ↓
+    [Игрок B согласился] ИЛИ [Время истекло]
+         ↓
+    Розыгрыш кубиков
+         ↓
+    Определение победителя
+         ↓
+    Передача коинов
+         ↓
+    Удаление дуэли из хранилища
+</code></pre>
+
+<hr />
+<h2>🔌 API системы дуэлей</h2>
+<h3>_CubesDuel</h3>
+<p>Класс данных для хранения информации о дуэли.</p>
+<pre class="codehilite"><code class="language-python">@dataclass
+class _CubesDuel:
+    duel_id: str              # Уникальный ID дуэли
+    chat_id: int              # ID чата, где идёт дуэль
+    inviter_id: int           # ID приглашающего игрока
+    opponent_id: int          # ID вызванного игрока
+    inviter_name: str         # Имя приглашающего
+    opponent_name: str        # Имя вызванного
+    invite_message_id: int    # ID сообщения с приглашением
+    created_at: float         # Время создания (для проверки истечения)
+    stake: int                # Ставка в коинах
+</code></pre>
+
+<h3>_PENDING_BY_CHAT и _PENDING_BY_ID</h3>
+<p>Глобальные хранилища для отслеживания активных дуэлей.</p>
+<pre class="codehilite"><code class="language-python">_PENDING_BY_CHAT: dict[int, str] = {}  # chat_id -&gt; duel_id
+_PENDING_BY_ID: dict[str, _CubesDuel] = {}  # duel_id -&gt; _CubesDuel
+</code></pre>
+
+<h3>_parse_stake()</h3>
+<p>Функция для парсинга размера ставки из текста команды.</p>
+<pre class="codehilite"><code class="language-python">def _parse_stake(text: str) -&gt; Optional[int]:
+    &quot;&quot;&quot;
+    Поддерживает:
+      - &quot;!кубы 100&quot;
+      - &quot;! кубы 100&quot;
+      - без ставки -&gt; 100 (по умолчанию)
+    &quot;&quot;&quot;
+</code></pre>
+
+<p><strong>Параметры:</strong>
+- <code>text</code> (str): Текст команды</p>
+<p><strong>Возвращает:</strong> 
+- <code>int</code> - размер ставки (по умолчанию 100)
+- <code>None</code> - если формат неверный</p>
+<p><strong>Примеры:</strong></p>
+<pre class="codehilite"><code class="language-python">_parse_stake(&quot;!кубы 100&quot;)     # -&gt; 100
+_parse_stake(&quot;! кубы 50&quot;)     # -&gt; 50
+_parse_stake(&quot;!кубы&quot;)         # -&gt; 100 (по умолчанию)
+_parse_stake(&quot;!кубы abc&quot;)     # -&gt; None
+</code></pre>
+
+<h3>_ensure_farma_row_and_get_meshok()</h3>
+<p>Функция для получения баланса пользователя с автоматическим созданием записи.</p>
+<pre class="codehilite"><code class="language-python">def _ensure_farma_row_and_get_meshok(cursor: sqlite3.Cursor, user_id: int) -&gt; int:
+    &quot;&quot;&quot;
+    Обеспечивает наличие записи в таблице farma и возвращает баланс
+    &quot;&quot;&quot;
+</code></pre>
+
+<p><strong>Параметры:</strong>
+- <code>cursor</code> (sqlite3.Cursor): Курсор БД
+- <code>user_id</code> (int): ID пользователя</p>
+<p><strong>Возвращает:</strong> 
+- <code>int</code> - текущий баланс мешка (или 0 если новый пользователь)</p>
+<h3>cubes_handler()</h3>
+<p>Основной обработчик для инициирования дуэли.</p>
+<pre class="codehilite"><code class="language-python">@dp.message_handler(Text(startswith=['! кубы', '!кубы'], ignore_case=True))
+async def cubes_handler(message: types.Message):
+    &quot;&quot;&quot;
+    Инициирует дуэль между двумя игроками на кубиках
+    &quot;&quot;&quot;
+</code></pre>
+
+<p><strong>Срабатывает когда:</strong>
+- Пользователь напишет <code>!кубы</code> или <code>! кубы</code> с опциональной ставкой</p>
+<p><strong>Параметры:</strong>
+- <code>message.from_user.id</code> (int): ID приглашающего
+- <code>message.reply_to_message</code> (optional): Если дуэль по ответу на сообщение
+- <code>message.text</code> (str): Текст команды, содержит размер ставки</p>
+<p><strong>Возвращает:</strong> None (отправляет сообщение в чат)</p>
+<p><strong>Логика:</strong>
+1. Получает целевого игрока (из ответа на сообщение)
+2. Парсит размер ставки
+3. Проверяет баланс обоих игроков
+4. Создаёт объект _CubesDuel
+5. Отправляет сообщение с кнопками согласиться/отказаться
+6. Устанавливает таймер на 90 секунд
+7. При истечении удаляет дуэль</p>
+<hr />
+<h2>📊 Структура базы данных</h2>
+<h3>Таблица <code>farma</code></h3>
+<pre class="codehilite"><code class="language-sql">CREATE TABLE IF NOT EXISTS farma (
+    user_id INTEGER PRIMARY KEY,
+    meshok INTEGER DEFAULT 0,
+    last_date TEXT
+)
+</code></pre>
+
+<h3>Таблица <code>duels</code> (опционально, для истории)</h3>
+<pre class="codehilite"><code class="language-sql">CREATE TABLE IF NOT EXISTS duels (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    chat_id INTEGER NOT NULL,
+    inviter_id INTEGER NOT NULL,
+    opponent_id INTEGER NOT NULL,
+    winner_id INTEGER NOT NULL,
+    stake INTEGER NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+</code></pre>
+
+<h3>Примеры данных</h3>
+<pre class="codehilite"><code class="language-sql">-- Дуэль с ставкой 100 коинов
+INSERT INTO duels (chat_id, inviter_id, opponent_id, winner_id, stake)
+VALUES (-1001234567890, 111111, 222222, 111111, 100);
+
+-- Дуэль с ставкой 50 коинов
+INSERT INTO duels (chat_id, inviter_id, opponent_id, winner_id, stake)
+VALUES (-1001234567890, 333333, 444444, 444444, 50);
+</code></pre>
+
+<hr />
+<h2>🎯 Обработчики сообщений</h2>
+<h3>cubes_handler()</h3>
+<p><strong>Основной обработчик для инициирования дуэли.</strong></p>
+<pre class="codehilite"><code class="language-python">@dp.message_handler(Text(startswith=['! кубы', '!кубы'], ignore_case=True))
+async def cubes_handler(message: types.Message):
+    &quot;&quot;&quot;
+    Инициирует дуэль между приглашающим и вызванным игроком
+    Поддерживает ставки и проверку баланса
+    &quot;&quot;&quot;
+</code></pre>
+
+<p><strong>Действия:</strong>
+1. Проверяет, что дуэль инициирована ответом на сообщение
+2. Получает целевого игрока
+3. Парсит размер ставки из текста команды
+4. Проверяет баланс обоих игроков
+5. Создаёт новую дуэль
+6. Отправляет приглашение с кнопками
+7. Ждёт 90 секунд на ответ</p>
+<h3>accept_duel_handler()</h3>
+<p><strong>Обработчик для согласия с дуэлью.</strong></p>
+<pre class="codehilite"><code class="language-python">@dp.callback_query_handler(lambda call: call.data.startswith('duel_accept_'))
+async def accept_duel_handler(call: types.CallbackQuery):
+    &quot;&quot;&quot;
+    Обрабатывает нажатие кнопки &quot;Согласиться&quot;
+    Проводит розыгрыш и определяет победителя
+    &quot;&quot;&quot;
+</code></pre>
+
+<p><strong>Действия:</strong>
+1. Получает ID дуэли из callback data
+2. Проверяет, не истекла ли дуэль
+3. Проводит броски кубиков для обоих игроков
+4. Определяет победителя (больший результат)
+5. Передаёт коины от проигравшего к победителю
+6. Отправляет результаты
+7. Удаляет дуэль из хранилища</p>
+<h3>reject_duel_handler()</h3>
+<p><strong>Обработчик для отклонения дуэли.</strong></p>
+<pre class="codehilite"><code class="language-python">@dp.callback_query_handler(lambda call: call.data.startswith('duel_reject_'))
+async def reject_duel_handler(call: types.CallbackQuery):
+    &quot;&quot;&quot;
+    Обрабатывает нажатие кнопки &quot;Отказаться&quot;
+    &quot;&quot;&quot;
+</code></pre>
+
+<p><strong>Действия:</strong>
+1. Удаляет дуэль из хранилища
+2. Отправляет сообщение об отказе
+3. Уведомляет приглашающего об отказе</p>
+<hr />
+<h2>💻 Примеры использования</h2>
+<h3>Пример 1: Инициирование дуэли программно</h3>
+<pre class="codehilite"><code class="language-python">import asyncio
+from dataclasses import dataclass
+import time
+
+@dataclass
+class _CubesDuel:
+    duel_id: str
+    chat_id: int
+    inviter_id: int
+    opponent_id: int
+    inviter_name: str
+    opponent_name: str
+    invite_message_id: int
+    created_at: float
+    stake: int
+
+async def initiate_duel(inviter_id: int, opponent_id: int, chat_id: int, stake: int = 100):
+    &quot;&quot;&quot;Инициирует дуэль между двумя игроками&quot;&quot;&quot;
+    import secrets
+
+    duel_id = secrets.token_hex(4)
+
+    duel = _CubesDuel(
+        duel_id=duel_id,
+        chat_id=chat_id,
+        inviter_id=inviter_id,
+        opponent_id=opponent_id,
+        inviter_name=&quot;Player1&quot;,
+        opponent_name=&quot;Player2&quot;,
+        invite_message_id=0,
+        created_at=time.monotonic(),
+        stake=stake
+    )
+
+    return duel
+</code></pre>
+
+<h3>Пример 2: Проверка балансов для дуэли</h3>
+<pre class="codehilite"><code class="language-python">def can_both_afford_duel(inviter_id: int, opponent_id: int, stake: int, db_path: str) -&gt; tuple[bool, str]:
+    &quot;&quot;&quot;Проверяет, могут ли оба игрока участвовать в дуэли&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    # Проверяем баланс приглашающего
+    inviter_balance = cursor.execute(
+        &quot;SELECT meshok FROM farma WHERE user_id = ?&quot;, 
+        (inviter_id,)
+    ).fetchone()
+    inviter_balance = inviter_balance[0] if inviter_balance else 0
+
+    # Проверяем баланс вызванного
+    opponent_balance = cursor.execute(
+        &quot;SELECT meshok FROM farma WHERE user_id = ?&quot;, 
+        (opponent_id,)
+    ).fetchone()
+    opponent_balance = opponent_balance[0] if opponent_balance else 0
+
+    connection.close()
+
+    if inviter_balance &lt; stake:
+        return False, f&quot;У приглашающего недостаточно коинов ({inviter_balance}/{stake})&quot;
+
+    if opponent_balance &lt; stake:
+        return False, f&quot;У вызванного недостаточно коинов ({opponent_balance}/{stake})&quot;
+
+    return True, &quot;Оба игрока могут участвовать&quot;
+
+# Использование
+can_afford, message = can_both_afford_duel(123456, 234567, 100, &quot;Base_bot.db&quot;)
+if can_afford:
+    print(&quot;Дуэль может начаться&quot;)
+else:
+    print(f&quot;Ошибка: {message}&quot;)
+</code></pre>
+
+<h3>Пример 3: Броски кубиков и определение победителя</h3>
+<pre class="codehilite"><code class="language-python">import random
+
+def roll_dice() -&gt; int:
+    &quot;&quot;&quot;Бросает один кубик (от 1 до 6)&quot;&quot;&quot;
+    return random.randint(1, 6)
+
+def conduct_duel(inviter_name: str, opponent_name: str, stake: int) -&gt; dict:
+    &quot;&quot;&quot;Проводит дуэль и возвращает результаты&quot;&quot;&quot;
+    # Оба игрока бросают 3 кубика каждый
+    inviter_rolls = [roll_dice() for _ in range(3)]
+    opponent_rolls = [roll_dice() for _ in range(3)]
+
+    inviter_score = sum(inviter_rolls)
+    opponent_score = sum(opponent_rolls)
+
+    if inviter_score &gt; opponent_score:
+        winner = inviter_name
+        loser = opponent_name
+    elif opponent_score &gt; inviter_score:
+        winner = opponent_name
+        loser = inviter_name
+    else:
+        winner = &quot;Ничья&quot;
+        loser = None
+
+    return {
+        &quot;inviter_name&quot;: inviter_name,
+        &quot;opponent_name&quot;: opponent_name,
+        &quot;inviter_rolls&quot;: inviter_rolls,
+        &quot;opponent_rolls&quot;: opponent_rolls,
+        &quot;inviter_score&quot;: inviter_score,
+        &quot;opponent_score&quot;: opponent_score,
+        &quot;winner&quot;: winner,
+        &quot;stake&quot;: stake
+    }
+
+# Использование
+result = conduct_duel(&quot;Иван&quot;, &quot;Мария&quot;, 100)
+print(f&quot;{result['inviter_name']}: {result['inviter_rolls']} = {result['inviter_score']}&quot;)
+print(f&quot;{result['opponent_name']}: {result['opponent_rolls']} = {result['opponent_score']}&quot;)
+print(f&quot;Победитель: {result['winner']}&quot;)
+</code></pre>
+
+<h3>Пример 4: Передача коинов после дуэли</h3>
+<pre class="codehilite"><code class="language-python">def transfer_coins(from_user: int, to_user: int, amount: int, db_path: str) -&gt; bool:
+    &quot;&quot;&quot;Передаёт коины от одного пользователя другому&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    try:
+        # Вычитаем у первого
+        from_balance = cursor.execute(
+            &quot;SELECT meshok FROM farma WHERE user_id = ?&quot;,
+            (from_user,)
+        ).fetchone()
+
+        if from_balance is None or from_balance[0] &lt; amount:
+            return False
+
+        new_from_balance = from_balance[0] - amount
+        cursor.execute(
+            &quot;UPDATE farma SET meshok = ? WHERE user_id = ?&quot;,
+            (new_from_balance, from_user)
+        )
+
+        # Добавляем второму
+        to_balance = cursor.execute(
+            &quot;SELECT meshok FROM farma WHERE user_id = ?&quot;,
+            (to_user,)
+        ).fetchone()
+
+        new_to_balance = (to_balance[0] if to_balance else 0) + amount
+
+        if to_balance is None:
+            cursor.execute(
+                &quot;INSERT INTO farma (user_id, meshok, last_date) VALUES (?, ?, ?)&quot;,
+                (to_user, new_to_balance, datetime.now().strftime(&quot;%H:%M:%S %d.%m.%Y&quot;))
+            )
+        else:
+            cursor.execute(
+                &quot;UPDATE farma SET meshok = ? WHERE user_id = ?&quot;,
+                (new_to_balance, to_user)
+            )
+
+        connection.commit()
+        return True
+    except Exception as e:
+        print(f&quot;Ошибка при передаче коинов: {e}&quot;)
+        return False
+    finally:
+        connection.close()
+
+# Использование
+if transfer_coins(123456, 234567, 100, &quot;Base_bot.db&quot;):
+    print(&quot;✅ 100 коинов успешно переданы&quot;)
+else:
+    print(&quot;❌ Ошибка при передаче коинов&quot;)
+</code></pre>
+
+<h3>Пример 5: Сохранение результатов дуэли</h3>
+<pre class="codehilite"><code class="language-python">def save_duel_result(chat_id: int, inviter_id: int, opponent_id: int, 
+                     winner_id: int, stake: int, db_path: str) -&gt; bool:
+    &quot;&quot;&quot;Сохраняет результат дуэли в БД для истории&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    try:
+        # Сначала создаём таблицу, если её нет
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS duels (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                chat_id INTEGER NOT NULL,
+                inviter_id INTEGER NOT NULL,
+                opponent_id INTEGER NOT NULL,
+                winner_id INTEGER NOT NULL,
+                stake INTEGER NOT NULL,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+
+        cursor.execute(
+            '''INSERT INTO duels (chat_id, inviter_id, opponent_id, winner_id, stake)
+               VALUES (?, ?, ?, ?, ?)''',
+            (chat_id, inviter_id, opponent_id, winner_id, stake)
+        )
+
+        connection.commit()
+        return True
+    except Exception as e:
+        print(f&quot;Ошибка при сохранении дуэли: {e}&quot;)
+        return False
+    finally:
+        connection.close()
+
+# Использование
+save_duel_result(
+    chat_id=-1001234567890,
+    inviter_id=123456,
+    opponent_id=234567,
+    winner_id=123456,
+    stake=100,
+    db_path=&quot;Base_bot.db&quot;
+)
+</code></pre>
+
+<hr />
+<h2>🔧 Интеграция</h2>
+<h3>Интеграция в main_bot.py</h3>
+<pre class="codehilite"><code class="language-python"># main/main_bot.py
+
+import modules.cubes  # Обработчики регистрируются автоматически
+
+# Остальной код вашего бота...
+
+if __name__ == '__main__':
+    print(&quot;Starting bot...&quot;)
+    dp.start_polling()
+</code></pre>
+
+<h3>Интеграция с модулем Farm</h3>
+<pre class="codehilite"><code class="language-python"># Система дуэлей использует коины из модуля farm
+# Перед началом дуэли:
+# 1. Проверяется баланс в таблице farma
+# 2. Вычитаются коины со ставкой
+# 3. Добавляются коины победителю
+</code></pre>
+
+<hr />
+<h2>🧪 Тестирование</h2>
+<h3>Запуск тестов</h3>
+<pre class="codehilite"><code class="language-bash">python test_cubes.py
+</code></pre>
+
+<h3>Написание тестов</h3>
+<pre class="codehilite"><code class="language-python">import unittest
+import sqlite3
+from datetime import datetime
+from pathlib import Path
+
+class TestCubes(unittest.TestCase):
+    def setUp(self):
+        &quot;&quot;&quot;Подготовка к каждому тесту&quot;&quot;&quot;
+        self.test_db = Path(__file__).parent / 'test_cubes.db'
+        self.connection = sqlite3.connect(str(self.test_db), check_same_thread=False)
+        self.cursor = self.connection.cursor()
+        self._create_tables()
+
+    def tearDown(self):
+        &quot;&quot;&quot;Очистка после каждого теста&quot;&quot;&quot;
+        self.connection.close()
+        if self.test_db.exists():
+            self.test_db.unlink()
+
+    def _create_tables(self):
+        &quot;&quot;&quot;Создает необходимые таблицы&quot;&quot;&quot;
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS farma (
+                user_id INTEGER PRIMARY KEY,
+                meshok INTEGER DEFAULT 0,
+                last_date TEXT
+            )
+        ''')
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS duels (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                chat_id INTEGER,
+                inviter_id INTEGER,
+                opponent_id INTEGER,
+                winner_id INTEGER,
+                stake INTEGER,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        self.connection.commit()
+
+    def test_duel_requires_sufficient_balance(self):
+        &quot;&quot;&quot;Тест: дуэль требует достаточного баланса&quot;&quot;&quot;
+        # Первый игрок с 50 коинами
+        self.cursor.execute(
+            &quot;INSERT INTO farma (user_id, meshok, last_date) VALUES (?, ?, ?)&quot;,
+            (123456, 50, datetime.now().strftime(&quot;%H:%M:%S %d.%m.%Y&quot;))
+        )
+
+        # Второй игрок с 200 коинами
+        self.cursor.execute(
+            &quot;INSERT INTO farma (user_id, meshok, last_date) VALUES (?, ?, ?)&quot;,
+            (234567, 200, datetime.now().strftime(&quot;%H:%M:%S %d.%m.%Y&quot;))
+        )
+        self.connection.commit()
+
+        # Первый не может участвовать в дуэли на 100 коинов
+        balance1 = self.cursor.execute(
+            &quot;SELECT meshok FROM farma WHERE user_id = ?&quot;,
+            (123456,)
+        ).fetchone()[0]
+
+        stake = 100
+        self.assertLess(balance1, stake)
+
+if __name__ == '__main__':
+    unittest.main()
+</code></pre>
+
+<hr />
+<h2>🚀 Расширение функциональности</h2>
+<h3>Идея 1: Разные типы дуэлей</h3>
+<pre class="codehilite"><code class="language-python">DUEL_TYPES = {
+    &quot;стандарт&quot;: {&quot;dice_count&quot;: 3, &quot;name&quot;: &quot;Стандартная дуэль&quot;},
+    &quot;экстрим&quot;: {&quot;dice_count&quot;: 5, &quot;name&quot;: &quot;Экстремальная дуэль&quot;},
+    &quot;быстрая&quot;: {&quot;dice_count&quot;: 1, &quot;name&quot;: &quot;Быстрая дуэль&quot;}
+}
+
+def get_duel_type_info(duel_type: str) -&gt; dict:
+    &quot;&quot;&quot;Получает информацию о типе дуэли&quot;&quot;&quot;
+    return DUEL_TYPES.get(duel_type, DUEL_TYPES[&quot;стандарт&quot;])
+</code></pre>
+
+<h3>Идея 2: Рейтинг дуэлистов</h3>
+<pre class="codehilite"><code class="language-python">def get_duel_stats(user_id: int, db_path: str) -&gt; dict:
+    &quot;&quot;&quot;Получает статистику по дуэлям пользователя&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    # Всего дуэлей
+    total = cursor.execute(
+        &quot;SELECT COUNT(*) FROM duels WHERE inviter_id = ? OR opponent_id = ?&quot;,
+        (user_id, user_id)
+    ).fetchone()[0]
+
+    # Побед
+    wins = cursor.execute(
+        &quot;SELECT COUNT(*) FROM duels WHERE winner_id = ?&quot;,
+        (user_id,)
+    ).fetchone()[0]
+
+    # Проигрышей
+    losses = total - wins
+
+    # Выигранных коинов
+    earned = cursor.execute(
+        &quot;SELECT SUM(stake) FROM duels WHERE winner_id = ?&quot;,
+        (user_id,)
+    ).fetchone()[0] or 0
+
+    connection.close()
+
+    return {
+        &quot;total_duels&quot;: total,
+        &quot;wins&quot;: wins,
+        &quot;losses&quot;: losses,
+        &quot;win_rate&quot;: (wins / total * 100) if total &gt; 0 else 0,
+        &quot;earned_coins&quot;: earned
+    }
+</code></pre>
+
+<h3>Идея 3: Сезонные турниры дуэлей</h3>
+<pre class="codehilite"><code class="language-python">def get_season_stats(user_id: int, season: str, db_path: str) -&gt; dict:
+    &quot;&quot;&quot;Получает статистику пользователя за сезон&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    # Получаем даты сезона
+    season_dates = {
+        &quot;S1_2025&quot;: (&quot;2025-01-01&quot;, &quot;2025-03-31&quot;),
+        &quot;S2_2025&quot;: (&quot;2025-04-01&quot;, &quot;2025-06-30&quot;),
+        &quot;S3_2025&quot;: (&quot;2025-07-01&quot;, &quot;2025-09-30&quot;),
+        &quot;S4_2025&quot;: (&quot;2025-10-01&quot;, &quot;2025-12-31&quot;),
+    }
+
+    if season not in season_dates:
+        return {}
+
+    start_date, end_date = season_dates[season]
+
+    wins = cursor.execute(
+        &quot;SELECT COUNT(*) FROM duels WHERE winner_id = ? AND timestamp BETWEEN ? AND ?&quot;,
+        (user_id, start_date, end_date)
+    ).fetchone()[0]
+
+    connection.close()
+    return {&quot;season&quot;: season, &quot;wins&quot;: wins}
+</code></pre>
+
+<hr />
+<h2>📝 Лицензия</h2>
+<p>Часть проекта WERTY | Chat-Manager Bot</p>
+<hr />
+<p><strong>Версия:</strong> 1.0<br />
+<strong>Разработано:</strong> GitHub Copilot<br />
+<strong>Последнее обновление:</strong> 20.12.2025</p>
+        </div>
+
+        <div class="content">
+            <div class="nav-buttons">
+                <a href="../html/index_site.html" class="nav-button prev">← Вернуться к документации</a>
+                <a href="../html/index.html" class="nav-button">На главную →</a>
+            </div>
+        </div>
+
+        <footer>
+            <p>Chat Manager Bot | Полная документация и структура проекта | Версия 2.0</p>
+            <p style="margin-top: 10px;">
+                <a href="../html/index.html">Главная</a> | 
+                <a href="../html/index_site.html">Документация</a> | 
+                <a href="../html/modules.html">Модули</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

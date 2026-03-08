@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заявка в клан</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a0033 0%, #2d1b69 50%, #0f0c29 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Неоновые анимации фона */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(138, 43, 226, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(147, 51, 234, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(167, 139, 250, 0.2) 0%, transparent 50%);
+            animation: neonPulse 4s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes neonPulse {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Виджет профиля */
+        .profile-widget {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(30, 10, 60, 0.9);
+            border: 2px solid #8a2be2;
+            border-radius: 20px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0 20px rgba(138, 43, 226, 0.5),
+                inset 0 0 20px rgba(138, 43, 226, 0.1);
+            z-index: 1000;
+            animation: profileGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes profileGlow {
+            0% { 
+                box-shadow: 
+                    0 0 20px rgba(138, 43, 226, 0.5),
+                    inset 0 0 20px rgba(138, 43, 226, 0.1);
+            }
+            100% { 
+                box-shadow: 
+                    0 0 30px rgba(138, 43, 226, 0.8),
+                    inset 0 0 30px rgba(138, 43, 226, 0.2);
+            }
+        }
+
+        .profile-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid #a855f7;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #e9d5ff;
+            text-shadow: 0 0 10px rgba(138, 43, 226, 0.8);
+        }
+
+        .profile-status {
+            font-size: 12px;
+            color: #c084fc;
+            margin-top: 2px;
+        }
+
+        /* Основной контент */
+        .main-content {
+            position: relative;
+            z-index: 10;
+            padding: 100px 20px 40px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .neon-title {
+            font-size: 3rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #a855f7, #e9d5ff, #a855f7);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(138, 43, 226, 0.5);
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Форма и поля ввода */
+        .form-container {
+            background: rgba(30, 10, 60, 0.8);
+            border: 2px solid #8a2be2;
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0 30px rgba(138, 43, 226, 0.3),
+                inset 0 0 20px rgba(138, 43, 226, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .neon-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #e9d5ff;
+            font-size: 14px;
+            font-weight: 500;
+            text-shadow: 0 0 5px rgba(138, 43, 226, 0.5);
+        }
+
+        .neon-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(20, 5, 40, 0.8);
+            border: 2px solid #6b21a8;
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 10px rgba(138, 43, 226, 0.1);
+        }
+
+        .neon-input:focus {
+            outline: none;
+            border-color: #a855f7;
+            box-shadow: 
+                0 0 20px rgba(168, 85, 247, 0.4),
+                inset 0 0 10px rgba(138, 43, 226, 0.2);
+        }
+
+        .neon-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .neon-input.error {
+            border-color: #ef4444;
+            box-shadow: 
+                0 0 20px rgba(239, 68, 68, 0.4),
+                inset 0 0 10px rgba(239, 68, 68, 0.2);
+        }
+
+        .error-message {
+            display: none;
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 5px;
+            text-shadow: 0 0 5px rgba(239, 68, 68, 0.5);
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+/* Стили для правил и гайда */
+.rules-content, .guide-content {
+    background: rgba(26, 0, 51, 0.7);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(138, 43, 226, 0.3);
+}
+
+.rules-content h3, .guide-content h3 {
+    color: #8a2be2;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.rules-content p, .guide-content p {
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.rules-content ul, .guide-content ul {
+    margin: 15px 0;
+    padding-left: 20px;
+}
+
+.rules-content li, .guide-content li {
+    margin-bottom: 8px;
+    color: #ffffff;
+}
+
+.guide-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: center;
+}
+
+.guide-buttons button {
+    flex: 1;
+}
+
+/* Стили для загрузки фото */
+.upload-area {
+    border: 2px dashed rgba(138, 43, 226, 0.3);
+    border-radius: 15px;
+    padding: 30px;
+    text-align: center;
+    margin: 20px 0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: rgba(26, 0, 51, 0.3);
+}
+
+.upload-area:hover {
+    border-color: rgba(138, 43, 226, 0.6);
+    background: rgba(26, 0, 51, 0.5);
+}
+
+.upload-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.upload-placeholder p {
+    margin: 5px 0;
+    color: #ffffff;
+}
+
+.photo-preview {
+    text-align: center;
+}
+
+.photo-upload-content {
+    background: rgba(26, 0, 51, 0.7);
+    border-radius: 15px;
+    padding: 20px;
+    border: 1px solid rgba(138, 43, 226, 0.3);
+}
+
+.next-step-content {
+    background: rgba(26, 0, 51, 0.7);
+    border-radius: 15px;
+    padding: 20px;
+    border: 1px solid rgba(138, 43, 226, 0.3);
+    text-align: center;
+}
+
+/* Стили для блоков чатов */
+.invite-links-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: rgba(26, 0, 51, 0.7);
+    border-radius: 15px;
+    padding: 20px;
+    border: 1px solid rgba(138, 43, 226, 0.3);
+}
+
+.chat-block {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: rgba(138, 43, 226, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(138, 43, 226, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.chat-block:hover {
+    background: rgba(138, 43, 226, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(138, 43, 226, 0.4);
+}
+
+.chat-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.chat-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.chat-info {
+    flex: 1;
+    text-align: left;
+}
+
+.chat-info h3 {
+    color: #8a2be2;
+    margin: 0 0 5px 0;
+    font-size: 18px;
+    text-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
+}
+
+.chat-info p {
+    color: #ffffff;
+    margin: 5px 0;
+    opacity: 0.8;
+    font-size: 14px;
+}
+
+.link-hint {
+    color: #a855f7;
+    font-size: 12px;
+    margin-top: 5px;
+    opacity: 0.7;
+}
+
+        .neon-button {
+            background: linear-gradient(45deg, #8a2be2, #9333ea);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 0 20px rgba(138, 43, 226, 0.5),
+                inset 0 0 20px rgba(138, 43, 226, 0.2);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .neon-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .neon-button:hover::before {
+            left: 100%;
+        }
+
+        .neon-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 5px 30px rgba(138, 43, 226, 0.7),
+                inset 0 0 30px rgba(138, 43, 226, 0.3);
+        }
+
+        /* Декоративные элементы */
+        .neon-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.6;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .orb1 {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, #8a2be2, transparent);
+            top: 10%;
+            right: 10%;
+            animation-delay: 0s;
+        }
+
+        .orb2 {
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, #9333ea, transparent);
+            bottom: 20%;
+            left: 5%;
+            animation-delay: 2s;
+        }
+
+        .orb3 {
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, #a855f7, transparent);
+            top: 50%;
+            right: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .neon-title {
+                font-size: 2rem;
+            }
+            
+            .profile-widget {
+                top: 10px;
+                left: 10px;
+                padding: 10px;
+                gap: 10px;
+            }
+            
+            .profile-avatar {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .profile-name {
+                font-size: 14px;
+            }
+            
+            .form-container {
+                margin: 0 10px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Декоративные орбы -->
+    <div class="neon-orb orb1"></div>
+    <div class="neon-orb orb2"></div>
+    <div class="neon-orb orb3"></div>
+
+    <!-- Виджет профиля -->
+    <div class="profile-widget" id="profileWidget">
+        <img class="profile-avatar" id="userAvatar" src="https://via.placeholder.com/50" alt="Avatar">
+        <div class="profile-info">
+            <div class="profile-name" id="profileName">Загрузка...</div>
+            <div class="profile-status" id="userStatus">Telegram Mini App</div>
+        </div>
+    </div>
+
+    <!-- Основной контент -->
+    <div class="main-content">
+        <h1 class="neon-title">Заявка в клан</h1>
+        
+        <!-- Форма ввода кода -->
+        <div class="form-container" id="codeContainer">
+            <div class="input-group">
+                <label class="neon-label" for="inputCode">Код вступления:</label>
+                <input type="text" id="inputCode" class="neon-input" placeholder="Введите код приглашения">
+                <span class="error-message" id="codeError">Неверный код приглашения</span>
+            </div>
+            
+            <button class="neon-button" onclick="checkCode()">
+                Проверить код
+            </button>
+        </div>
+        
+        <!-- Форма заявки (изначально скрыта) -->
+        <div class="form-container" id="formContainer" style="display: none;">
+            <div class="input-group">
+                <label class="neon-label" for="inputName">Ваше имя:</label>
+                <input type="text" id="inputName" class="neon-input" placeholder="Введите ваше реальное имя">
+                <span class="error-message" id="nameError">Имя не может быть пустым</span>
+            </div>
+            
+            <div class="input-group">
+                <label class="neon-label" for="inputAge">Возраст:</label>
+                <input type="tel" id="inputAge" class="neon-input" placeholder="от 7 до 50 лет" pattern="[0-9]*" inputmode="numeric">
+                <span class="error-message" id="ageError">Возраст должен быть от 7 до 50</span>
+            </div>
+            
+            <div class="input-group">
+                <label class="neon-label" for="inputNick">Игровой ник:</label>
+                <input type="text" id="inputNick" class="neon-input" placeholder="Ваш ник в игре" maxlength="14">
+                <span class="error-message" id="nickError">Ник не должен превышать 14 символов</span>
+            </div>
+            
+            <div class="input-group">
+                <label class="neon-label" for="inputGameId">Игровой ID:</label>
+                <input type="tel" id="inputGameId" class="neon-input" placeholder="ID начинается с 5, 9-12 цифр" pattern="[0-9]*" inputmode="numeric">
+                <span class="error-message" id="idError">ID должен начинаться с 5 и содержать 9-12 цифр</span>
+            </div>
+            
+            <button class="neon-button" onclick="handleFillButton()">
+                Подать заявку
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Инициализация Telegram Web App
+        const tg = window.Telegram.WebApp;
+
+        // Расширяем на весь экран
+        tg.expand();
+
+        // Устанавливаем цвет темы
+        tg.setHeaderColor('#1a0033');
+        tg.setBackgroundColor('#1a0033');
+
+        // Инициализация данных пользователя
+        function initUserData() {
+            const user = tg.initDataUnsafe?.user;
+            
+            if (user) {
+                // Обновляем имя пользователя в профиле
+                document.getElementById('profileName').textContent = 
+                    user.first_name + (user.last_name ? ' ' + user.last_name : '');
+                
+                // Заполняем поле имени
+                document.getElementById('inputName').value = 
+                    user.first_name + (user.last_name ? ' ' + user.last_name : '');
+                
+                // Обновляем аватар
+                if (user.photo_url) {
+                    document.getElementById('userAvatar').src = user.photo_url;
+                } else {
+                    // Если нет фото, используем первую букву имени
+                    const avatar = document.getElementById('userAvatar');
+                    const initial = user.first_name ? user.first_name[0].toUpperCase() : 'U';
+                    avatar.style.background = 'linear-gradient(45deg, #8a2be2, #9333ea)';
+                    avatar.style.display = 'flex';
+                    avatar.style.alignItems = 'center';
+                    avatar.style.justifyContent = 'center';
+                    avatar.style.fontSize = '20px';
+                    avatar.style.fontWeight = 'bold';
+                    avatar.style.color = 'white';
+                    avatar.textContent = initial;
+                }
+                
+                // Обновляем статус
+                if (user.username) {
+                    document.getElementById('userStatus').textContent = '@' + user.username;
+                } else {
+                    document.getElementById('userStatus').textContent = 'Пользователь Telegram';
+                }
+            } else {
+                // Если данные недоступны, показываем заглушку
+                document.getElementById('profileName').textContent = 'Гость';
+                document.getElementById('userStatus').textContent = 'Демо режим';
+            }
+        }
+
+        // Валидация имени
+        function validateName(name) {
+            return name.trim().length > 0;
+        }
+
+        // Валидация возраста
+        function validateAge(age) {
+            const ageNum = parseInt(age);
+            return !isNaN(ageNum) && ageNum >= 7 && ageNum <= 50;
+        }
+
+        // Валидация игрового ника
+        function validateNick(nick) {
+            return nick.length <= 14 && nick.length > 0;
+        }
+
+        // Валидация игрового ID
+        function validateGameId(gameId) {
+            const idRegex = /^5\d{8,11}$/;
+            return idRegex.test(gameId);
+        }
+
+        // Показать/скрыть ошибку
+        function toggleError(inputId, errorId, show) {
+            const input = document.getElementById(inputId);
+            const error = document.getElementById(errorId);
+            
+            if (show) {
+                input.classList.add('error');
+                error.classList.add('show');
+            } else {
+                input.classList.remove('error');
+                error.classList.remove('show');
+            }
+        }
+
+        // Глобальные переменные для хранения данных о коде
+        let currentCodeData = null;
+
+        // Проверка кода приглашения
+        async function checkCode() {
+            const code = document.getElementById('inputCode').value.trim();
+            
+            if (!code) {
+                toggleError('inputCode', 'codeError', true);
+                return;
+            }
+            
+            // Вибрация для обратной связи
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
+            }
+            
+            try {
+                const response = await fetch('https://ezh-dev.ru:8000/check_invite_code', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ code: code })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    // Код найден, сохраняем данные и показываем форму
+                    currentCodeData = data.data;
+                    toggleError('inputCode', 'codeError', false);
+                    
+                    // Показываем форму заявки, скрываем форму кода
+                    document.getElementById('codeContainer').style.display = 'none';
+                    document.getElementById('formContainer').style.display = 'block';
+                    
+                    // Вибрация успеха
+                    if (tg.HapticFeedback) {
+                        tg.HapticFeedback.notificationOccurred('success');
+                    }
+                    
+                    tg.showPopup({
+                        title: 'Код принят!',
+                        message: `Код действителен. Осталось активаций: ${data.data.activate_count}`,
+                        buttons: [{
+                            text: 'Продолжить',
+                            type: 'default'
+                        }]
+                    });
+                } else {
+                    // Код не найден или недействителен
+                    toggleError('inputCode', 'codeError', true);
+                    
+                    // Вибрация ошибки
+                    if (tg.HapticFeedback) {
+                        tg.HapticFeedback.notificationOccurred('error');
+                    }
+                    
+                    tg.showPopup({
+                        title: 'Ошибка!',
+                        message: data.message || 'Неверный код приглашения',
+                        buttons: [{
+                            text: 'Понятно',
+                            type: 'default'
+                        }]
+                    });
+                }
+            } catch (error) {
+                console.error('Ошибка при проверке кода:', error);
+                toggleError('inputCode', 'codeError', true);
+                
+                if (tg.HapticFeedback) {
+                    tg.HapticFeedback.notificationOccurred('error');
+                }
+                
+                tg.showPopup({
+                    title: 'Ошибка!',
+                    message: 'Не удалось проверить код. Попробуйте еще раз.',
+                    buttons: [{
+                        text: 'Понятно',
+                        type: 'default'
+                    }]
+                });
+            }
+        }
+
+        // Функция показа правил и гайда
+        async function showRulesAndGuide() {
+            // Скрываем все контейнеры
+            document.getElementById('codeContainer').style.display = 'none';
+            document.getElementById('formContainer').style.display = 'none';
+            
+            try {
+                // Получаем правила с сервера
+                const response = await fetch('https://ezh-dev.ru:8000/get_rules');
+                const data = await response.json();
+                
+                let rulesContent = '';
+                if (data.status === 'success' && data.data.rules) {
+                    rulesContent = data.data.rules;
+                } else {
+                    rulesContent = '📋 Основные правила:\n• Уважай других игроков\n• Не используй читеры\n• Участвуй в войнах клана\n• Соблюдай дисциплину\n\n🎮 Игровые требования:\n• Активность 3+ раза в неделю\n• Уровень 50+\n• Наличие микрофона';
+                }
+                
+                // Показываем правила
+                const rulesContainer = document.createElement('div');
+                rulesContainer.className = 'form-container';
+                rulesContainer.innerHTML = `
+                    <h2 class="neon-title">Правила клана</h2>
+                    <div class="rules-content">
+                        <pre style="white-space: pre-wrap; font-family: inherit; color: white;">${rulesContent}</pre>
+                    </div>
+                    <button class="neon-button" onclick="showGuide()">
+                        Как вступить в клан
+                    </button>
+                `;
+                
+                // Заменяем основной контент, но сохраняем заголовок
+                const mainContent = document.querySelector('.main-content');
+                const title = mainContent.querySelector('.neon-title');
+                mainContent.innerHTML = '';
+                if (title) {
+                    mainContent.appendChild(title);
+                }
+                mainContent.appendChild(rulesContainer);
+                
+            } catch (error) {
+                console.error('Ошибка при загрузке правил:', error);
+                // Показываем правила по умолчанию
+                showDefaultRules();
+            }
+        }
+
+        // Функция показа правил по умолчанию
+        function showDefaultRules() {
+            const defaultRules = '📋 Основные правила:\n• Уважай других игроков\n• Не используй читеры\n• Участвуй в войнах клана\n• Соблюдай дисциплину\n\n🎮 Игровые требования:\n• Активность 3+ раза в неделю\n• Уровень 50+\n• Наличие микрофона';
+            
+            const rulesContainer = document.createElement('div');
+            rulesContainer.className = 'form-container';
+            rulesContainer.innerHTML = `
+                <h2 class="neon-title">Правила клана</h2>
+                <div class="rules-content">
+                    <pre style="white-space: pre-wrap; font-family: inherit; color: white;">${defaultRules}</pre>
+                </div>
+                <button class="neon-button" onclick="showGuide()">
+                    Как вступить в клан
+                </button>
+            `;
+            
+            const mainContent = document.querySelector('.main-content');
+            const title = mainContent.querySelector('.neon-title');
+            mainContent.innerHTML = '';
+            if (title) {
+                mainContent.appendChild(title);
+            }
+            mainContent.appendChild(rulesContainer);
+        }
+
+        // Функция показа гайда
+        function showGuide() {
+            const guideContainer = document.createElement('div');
+            guideContainer.className = 'form-container';
+            guideContainer.innerHTML = `
+                <h2 class="neon-title">Как вступить в клан</h2>
+                <div class="guide-content">
+                    <p>🔗 <b>Шаг 1:</b></p>
+                    <p>Найди игрока <code>wePiKAcHy</code> по ID <code>51445023900</code> и нажми на его аватар</p>
+                    
+                    <p>🔗 <b>Шаг 2:</b></p>
+                    <p>В профиле игрока нажми на аватар клана «Werty» и отправь запрос</p>
+                    
+                    <p>📸 <b>Шаг 3:</b></p>
+                    <p>Сделай скриншот того что ты отправил запрос и продолжай</p>
+                    
+                    <div class="guide-buttons">
+                        <button class="neon-button" onclick="showPhotoUpload()">
+                            Я отправил запрос
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            const mainContent = document.querySelector('.main-content');
+            const title = mainContent.querySelector('.neon-title');
+            mainContent.innerHTML = '';
+            if (title) {
+                mainContent.appendChild(title);
+            }
+            mainContent.appendChild(guideContainer);
+        }
+
+        // Функция загрузки фото
+        function showPhotoUpload() {
+            const photoContainer = document.createElement('div');
+            photoContainer.className = 'form-container';
+            photoContainer.innerHTML = `
+                <h2 class="neon-title">Загрузка скриншота</h2>
+                <div class="photo-upload-content">
+                    <p>📸 <b>Сделайте скриншот</b> отправленного запроса в клан</p>
+                    <p>Это нужно для подтверждения вашей заявки</p>
+                    
+                    <div class="upload-area" id="uploadArea">
+                        <input type="file" id="photoInput" accept="image/*" style="display: none;" onchange="handlePhotoSelect(event)">
+                        <div class="upload-placeholder" onclick="document.getElementById('photoInput').click()">
+                            <div class="upload-icon">📷</div>
+                            <p>Нажмите для выбора фото</p>
+                            <p style="font-size: 12px; opacity: 0.7;">Или перетащите файл сюда</p>
+                        </div>
+                        <div class="photo-preview" id="photoPreview" style="display: none;">
+                            <img id="previewImage" src="" alt="Preview" style="max-width: 100%; border-radius: 10px;">
+                            <button class="neon-button" onclick="submitPhoto()" style="margin-top: 15px;">
+                                Отправить скриншот
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="guide-buttons">
+                        <button class="neon-button" onclick="showGuide()">
+                            Назад
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            const mainContent = document.querySelector('.main-content');
+            const title = mainContent.querySelector('.neon-title');
+            mainContent.innerHTML = '';
+            if (title) {
+                mainContent.appendChild(title);
+            }
+            mainContent.appendChild(photoContainer);
+            
+            // Добавляем обработчики для drag & drop
+            setupDragAndDrop();
+        }
+
+        // Функция обработки выбора фото
+        function handlePhotoSelect(event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImage').src = e.target.result;
+                    document.querySelector('.upload-placeholder').style.display = 'none';
+                    document.getElementById('photoPreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Настройка drag & drop
+        function setupDragAndDrop() {
+            const uploadArea = document.getElementById('uploadArea');
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#8a2be2';
+                uploadArea.style.backgroundColor = 'rgba(138, 43, 226, 0.1)';
+            });
+            
+            uploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = 'rgba(138, 43, 226, 0.3)';
+                uploadArea.style.backgroundColor = 'transparent';
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = 'rgba(138, 43, 226, 0.3)';
+                uploadArea.style.backgroundColor = 'transparent';
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0 && files[0].type.startsWith('image/')) {
+                    const input = document.getElementById('photoInput');
+                    input.files = files;
+                    handlePhotoSelect({ target: input });
+                }
+            });
+        }
+
+        // Функция отправки фото
+        function submitPhoto() {
+            const input = document.getElementById('photoInput');
+            const file = input.files[0];
+            
+            if (!file) {
+                console.error('Файл не выбран');
+                return;
+            }
+            
+            console.log('Отправка файла:', file);
+            console.log('Размер файла:', file.size, 'байт');
+            console.log('Тип файла:', file.type);
+            
+            // Создаем FormData для отправки файла
+            const formData = new FormData();
+            formData.append('photo', file);
+            
+            // Получаем данные пользователя
+            const userData = tg.initDataUnsafe?.user;
+            const telegram_id = userData?.id || null;
+            const username = userData?.username || null;
+            
+            formData.append('telegram_id', telegram_id);
+            formData.append('username', username);
+            
+            console.log('Данные пользователя:', { telegram_id, username });
+            console.log('FormData содержимое:');
+            for (let [key, value] of formData.entries()) {
+                console.log(key, value);
+            }
+            
+            // Отправляем фото на сервер
+            fetch('https://ezh-dev.ru:8000/upload_photo', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                console.log('Статус ответа:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Ответ сервера:', data);
+                
+                if (data.status === 'success') {
+                    // Переходим на следующий шаг
+                    showNextStep();
+                } else {
+                    tg.showPopup({
+                        title: 'Ошибка!',
+                        message: data.message || 'Не удалось загрузить фото',
+                        buttons: [{
+                            text: 'Понятно',
+                            type: 'default'
+                        }]
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка при загрузке фото:', error);
+                tg.showPopup({
+                    title: 'Ошибка!',
+                    message: 'Не удалось загрузить фото. Попробуйте еще раз.',
+                    buttons: [{
+                        text: 'Понятно',
+                        type: 'default'
+                    }]
+                });
+            });
+        }
+
+        // Функция следующего шага - загрузка ссылок на чаты
+        async function showNextStep() {
+            const userData = tg.initDataUnsafe?.user;
+            const telegram_id = userData?.id || null;
+            const username = userData?.username || null;
+            
+            try {
+                // Запрашиваем ссылки-приглашения
+                const response = await fetch('https://ezh-dev.ru:8000/generate_invite_links', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        telegram_id: telegram_id,
+                        username: username
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    showInviteLinks(data.data);
+                } else {
+                    // Показываем ошибку
+                    const errorContainer = document.createElement('div');
+                    errorContainer.className = 'form-container';
+                    errorContainer.innerHTML = `
+                        <h2 class="neon-title">Ошибка</h2>
+                        <div class="next-step-content">
+                            <p>❌ <b>${data.message}</b></p>
+                            
+                            <div class="guide-buttons">
+                                <button class="neon-button" onclick="showPhotoUpload()">
+                                    Назад
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    const mainContent = document.querySelector('.main-content');
+                    const title = mainContent.querySelector('.neon-title');
+                    mainContent.innerHTML = '';
+                    if (title) {
+                        mainContent.appendChild(title);
+                    }
+                    mainContent.appendChild(errorContainer);
+                }
+                
+            } catch (error) {
+                console.error('Ошибка при загрузке ссылок:', error);
+                tg.showPopup({
+                    title: 'Ошибка!',
+                    message: 'Не удалось загрузить ссылки. Попробуйте еще раз.',
+                    buttons: [{
+                        text: 'Понятно',
+                        type: 'default'
+                    }]
+                });
+            }
+        }
+
+        // Функция показа ссылок на чаты
+        function showInviteLinks(linksData) {
+            const linksContainer = document.createElement('div');
+            linksContainer.className = 'form-container';
+            linksContainer.innerHTML = `
+                <h2 class="neon-title">Вступление в чаты</h2>
+                <div class="invite-links-content">
+                    <div class="chat-block" onclick="openLink('${linksData.clan.link}')">
+                        <div class="chat-avatar">
+                            <img src="https://ezh-dev.ru/chat_manager_aiogram3${linksData.clan.avatar}" alt="${linksData.clan.name}">
+                        </div>
+                        <div class="chat-info">
+                            <h3>${linksData.clan.name}</h3>
+                            <p>Основной чат клана</p>
+                            <div class="link-hint">Нажмите для вступления</div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-block" onclick="openLink('${linksData.sostav.link}')">
+                        <div class="chat-avatar">
+                            <img src="https://ezh-dev.ru/chat_manager_aiogram3${linksData.sostav.avatar}" alt="${linksData.sostav.name}">
+                        </div>
+                        <div class="chat-info">
+                            <h3>${linksData.sostav.name}</h3>
+                            <p>Ваш состав</p>
+                            <div class="link-hint">Нажмите для вступления</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="guide-buttons">
+                    <button class="neon-button" onclick="tg.close()">
+                        Закрыть MiniApp
+                    </button>
+                </div>
+            `;
+            
+            const mainContent = document.querySelector('.main-content');
+            const title = mainContent.querySelector('.neon-title');
+            mainContent.innerHTML = '';
+            if (title) {
+                mainContent.appendChild(title);
+            }
+            mainContent.appendChild(linksContainer);
+        }
+
+        // Функция открытия ссылки
+        function openLink(link) {
+            window.open(link, '_blank');
+        }
+
+        // Обработчик нажатия на кнопку "Подать заявку"
+        function handleFillButton() {
+            // Вибрация для обратной связи
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('medium');
+            }
+
+            // Получаем значения полей
+            const name = document.getElementById('inputName').value.trim();
+            const age = document.getElementById('inputAge').value;
+            const nick = document.getElementById('inputNick').value.trim();
+            const gameId = document.getElementById('inputGameId').value.trim();
+
+            // Сбрасываем предыдущие ошибки
+            toggleError('inputName', 'nameError', false);
+            toggleError('inputAge', 'ageError', false);
+            toggleError('inputNick', 'nickError', false);
+            toggleError('inputGameId', 'idError', false);
+
+            let hasErrors = false;
+
+            // Валидация полей
+            if (!validateName(name)) {
+                toggleError('inputName', 'nameError', true);
+                hasErrors = true;
+            }
+
+            if (!validateAge(age)) {
+                toggleError('inputAge', 'ageError', true);
+                hasErrors = true;
+            }
+
+            if (!validateNick(nick)) {
+                toggleError('inputNick', 'nickError', true);
+                hasErrors = true;
+            }
+
+            if (!validateGameId(gameId)) {
+                toggleError('inputGameId', 'idError', true);
+                hasErrors = true;
+            }
+
+            if (hasErrors) {
+                // Вибрация ошибки
+                if (tg.HapticFeedback) {
+                    tg.HapticFeedback.notificationOccurred('error');
+                }
+                return;
+            }
+
+            // Если все поля валидны, отправляем на сервер
+            const userData = tg.initDataUnsafe?.user;
+            const formData = {
+                telegram_id: userData?.id || null,
+                user: userData?.username || null,
+                name: name,
+                age: parseInt(age),
+                nick: nick,
+                gameId: gameId,
+                invite_code: currentCodeData.link,
+                sost: currentCodeData.sost
+            };
+
+            console.log('Отправка заявки в клан:', formData);
+
+            // Отправка данных на сервер
+            fetch(`https://ezh-dev.ru:8000/submit_form`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            
+
+
+            
+            showRulesAndGuide();
+
+        }
+
+        // Добавляем обработчики для real-time валидации
+        document.addEventListener('DOMContentLoaded', function() {
+            initUserData();
+            
+            // Валидация кода при вводе
+            document.getElementById('inputCode').addEventListener('input', function() {
+                toggleError('inputCode', 'codeError', false);
+            });
+            
+            // Валидация имени при вводе
+            document.getElementById('inputName').addEventListener('input', function() {
+                toggleError('inputName', 'nameError', !validateName(this.value));
+            });
+            
+            // Валидация возраста при вводе
+            document.getElementById('inputAge').addEventListener('input', function() {
+                if (this.value) {
+                    toggleError('inputAge', 'ageError', !validateAge(this.value));
+                } else {
+                    toggleError('inputAge', 'ageError', false);
+                }
+            });
+
+            // Валидация ника при вводе
+            document.getElementById('inputNick').addEventListener('input', function() {
+                toggleError('inputNick', 'nickError', !validateNick(this.value));
+            });
+
+            // Валидация ID при вводе
+            document.getElementById('inputGameId').addEventListener('input', function() {
+                if (this.value) {
+                    toggleError('inputGameId', 'idError', !validateGameId(this.value));
+                } else {
+                    toggleError('inputGameId', 'idError', false);
+                }
+            });
+            
+            // Говорим Telegram, что страница готова
+            tg.ready();
+        });
+
+        // Обработка изменений темы
+        tg.onEvent('themeChanged', function() {
+            console.log('Theme changed');
+        });
+    </script>
+</body>
+</html>

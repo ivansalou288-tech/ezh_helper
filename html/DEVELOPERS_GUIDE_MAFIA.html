@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎭 Модуль Mafia (Мафия) - Полное руководство для разработчиков</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .breadcrumb {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .content h1 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .content h2 {
+            color: #764ba2;
+            font-size: 1.6em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+
+        .content h3 {
+            color: #667eea;
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .content h4 {
+            color: #764ba2;
+            font-size: 1.1em;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        .content p {
+            line-height: 1.8;
+            margin: 15px 0;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin: 15px 0;
+            margin-left: 30px;
+            line-height: 1.8;
+        }
+
+        .content li {
+            margin: 8px 0;
+            color: #444;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+            font-size: 0.95em;
+        }
+
+        .content pre {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .content pre code {
+            color: #333;
+            padding: 0;
+            background: none;
+            font-size: 0.9em;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 20px;
+            margin: 20px 0;
+            color: #666;
+            font-style: italic;
+        }
+
+        .content a {
+            color: #667eea;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .content a:hover {
+            border-bottom-color: #667eea;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .content table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .content table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+        }
+
+        .content table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .content hr {
+            border: none;
+            border-top: 2px solid #667eea;
+            margin: 30px 0;
+        }
+
+        .content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+            justify-content: space-between;
+        }
+
+        .nav-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .nav-button:hover {
+            background: #764ba2;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-button.prev {
+            margin-right: auto;
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+            }
+
+            .nav-button.prev {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎭 Модуль Mafia (Мафия) - Полное руководство для разработчиков</h1>
+            <p style="opacity: 0.9; font-size: 1.1em;">Chat Manager Bot - Документация</p>
+        </header>
+
+        <div class="breadcrumb">
+            <a href="../html/index.html">🏠 Главная</a> / 
+            <a href="../html/index_site.html">📖 Документация</a> / 
+            <span>🎭 Модуль Mafia (Мафия) - Полное руководство для разработчиков</span>
+        </div>
+
+        <div class="content">
+            
+<p><strong>Версия:</strong> 1.0<br />
+<strong>Дата:</strong> 20.12.2025<br />
+<strong>Статус:</strong> ✅ Готово к production<br />
+<strong>Язык:</strong> Python 3.10+  </p>
+<hr />
+<h2>📖 Обзор</h2>
+<p>Модуль Mafia (<code>modules/mafia.py</code>) реализует полнофункциональную ролевую игру "Мафия" с поддержкой 6+ различных ролей, ночных и дневных фаз, голосования и динамического развития игры.</p>
+<h3>Основные возможности</h3>
+<p>✅ <strong>Множественные роли</strong> - Мирный, Дон, Мафия, Комиссар, Доктор, Маньяк<br />
+✅ <strong>Фазы игры</strong> - Ночь/День с разными действиями<br />
+✅ <strong>Голосование</strong> - Дневное голосование за исключение игрока<br />
+✅ <strong>Ночные действия</strong> - Убийства, проверки, защита<br />
+✅ <strong>Сложная логика</strong> - Учёт ролей, победных условий, взаимодействий<br />
+✅ <strong>История игр</strong> - Сохранение результатов в БД  </p>
+<hr />
+<h2>🎭 Роли в игре</h2>
+<h3>Роли горожан</h3>
+<table>
+<thead>
+<tr>
+<th>Роль</th>
+<th>Описание</th>
+<th>Действие</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>👥 Мирный</td>
+<td>Обычный житель без способностей</td>
+<td>Голосование днём</td>
+</tr>
+<tr>
+<td>🕵️ Комиссар</td>
+<td>Следователь</td>
+<td>Проверить роль или убить ночью</td>
+</tr>
+<tr>
+<td>🏥 Доктор</td>
+<td>Защитник</td>
+<td>Спасить игрока от убийства ночью</td>
+</tr>
+</tbody>
+</table>
+<h3>Роли мафии</h3>
+<table>
+<thead>
+<tr>
+<th>Роль</th>
+<th>Описание</th>
+<th>Действие</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🕴 Дон</td>
+<td>Глава мафии</td>
+<td>Координирует убийства и знает других</td>
+</tr>
+<tr>
+<td>💀 Мафия</td>
+<td>Член мафии</td>
+<td>Участвует в убийствах</td>
+</tr>
+</tbody>
+</table>
+<h3>Нейтральные роли</h3>
+<table>
+<thead>
+<tr>
+<th>Роль</th>
+<th>Описание</th>
+<th>Действие</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🔪 Маньяк</td>
+<td>Убийца-одиночка</td>
+<td>Убивает ночью для себя</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>🏗️ Архитектура</h2>
+<h3>Система распределения ролей</h3>
+<pre class="codehilite"><code class="language-python">QUANTITY_OF_ROLES = {
+    4: '2 1 0 0 1 0',  # 4 игрока: 2 мирных, 1 дон, 0 мафии, 0 комиссар, 1 доктор, 0 маньяк
+    5: '2 1 0 1 1 0',
+    6: '3 1 0 1 1 0',
+    7: '4 1 0 1 1 0',
+    8: '4 1 1 1 1 0',
+    9: '4 1 1 1 1 1',
+    10: '4 1 2 1 1 1'
+}
+
+def parse_roles(count: int) -&gt; dict:
+    &quot;&quot;&quot;Преобразует строку ролей в словарь&quot;&quot;&quot;
+    if count not in QUANTITY_OF_ROLES:
+        return {}
+
+    roles_str = QUANTITY_OF_ROLES[count]
+    mirny, don, mafia, police, doctor, maniak = map(int, roles_str.split())
+
+    return {
+        'mirny': mirny,
+        'don': don,
+        'mafia': mafia,
+        'police': police,
+        'doctor': doctor,
+        'maniak': maniak
+    }
+</code></pre>
+
+<h3>Поток игры</h3>
+<pre class="codehilite"><code>Игроки регистрируются
+         ↓
+Роли распределяются случайно
+         ↓
+НОЧЬ 1: Действия мафии, доктора, комиссара
+         ↓
+ДЕНЬ 1: Все голосуют за исключение
+         ↓
+Проверка условия победы
+         ↓
+НОЧЬ 2: Ночные действия продолжаются
+         ↓
+ДЕНЬ 2: Голосование
+         ↓
+... (Игра продолжается)
+         ↓
+Побеждают горожане ИЛИ мафия ИЛИ маньяк
+</code></pre>
+
+<hr />
+<h2>💻 Примеры использования</h2>
+<h3>Пример 1: Начало игры</h3>
+<pre class="codehilite"><code class="language-python">async def start_mafia_game(chat_id: int, players: list[int], bot: Bot) -&gt; bool:
+    &quot;&quot;&quot;Начинает новую игру мафии&quot;&quot;&quot;
+    player_count = len(players)
+
+    if player_count &lt; 4:
+        return False  # Минимум 4 игрока
+
+    # Получаем распределение ролей
+    roles_dist = parse_roles(player_count)
+
+    # Создаём список всех ролей
+    all_roles = (
+        ['mirny'] * roles_dist['mirny'] +
+        ['don'] * roles_dist['don'] +
+        ['mafia'] * roles_dist['mafia'] +
+        ['police'] * roles_dist['police'] +
+        ['doctor'] * roles_dist['doctor'] +
+        ['maniak'] * roles_dist['maniak']
+    )
+
+    # Перемешиваем роли
+    random.shuffle(all_roles)
+
+    # Распределяем каждому игроку
+    player_roles = {player_id: role for player_id, role in zip(players, all_roles)}
+
+    # Отправляем приватные сообщения с ролями
+    for player_id, role in player_roles.items():
+        role_info = ROLES_ABOUT.get(role, &quot;Неизвестная роль&quot;)
+        await bot.send_message(player_id, f&quot;🎭 Ваша роль: {role_info}&quot;)
+
+    return True
+</code></pre>
+
+<h3>Пример 2: Ночное голосование мафии</h3>
+<pre class="codehilite"><code class="language-python">async def mafia_night_vote(game_id: str, db_path: str) -&gt; int:
+    &quot;&quot;&quot;Проводит голосование мафии за жертву&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    # Получаем всех живых членов мафии
+    mafia_members = cursor.execute(
+        &quot;SELECT user_id FROM mafia_game_players WHERE game_id = ? AND role IN ('don', 'mafia') AND alive = 1&quot;,
+        (game_id,)
+    ).fetchall()
+
+    # Получаем всех живых горожан (кроме мафии)
+    possible_victims = cursor.execute(
+        &quot;SELECT user_id FROM mafia_game_players WHERE game_id = ? AND role NOT IN ('don', 'mafia') AND alive = 1&quot;,
+        (game_id,)
+    ).fetchall()
+
+    # Каждый член мафии голосует
+    votes = {}
+    for member_id, in mafia_members:
+        # Выбираем случайную жертву
+        victim_id = random.choice(possible_victims)[0]
+        votes[victim_id] = votes.get(victim_id, 0) + 1
+
+    # Определяем жертву с наибольшим количеством голосов
+    if votes:
+        victim_id = max(votes, key=votes.get)
+        return victim_id
+
+    connection.close()
+    return None
+</code></pre>
+
+<h3>Пример 3: Дневное голосование</h3>
+<pre class="codehilite"><code class="language-python">async def day_voting(game_id: str, votes: dict[int, int], db_path: str) -&gt; int:
+    &quot;&quot;&quot;Обрабатывает дневное голосование&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    # Находим игрока с максимальным количеством голосов
+    if not votes:
+        return None
+
+    voted_out = max(votes, key=votes.get)
+    vote_count = votes[voted_out]
+
+    # Удаляем игрока из живых
+    cursor.execute(
+        &quot;UPDATE mafia_game_players SET alive = 0 WHERE game_id = ? AND user_id = ?&quot;,
+        (game_id, voted_out)
+    )
+
+    # Получаем информацию об исключённом игроке
+    player_info = cursor.execute(
+        &quot;SELECT user_id, nik, role FROM mafia_game_players WHERE game_id = ? AND user_id = ?&quot;,
+        (game_id, voted_out)
+    ).fetchone()
+
+    connection.commit()
+    connection.close()
+
+    return player_info
+</code></pre>
+
+<h3>Пример 4: Проверка условия победы</h3>
+<pre class="codehilite"><code class="language-python">def check_win_condition(game_id: str, db_path: str) -&gt; tuple[bool, str]:
+    &quot;&quot;&quot;Проверяет, выиграла ли какая-то сторона&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    # Подсчитываем живых игроков по ролям
+    alive_counts = cursor.execute('''
+        SELECT role, COUNT(*) FROM mafia_game_players 
+        WHERE game_id = ? AND alive = 1
+        GROUP BY role
+    ''', (game_id,)).fetchall()
+
+    alive_by_role = {role: count for role, count in alive_counts}
+
+    mafia_alive = alive_by_role.get('don', 0) + alive_by_role.get('mafia', 0)
+    townspeople_alive = sum(count for role, count in alive_by_role.items() 
+                           if role not in ['don', 'mafia'])
+    maniak_alive = alive_by_role.get('maniak', 0)
+
+    # Проверяем условия победы
+    if mafia_alive == 0:
+        connection.close()
+        return True, &quot;Горожане выиграли! Мафия уничтожена!&quot;
+
+    if mafia_alive &gt;= townspeople_alive:
+        connection.close()
+        return True, &quot;Мафия выиграла!&quot;
+
+    if maniak_alive &gt; 0 and townspeople_alive + mafia_alive == 1:
+        connection.close()
+        return True, &quot;Маньяк выиграл!&quot;
+
+    connection.close()
+    return False, None
+</code></pre>
+
+<hr />
+<h2>📊 Структура базы данных</h2>
+<h3>Таблица <code>mafia_game_players</code></h3>
+<pre class="codehilite"><code class="language-sql">CREATE TABLE IF NOT EXISTS mafia_game_players (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    game_id TEXT NOT NULL,
+    chat_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    nik TEXT,
+    role TEXT NOT NULL,
+    alive INTEGER DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+</code></pre>
+
+<h3>Таблица <code>mafia_game_actions</code></h3>
+<pre class="codehilite"><code class="language-sql">CREATE TABLE IF NOT EXISTS mafia_game_actions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    game_id TEXT NOT NULL,
+    night_number INTEGER NOT NULL,
+    actor_id INTEGER NOT NULL,
+    action TEXT NOT NULL,
+    target_id INTEGER,
+    result TEXT,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+</code></pre>
+
+<hr />
+<h2>🚀 Расширение функциональности</h2>
+<h3>Идея 1: Новые роли</h3>
+<pre class="codehilite"><code class="language-python">EXTENDED_ROLES = {
+    # ... старые роли ...
+    &quot;love&quot;: &quot;💕 Влюблённые - пара игроков, защищают друг друга&quot;,
+    &quot;witch&quot;: &quot;🧙 Ведьма - может спасти или проклясть&quot;,
+    &quot;informant&quot;: &quot;🕵️ Информатор - знает одного члена мафии&quot;
+}
+</code></pre>
+
+<h3>Идея 2: Система статистики</h3>
+<pre class="codehilite"><code class="language-python">def get_player_mafia_stats(user_id: int, db_path: str) -&gt; dict:
+    &quot;&quot;&quot;Получает статистику игрока в мафии&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    stats = cursor.execute('''
+        SELECT role, COUNT(*) as games, SUM(CASE WHEN alive = 1 THEN 1 ELSE 0 END) as wins
+        FROM mafia_game_players
+        WHERE user_id = ?
+        GROUP BY role
+    ''', (user_id,)).fetchall()
+
+    connection.close()
+
+    return {role: {&quot;games&quot;: games, &quot;wins&quot;: wins} for role, games, wins in stats}
+</code></pre>
+
+<h3>Идея 3: Рейтинг лучших игроков</h3>
+<pre class="codehilite"><code class="language-python">def get_mafia_leaderboard(chat_id: int, limit: int = 10, db_path: str = &quot;mafia.db&quot;) -&gt; list:
+    &quot;&quot;&quot;Получает рейтинг лучших игроков мафии&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    leaders = cursor.execute('''
+        SELECT user_id, COUNT(*) as games_played, 
+               SUM(CASE WHEN alive = 1 THEN 1 ELSE 0 END) as wins
+        FROM mafia_game_players
+        WHERE chat_id = ?
+        GROUP BY user_id
+        ORDER BY wins DESC
+        LIMIT ?
+    ''', (chat_id, limit)).fetchall()
+
+    connection.close()
+    return leaders
+</code></pre>
+
+<hr />
+<h2>🐛 Решение проблем</h2>
+<h3>Проблема: "Роли распределяются неправильно"</h3>
+<p><strong>Решение:</strong> Убедитесь что вы перемешиваете список ролей</p>
+<pre class="codehilite"><code class="language-python">random.shuffle(all_roles)  # ✅ Обязательно!
+</code></pre>
+
+<h3>Проблема: "Игра не заканчивается"</h3>
+<p><strong>Решение:</strong> Проверяйте условие победы после каждого дня</p>
+<pre class="codehilite"><code class="language-python">won, message = check_win_condition(game_id, db_path)
+if won:
+    await notify_game_end(chat_id, message)
+    delete_game(game_id)
+</code></pre>
+
+<hr />
+<h2>📝 Лицензия</h2>
+<p>Часть проекта WERTY | Chat-Manager Bot</p>
+<hr />
+<p><strong>Версия:</strong> 1.0<br />
+<strong>Разработано:</strong> GitHub Copilot<br />
+<strong>Последнее обновление:</strong> 20.12.2025</p>
+        </div>
+
+        <div class="content">
+            <div class="nav-buttons">
+                <a href="../html/index_site.html" class="nav-button prev">← Вернуться к документации</a>
+                <a href="../html/index.html" class="nav-button">На главную →</a>
+            </div>
+        </div>
+
+        <footer>
+            <p>Chat Manager Bot | Полная документация и структура проекта | Версия 2.0</p>
+            <p style="margin-top: 10px;">
+                <a href="../html/index.html">Главная</a> | 
+                <a href="../html/index_site.html">Документация</a> | 
+                <a href="../html/modules.html">Модули</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

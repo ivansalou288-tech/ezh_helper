@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎲 Модуль Roulettes (Рулетки) - Полное руководство для разработчиков</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .breadcrumb {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .content h1 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .content h2 {
+            color: #764ba2;
+            font-size: 1.6em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+
+        .content h3 {
+            color: #667eea;
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .content h4 {
+            color: #764ba2;
+            font-size: 1.1em;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        .content p {
+            line-height: 1.8;
+            margin: 15px 0;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin: 15px 0;
+            margin-left: 30px;
+            line-height: 1.8;
+        }
+
+        .content li {
+            margin: 8px 0;
+            color: #444;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+            font-size: 0.95em;
+        }
+
+        .content pre {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .content pre code {
+            color: #333;
+            padding: 0;
+            background: none;
+            font-size: 0.9em;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 20px;
+            margin: 20px 0;
+            color: #666;
+            font-style: italic;
+        }
+
+        .content a {
+            color: #667eea;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .content a:hover {
+            border-bottom-color: #667eea;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .content table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .content table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+        }
+
+        .content table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .content hr {
+            border: none;
+            border-top: 2px solid #667eea;
+            margin: 30px 0;
+        }
+
+        .content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+            justify-content: space-between;
+        }
+
+        .nav-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .nav-button:hover {
+            background: #764ba2;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-button.prev {
+            margin-right: auto;
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+            }
+
+            .nav-button.prev {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎲 Модуль Roulettes (Рулетки) - Полное руководство для разработчиков</h1>
+            <p style="opacity: 0.9; font-size: 1.1em;">Chat Manager Bot - Документация</p>
+        </header>
+
+        <div class="breadcrumb">
+            <a href="../html/index.html">🏠 Главная</a> / 
+            <a href="../html/index_site.html">📖 Документация</a> / 
+            <span>🎲 Модуль Roulettes (Рулетки) - Полное руководство для разработчиков</span>
+        </div>
+
+        <div class="content">
+            
+<p><strong>Версия:</strong> 1.0<br />
+<strong>Дата:</strong> 20.12.2025<br />
+<strong>Статус:</strong> ✅ Готово к production<br />
+<strong>Язык:</strong> Python 3.10+  </p>
+<hr />
+<h2>📖 Обзор</h2>
+<p>Проект включает две рулетки:</p>
+<ol>
+<li><strong>Golden Roulette</strong> (<code>modules/golden_rulet.py</code>) - играем на коины с шансом удвоить или потерять ставку (3/6)</li>
+<li><strong>Russian Roulette</strong> (<code>modules/rus_rulet.py</code>) - рискованная игра с шансом получить мут (1/6)</li>
+</ol>
+<hr />
+<h2>🎰 Golden Roulette (Золотая рулетка)</h2>
+<h3>Обзор</h3>
+<p>Игра по принципу классической рулетки: ставите коины, с вероятностью 3/6 выигрываете (ставка удваивается), с вероятностью 3/6 проигрываете (ставка сгорает).</p>
+<h3>Основной обработчик</h3>
+<pre class="codehilite"><code class="language-python">@dp.message_handler(Text(startswith=[
+    &quot;! золотая рулетка&quot;,
+    &quot;!золотая рулетка&quot;,
+    &quot;.золотая рулетка&quot;,
+    &quot;/золотая рулетка&quot;,
+    &quot;золотая рулетка&quot;,
+], ignore_case=True))
+async def golden_roulette(message: types.Message):
+    &quot;&quot;&quot;
+    Играем в золотую рулетку
+    50% вероятность выигрыша (ставка удваивается)
+    50% вероятность проигрыша (ставка теряется)
+    &quot;&quot;&quot;
+</code></pre>
+
+<h3>Логика игры</h3>
+<pre class="codehilite"><code class="language-python">def play_golden_roulette(stake: int) -&gt; tuple[bool, int]:
+    &quot;&quot;&quot;Проводит раунд золотой рулетки&quot;&quot;&quot;
+    # Вероятность выигрыша: 3 из 6 (50%)
+    outcome = random.randint(1, 6)
+
+    if outcome in [1, 2, 3]:  # Выигрыш
+        return True, stake * 2  # Ставка удваивается
+    else:  # Проигрыш
+        return False, 0  # Ставка теряется
+
+# Использование
+won, reward = play_golden_roulette(100)
+if won:
+    print(f&quot;✅ Выигрыш! Получили {reward} коинов&quot;)
+else:
+    print(&quot;❌ Проигрыш! Ставка потеряна&quot;)
+</code></pre>
+
+<h3>Примеры использования</h3>
+<pre class="codehilite"><code class="language-python"># Пример 1: Полный цикл игры
+async def golden_roulette_cycle(user_id: int, stake: int, db_path: str):
+    &quot;&quot;&quot;Полный цикл игры в золотую рулетку&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    # Проверяем баланс
+    current_balance = cursor.execute(
+        &quot;SELECT meshok FROM farma WHERE user_id = ?&quot;,
+        (user_id,)
+    ).fetchone()[0]
+
+    if current_balance &lt; stake:
+        return False, &quot;Недостаточно коинов&quot;
+
+    # Вычитаем ставку
+    cursor.execute(
+        &quot;UPDATE farma SET meshok = ? WHERE user_id = ?&quot;,
+        (current_balance - stake, user_id)
+    )
+
+    # Проводим игру
+    won, reward = play_golden_roulette(stake)
+
+    if won:
+        # Добавляем выигрыш
+        new_balance = current_balance - stake + reward
+        result_text = f&quot;✅ Выигрыш! +{reward} коинов&quot;
+    else:
+        new_balance = current_balance - stake
+        result_text = &quot;❌ Проигрыш! Ставка потеряна&quot;
+
+    cursor.execute(
+        &quot;UPDATE farma SET meshok = ? WHERE user_id = ?&quot;,
+        (new_balance, user_id)
+    )
+
+    connection.commit()
+    connection.close()
+
+    return True, result_text
+</code></pre>
+
+<hr />
+<h2>🔫 Russian Roulette (Русская рулетка)</h2>
+<h3>Обзор</h3>
+<p>Опасная развлекательная игра: с вероятностью 1/6 получаете 5-минутный мут. Это чистый риск, деньги не используются.</p>
+<h3>Основной обработчик</h3>
+<pre class="codehilite"><code class="language-python">@dp.message_handler(Text(startswith=[
+    &quot;! русская рулетка&quot;,
+    &quot;!русская рулетка&quot;,
+    &quot;.русская рулетка&quot;,
+    &quot;/русская рулетка&quot;,
+    &quot;русская рулетка&quot;
+], ignore_case=True))
+async def russian_roulette(message: types.Message):
+    &quot;&quot;&quot;
+    Играем в русскую рулетку
+    1/6 вероятность мута на 5 минут
+    5/6 выживаешь
+    &quot;&quot;&quot;
+</code></pre>
+
+<h3>Логика игры</h3>
+<pre class="codehilite"><code class="language-python">def play_russian_roulette() -&gt; bool:
+    &quot;&quot;&quot;Проводит раунд русской рулетки&quot;&quot;&quot;
+    # 1 из 6 шанс мута
+    outcome = random.randint(1, 6)
+    return outcome == 1  # True = мут, False = выжил
+
+# Использование
+got_muted = play_russian_roulette()
+if got_muted:
+    print(&quot;❌ Получил мут на 5 минут!&quot;)
+else:
+    print(&quot;✅ Выжил!&quot;)
+</code></pre>
+
+<h3>Примеры использования</h3>
+<pre class="codehilite"><code class="language-python"># Пример 1: Полный цикл с мутом
+async def russian_roulette_cycle(user_id: int, chat_id: int, bot: Bot):
+    &quot;&quot;&quot;Полный цикл русской рулетки с применением мута&quot;&quot;&quot;
+    MUTE_TIME = 5  # минут
+
+    got_muted = play_russian_roulette()
+
+    if got_muted:
+        # Применяем мут
+        permissions = ChatPermissions(can_send_messages=False)
+        mute_until = datetime.now() + timedelta(minutes=MUTE_TIME)
+
+        await bot.restrict_chat_member(
+            chat_id=chat_id,
+            user_id=user_id,
+            permissions=permissions,
+            until_date=mute_until
+        )
+        return &quot;❌ Получил мут на 5 минут!&quot;
+    else:
+        return &quot;✅ Выжил! 🎉&quot;
+
+# Пример 2: Получение статистики русской рулетки
+def get_russian_roulette_stats(user_id: int, db_path: str) -&gt; dict:
+    &quot;&quot;&quot;Получает статистику игрока в русской рулетке&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    try:
+        # Создаём таблицу если её нет
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS russian_roulette_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                chat_id INTEGER,
+                got_muted INTEGER,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+
+        # Всего игр
+        total_games = cursor.execute(
+            &quot;SELECT COUNT(*) FROM russian_roulette_history WHERE user_id = ?&quot;,
+            (user_id,)
+        ).fetchone()[0]
+
+        # Сколько раз получил мут
+        muted_times = cursor.execute(
+            &quot;SELECT COUNT(*) FROM russian_roulette_history WHERE user_id = ? AND got_muted = 1&quot;,
+            (user_id,)
+        ).fetchone()[0]
+
+        survive_rate = ((total_games - muted_times) / total_games * 100) if total_games &gt; 0 else 0
+
+        return {
+            &quot;total_games&quot;: total_games,
+            &quot;muted_times&quot;: muted_times,
+            &quot;survive_rate&quot;: survive_rate
+        }
+    finally:
+        connection.close()
+</code></pre>
+
+<hr />
+<h2>🎯 Сравнение двух рулеток</h2>
+<table>
+<thead>
+<tr>
+<th>Характеристика</th>
+<th>Golden Roulette</th>
+<th>Russian Roulette</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Тип игры</td>
+<td>Азартная</td>
+<td>Развлекательная</td>
+</tr>
+<tr>
+<td>Использует коины</td>
+<td>✅ Да</td>
+<td>❌ Нет</td>
+</tr>
+<tr>
+<td>Шанс выигрыша</td>
+<td>50% (3/6)</td>
+<td>83% (5/6)</td>
+</tr>
+<tr>
+<td>Шанс проигрыша</td>
+<td>50% (3/6)</td>
+<td>17% (1/6)</td>
+</tr>
+<tr>
+<td>Результат проигрыша</td>
+<td>Потеря коинов</td>
+<td>5-минутный мут</td>
+</tr>
+<tr>
+<td>Результат выигрыша</td>
+<td>Удвоение ставки</td>
+<td>Просто выживание</td>
+</tr>
+<tr>
+<td>Кулдаун</td>
+<td>Зависит</td>
+<td>Нет</td>
+</tr>
+<tr>
+<td>Рекомендация</td>
+<td>Для любителей риска</td>
+<td>Для веселья</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>⚙️ Производительность и безопасность</h2>
+<h3>Защита от спама</h3>
+<pre class="codehilite"><code class="language-python"># Golden Roulette имеет встроенный кулдаун
+# Russian Roulette может играться без ограничений
+# Рекомендуется добавить кулдаун если нужно
+</code></pre>
+
+<h3>Проверка чёрного списка</h3>
+<pre class="codehilite"><code class="language-python"># Оба модуля проверяют чёрный список перед игрой
+if message.from_user.id in black_list:
+    await message.answer(&quot;В доступе отказано&quot;)
+    return
+</code></pre>
+
+<hr />
+<h2>🚀 Расширение функциональности</h2>
+<h3>Идея 1: Комбинированная рулетка</h3>
+<pre class="codehilite"><code class="language-python">async def super_roulette(user_id: int, stake: int, db_path: str):
+    &quot;&quot;&quot;Суперрулетка: играем на коины И рискуем мутом&quot;&quot;&quot;
+    won_money, got_muted = play_golden_roulette(stake), play_russian_roulette()
+
+    if got_muted:
+        return {
+            &quot;money_result&quot;: won_money,
+            &quot;muted&quot;: True,
+            &quot;message&quot;: &quot;Выиграл деньги но получил мут!&quot;
+        }
+    else:
+        return {
+            &quot;money_result&quot;: won_money,
+            &quot;muted&quot;: False,
+            &quot;message&quot;: &quot;Выиграл и не получил мут!&quot;
+        }
+</code></pre>
+
+<h3>Идея 2: Прогрессирующий мут</h3>
+<pre class="codehilite"><code class="language-python">def get_mute_duration(previous_mutes: int) -&gt; int:
+    &quot;&quot;&quot;Определяет длительность мута в зависимости от истории&quot;&quot;&quot;
+    # Каждый следующий мут дольше
+    base = 5  # 5 минут
+    multiplier = 1 + (previous_mutes * 0.5)
+    return int(base * multiplier)
+</code></pre>
+
+<h3>Идея 3: Серии побед/поражений</h3>
+<pre class="codehilite"><code class="language-python">def calculate_streak_bonus(streak: int) -&gt; float:
+    &quot;&quot;&quot;Бонус за серию побед в золотой рулетке&quot;&quot;&quot;
+    if streak &lt;= 1:
+        return 1.0
+    elif streak &lt;= 3:
+        return 1.2
+    elif streak &lt;= 5:
+        return 1.5
+    else:
+        return 2.0  # Удвоенный бонус за 5+ побед подряд
+</code></pre>
+
+<hr />
+<h2>📊 Таблицы БД</h2>
+<h3>Таблица <code>golden_roulette_history</code> (опционально)</h3>
+<pre class="codehilite"><code class="language-sql">CREATE TABLE IF NOT EXISTS golden_roulette_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    chat_id INTEGER NOT NULL,
+    stake INTEGER NOT NULL,
+    won INTEGER NOT NULL,
+    winnings INTEGER NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+</code></pre>
+
+<h3>Таблица <code>russian_roulette_history</code> (опционально)</h3>
+<pre class="codehilite"><code class="language-sql">CREATE TABLE IF NOT EXISTS russian_roulette_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    chat_id INTEGER NOT NULL,
+    got_muted INTEGER NOT NULL,
+    mute_duration INTEGER,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+</code></pre>
+
+<hr />
+<h2>🐛 Решение проблем</h2>
+<h3>Проблема: Мут не применяется</h3>
+<p><strong>Решение:</strong> Проверьте, что у бота есть права администратора</p>
+<pre class="codehilite"><code class="language-python"># Убедитесь, что передаёте правильные параметры
+await bot.restrict_chat_member(
+    chat_id=chat_id,
+    user_id=user_id,
+    permissions=ChatPermissions(can_send_messages=False),
+    until_date=datetime.now() + timedelta(minutes=5)
+)
+</code></pre>
+
+<h3>Проблема: Коины не вычитаются</h3>
+<p><strong>Решение:</strong> Убедитесь в вызове <code>connection.commit()</code></p>
+<pre class="codehilite"><code class="language-python">cursor.execute(&quot;UPDATE farma SET meshok = ? WHERE user_id = ?&quot;, (new_balance, user_id))
+connection.commit()  # ✅ Обязательно!
+</code></pre>
+
+<hr />
+<h2>📝 Лицензия</h2>
+<p>Часть проекта WERTY | Chat-Manager Bot</p>
+<hr />
+<p><strong>Версия:</strong> 1.0<br />
+<strong>Разработано:</strong> GitHub Copilot<br />
+<strong>Последнее обновление:</strong> 20.12.2025</p>
+        </div>
+
+        <div class="content">
+            <div class="nav-buttons">
+                <a href="../html/index_site.html" class="nav-button prev">← Вернуться к документации</a>
+                <a href="../html/index.html" class="nav-button">На главную →</a>
+            </div>
+        </div>
+
+        <footer>
+            <p>Chat Manager Bot | Полная документация и структура проекта | Версия 2.0</p>
+            <p style="margin-top: 10px;">
+                <a href="../html/index.html">Главная</a> | 
+                <a href="../html/index_site.html">Документация</a> | 
+                <a href="../html/modules.html">Модули</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

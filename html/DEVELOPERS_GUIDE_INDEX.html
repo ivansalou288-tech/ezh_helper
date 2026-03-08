@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 ИНДЕКС МОДУЛЕЙ - Chat-Manager Bot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .breadcrumb {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .content h1 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .content h2 {
+            color: #764ba2;
+            font-size: 1.6em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+
+        .content h3 {
+            color: #667eea;
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .content h4 {
+            color: #764ba2;
+            font-size: 1.1em;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        .content p {
+            line-height: 1.8;
+            margin: 15px 0;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin: 15px 0;
+            margin-left: 30px;
+            line-height: 1.8;
+        }
+
+        .content li {
+            margin: 8px 0;
+            color: #444;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+            font-size: 0.95em;
+        }
+
+        .content pre {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .content pre code {
+            color: #333;
+            padding: 0;
+            background: none;
+            font-size: 0.9em;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 20px;
+            margin: 20px 0;
+            color: #666;
+            font-style: italic;
+        }
+
+        .content a {
+            color: #667eea;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .content a:hover {
+            border-bottom-color: #667eea;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .content table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .content table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+        }
+
+        .content table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .content hr {
+            border: none;
+            border-top: 2px solid #667eea;
+            margin: 30px 0;
+        }
+
+        .content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+            justify-content: space-between;
+        }
+
+        .nav-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .nav-button:hover {
+            background: #764ba2;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-button.prev {
+            margin-right: auto;
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+            }
+
+            .nav-button.prev {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 ИНДЕКС МОДУЛЕЙ - Chat-Manager Bot</h1>
+            <p style="opacity: 0.9; font-size: 1.1em;">Chat Manager Bot - Документация</p>
+        </header>
+
+        <div class="breadcrumb">
+            <a href="../html/index.html">🏠 Главная</a> / 
+            <a href="../html/index_site.html">📖 Документация</a> / 
+            <span>📚 ИНДЕКС МОДУЛЕЙ - Chat-Manager Bot</span>
+        </div>
+
+        <div class="content">
+            
+<p><strong>Версия:</strong> 2.0 | <strong>Дата:</strong> 20.12.2025 | <strong>Статус:</strong> ✅ Актуальный</p>
+<hr />
+<h2>🎯 БЫСТРЫЙ СТАРТ</h2>
+<p>⭐ <strong>Начните с:</strong> <a href="../CODE_REFERENCE.html">../CODE_REFERENCE.html</a> - полный справочник всех функций</p>
+<hr />
+<h2>📋 МАТРИЦА МОДУЛЕЙ (10 основных)</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Модуль</th>
+<th>Файл</th>
+<th>Тип</th>
+<th>Строк</th>
+<th>Основной класс</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>⭐ ЯДРО БОТА</td>
+<td><code>html/DEVELOPERS_GUIDE_MAIN.html</code></td>
+<td>Config</td>
+<td>500+</td>
+<td>BotConfig</td>
+</tr>
+<tr>
+<td>1</td>
+<td>📌 Bookmarks</td>
+<td><code>html/BOOKMARKS_FOR_DEVELOPERS.html</code></td>
+<td>Data</td>
+<td>600+</td>
+<td>BookmarkManager</td>
+</tr>
+<tr>
+<td>2</td>
+<td>🌾 Farm</td>
+<td><code>html/DEVELOPERS_GUIDE_FARM.html</code></td>
+<td>Economy</td>
+<td>500+</td>
+<td>FarmSystem</td>
+</tr>
+<tr>
+<td>3</td>
+<td>🎲 Cubes</td>
+<td><code>html/DEVELOPERS_GUIDE_CUBES.html</code></td>
+<td>Game</td>
+<td>450+</td>
+<td>DuelSystem</td>
+</tr>
+<tr>
+<td>4</td>
+<td>🎰 Kasik</td>
+<td><code>html/DEVELOPERS_GUIDE_KASIK.html</code></td>
+<td>Game</td>
+<td>300+</td>
+<td>SlotMachine</td>
+</tr>
+<tr>
+<td>5</td>
+<td>🎡 Roulettes</td>
+<td><code>html/DEVELOPERS_GUIDE_ROULETTES.html</code></td>
+<td>Game</td>
+<td>400+</td>
+<td>RouletteGame</td>
+</tr>
+<tr>
+<td>6</td>
+<td>🎮 Hot-Cold</td>
+<td><code>html/DEVELOPERS_GUIDE_HOTCOLD.html</code></td>
+<td>Game</td>
+<td>350+</td>
+<td>GuessGame</td>
+</tr>
+<tr>
+<td>7</td>
+<td>🎭 Mafia</td>
+<td><code>html/DEVELOPERS_GUIDE_MAFIA.html</code></td>
+<td>Game</td>
+<td>400+</td>
+<td>MafiaGame</td>
+</tr>
+<tr>
+<td>8</td>
+<td>🏆 Tournaments</td>
+<td><code>html/DEVELOPERS_GUIDE_TOURNAMENTS.html</code></td>
+<td>System</td>
+<td>500+</td>
+<td>Tournament</td>
+</tr>
+<tr>
+<td>9</td>
+<td>🔍 Utils</td>
+<td><code>html/DEVELOPERS_GUIDE_UTILS.html</code></td>
+<td>Utility</td>
+<td>350+</td>
+<td>UserSearch</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>🚀 РЕКОМЕНДУЕМАЯ ПОСЛЕДОВАТЕЛЬНОСТЬ (4 недели)</h2>
+<h3>НЕДЕЛЯ 1: Основы</h3>
+<ul>
+<li><strong>День 1-2:</strong> <a href="DEVELOPERS_GUIDE_MAIN.html">DEVELOPERS_GUIDE_MAIN.html</a> - Архитектура бота</li>
+<li><strong>День 3-4:</strong> <a href="BOOKMARKS_FOR_DEVELOPERS.html">BOOKMARKS_FOR_DEVELOPERS.html</a> - Система хранения</li>
+<li><strong>День 5-7:</strong> <a href="DEVELOPERS_GUIDE_FARM.html">DEVELOPERS_GUIDE_FARM.html</a> - Экономика</li>
+</ul>
+<h3>НЕДЕЛЯ 2: Простые игры</h3>
+<ul>
+<li><strong>День 1-2:</strong> <a href="DEVELOPERS_GUIDE_HOTCOLD.html">DEVELOPERS_GUIDE_HOTCOLD.html</a> - Логика игры</li>
+<li><strong>День 3-4:</strong> <a href="DEVELOPERS_GUIDE_CUBES.html">DEVELOPERS_GUIDE_CUBES.html</a> - Два игрока</li>
+<li><strong>День 5-7:</strong> <a href="DEVELOPERS_GUIDE_KASIK.html">DEVELOPERS_GUIDE_KASIK.html</a> - Слот-машина</li>
+</ul>
+<h3>НЕДЕЛЯ 3: Продвинутые игры</h3>
+<ul>
+<li><strong>День 1-2:</strong> <a href="DEVELOPERS_GUIDE_ROULETTES.html">DEVELOPERS_GUIDE_ROULETTES.html</a> - Две рулетки</li>
+<li><strong>День 3-5:</strong> <a href="DEVELOPERS_GUIDE_MAFIA.html">DEVELOPERS_GUIDE_MAFIA.html</a> - Сложная логика</li>
+<li><strong>День 6-7:</strong> <a href="DEVELOPERS_GUIDE_TOURNAMENTS.html">DEVELOPERS_GUIDE_TOURNAMENTS.html</a> - Турниры</li>
+</ul>
+<h3>НЕДЕЛЯ 4: Интеграция</h3>
+<ul>
+<li><strong>День 1-2:</strong> <a href="DEVELOPERS_GUIDE_UTILS.html">DEVELOPERS_GUIDE_UTILS.html</a> - Утилиты</li>
+<li><strong>День 3-7:</strong> Собственные проекты + интеграция модулей</li>
+</ul>
+<hr />
+<h2>📂 ВСЕГО ДОКУМЕНТОВ: 12</h2>
+<p>✅ Основные модули: 10 файлов<br />
+✅ Мета-документация: 2 файла (этот + START_HERE)<br />
+✅ Общий объём: 5000+ строк<br />
+✅ Примеров кода: 50+</p>
+<hr />
+<h2>🔗 МЕЖМОДУЛЬНЫЕ ЗАВИСИМОСТИ</h2>
+<pre class="codehilite"><code>MAIN (конфиг) 
+    ├─ Farm (коины)
+    ├─ Bookmarks (хранение)
+    ├─ Cubes (зависит от Farm)
+    ├─ Kasik (зависит от Farm)
+    ├─ Roulettes (зависит от Farm)
+    ├─ Hot-Cold (независим)
+    ├─ Mafia (независим)
+    ├─ Tournaments (независим)
+    ├─ Utils (утилиты для всех)
+    └─ Message Top (статистика)
+</code></pre>
+
+<hr />
+<h2>🧪 ПРОВЕРКА ЗНАНИЙ</h2>
+<p><strong>Начинающий</strong> (после 1 недели):
+- [ ] Могу объяснить как конфигурируется бот
+- [ ] Понимаю как работает система коинов
+- [ ] Могу добавить закладку в базу</p>
+<p><strong>Средний</strong> (после 2 недель):
+- [ ] Могу создать простую игру
+- [ ] Понимаю дизайн казино и рулеток
+- [ ] Могу модифицировать игровую логику</p>
+<p><strong>Продвинутый</strong> (после 3 недель):
+- [ ] Могу добавить новый модуль
+- [ ] Могу интегрировать несколько модулей
+- [ ] Могу создать систему турниров</p>
+<hr />
+<p><em>Используйте <a href="../CODE_REFERENCE.html">../CODE_REFERENCE.html</a> как основной справочник!</em>
+   - Статистика игр
+   - Достижения</p>
+<h3>🎭 Сложные модули</h3>
+<ol>
+<li><strong><a href="DEVELOPERS_GUIDE_MAFIA.html">Mafia (Мафия)</a></strong> - Полнофункциональная ролевая игра</li>
+<li>6+ различных ролей</li>
+<li>Система фаз (ночь/день)</li>
+<li>Голосование</li>
+<li>Динамическое развитие</li>
+<li>
+<p>История игр</p>
+</li>
+<li>
+<p><strong><a href="DEVELOPERS_GUIDE_TOURNAMENTS.html">Tournaments (Турниры)</a></strong> - Система управления турнирами</p>
+</li>
+<li>Создание и управление</li>
+<li>Личные и командные турниры</li>
+<li>Регистрация участников</li>
+<li>Отслеживание побед</li>
+<li>Автоматическое распределение команд</li>
+</ol>
+<h3>🛠️ Утилиты</h3>
+<ol>
+<li><strong><a href="DEVELOPERS_GUIDE_UTILS.html">Who-Is-Who &amp; Message Top</a></strong> - Поиск и статистика</li>
+<li>Поиск пользователей</li>
+<li>Топ по сообщениям</li>
+<li>Статистика активности</li>
+</ol>
+<hr />
+<h2>📊 МАТРИЦА МОДУЛЕЙ</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Модуль</th>
+<th>Файл</th>
+<th>Строк</th>
+<th>Тип</th>
+<th>Сложность</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td><strong>Main</strong></td>
+<td><code>main/</code></td>
+<td>500+</td>
+<td>Ядро</td>
+<td>⭐⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Закладки</td>
+<td><code>modules/bookmarks.py</code></td>
+<td>600+</td>
+<td>Утилита</td>
+<td>⭐⭐⭐</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Ферма</td>
+<td><code>modules/farm.py</code></td>
+<td>500+</td>
+<td>Игра</td>
+<td>⭐⭐</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Дуэли</td>
+<td><code>modules/cubes.py</code></td>
+<td>450+</td>
+<td>Игра</td>
+<td>⭐⭐⭐</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Казино</td>
+<td><code>modules/kasik.py</code></td>
+<td>300+</td>
+<td>Игра</td>
+<td>⭐⭐</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Рулетки</td>
+<td><code>modules/golden_rulet.py</code> + <code>modules/rus_rulet.py</code></td>
+<td>400+</td>
+<td>Игра</td>
+<td>⭐⭐</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Hot-Cold</td>
+<td><code>modules/hot_cold.py</code></td>
+<td>350+</td>
+<td>Игра</td>
+<td>⭐⭐</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Мафия</td>
+<td><code>modules/mafia.py</code></td>
+<td>400+</td>
+<td>Ролевая</td>
+<td>⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Турниры</td>
+<td><code>modules/turnaments.py</code></td>
+<td>500+</td>
+<td>Система</td>
+<td>⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Утилиты</td>
+<td><code>modules/who_is_who.py</code> + <code>modules/message_top.py</code></td>
+<td>350+</td>
+<td>Утилита</td>
+<td>⭐⭐</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>🚀 Начало работы</h2>
+<h3>Для новичка (0-50 часов)</h3>
+<ol>
+<li><strong>Неделя 0:</strong> <a href="DEVELOPERS_GUIDE_MAIN.html">DEVELOPERS_GUIDE_MAIN.html</a> - Понимание архитектуры</li>
+<li><strong>Неделя 1:</strong> <a href="DEVELOPERS_GUIDE_FARM.html">Farm</a> → <a href="BOOKMARKS_FOR_DEVELOPERS.html">Bookmarks</a> → <a href="DEVELOPERS_GUIDE_HOTCOLD.html">Hot-Cold</a></li>
+<li><strong>Неделя 2:</strong> <a href="DEVELOPERS_GUIDE_CUBES.html">Cubes</a> → <a href="DEVELOPERS_GUIDE_KASIK.html">Kasik</a> → <a href="DEVELOPERS_GUIDE_ROULETTES.html">Roulettes</a></li>
+</ol>
+<h3>Для опытного (50-200 часов)</h3>
+<ol>
+<li><strong>День 1:</strong> <a href="DEVELOPERS_GUIDE_MAIN.html">DEVELOPERS_GUIDE_MAIN.html</a> - обновление знаний</li>
+<li><strong>День 2:</strong> <a href="DEVELOPERS_GUIDE_MAFIA.html">Mafia</a> - сложная логика</li>
+<li><strong>День 3:</strong> <a href="DEVELOPERS_GUIDE_TOURNAMENTS.html">Tournaments</a> - интеграция</li>
+</ol>
+<h3>Для senior (200+ часов)</h3>
+<ol>
+<li>Создание собственного модуля</li>
+<li>Интеграция нескольких модулей</li>
+<li>Оптимизация производительности</li>
+</ol>
+<hr />
+<h2>💡 Общие паттерны</h2>
+<h3>Проверка чёрного списка</h3>
+<pre class="codehilite"><code class="language-python"># Паттерн используется во всех модулях
+black_list = cursor.execute('SELECT user_id FROM black_list').fetchall()
+if message.from_user.id in black_list:
+    await message.answer('В доступе отказано')
+    return
+</code></pre>
+
+<h3>Работа с таблицами чатов</h3>
+<pre class="codehilite"><code class="language-python"># Каждый чат имеет свою таблицу
+table_name = str(-(chat_id))  # Преобразуем в строку
+cursor.execute(f&quot;SELECT * FROM [{table_name}] WHERE ...&quot;)
+</code></pre>
+
+<h3>Проверка кулдауна</h3>
+<pre class="codehilite"><code class="language-python"># Паттерн для игр с ограничением по времени
+delta = now - last_date
+if delta &gt;= timedelta(hours=4):
+    # Разрешить действие
+else:
+    remaining = timedelta(hours=4) - delta
+    # Показать оставшееся время
+</code></pre>
+
+<h3>Обработка коинов</h3>
+<pre class="codehilite"><code class="language-python"># Паттерн для передачи коинов между пользователями
+current_balance = cursor.execute(
+    &quot;SELECT meshok FROM farma WHERE user_id = ?&quot;, 
+    (user_id,)
+).fetchone()[0]
+
+new_balance = current_balance + amount
+cursor.execute(
+    &quot;UPDATE farma SET meshok = ? WHERE user_id = ?&quot;,
+    (new_balance, user_id)
+)
+connection.commit()
+</code></pre>
+
+<hr />
+<h2>🔧 Типовые задачи</h2>
+<h3>Задача 1: Получить баланс пользователя</h3>
+<pre class="codehilite"><code class="language-python"># Смотри: Farm, Cubes, Kasik
+def get_balance(user_id: int, db_path: str) -&gt; int:
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+    try:
+        balance = cursor.execute(
+            &quot;SELECT meshok FROM farma WHERE user_id = ?&quot;, 
+            (user_id,)
+        ).fetchone()
+        return balance[0] if balance else 0
+    finally:
+        connection.close()
+</code></pre>
+
+<h3>Задача 2: Создать новую игру</h3>
+<pre class="codehilite"><code class="language-python"># Смотри: Mafia, Hot-Cold, Tournaments
+def start_new_game(game_id: str, players: list[int], db_path: str) -&gt; bool:
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute(
+            &quot;INSERT INTO game (id, players, status) VALUES (?, ?, ?)&quot;,
+            (game_id, ','.join(map(str, players)), 'active')
+        )
+        connection.commit()
+        return True
+    finally:
+        connection.close()
+</code></pre>
+
+<h3>Задача 3: Получить информацию о пользователе</h3>
+<pre class="codehilite"><code class="language-python"># Смотри: Bookmarks, Cubes, Who-Is-Who
+def get_user_info(chat_id: int, user_id: int, db_path: str) -&gt; dict:
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    table_name = str(-(chat_id))
+    try:
+        user = cursor.execute(
+            f&quot;SELECT tg_id, nik, username FROM [{table_name}] WHERE tg_id = ?&quot;,
+            (user_id,)
+        ).fetchone()
+
+        if user:
+            return {
+                &quot;user_id&quot;: user[0],
+                &quot;nik&quot;: user[1],
+                &quot;username&quot;: user[2]
+            }
+        return {}
+    finally:
+        connection.close()
+</code></pre>
+
+<hr />
+<h2>📖 Структура каждого гайда</h2>
+<p>Каждый гайд разработчика содержит:</p>
+<ol>
+<li><strong>📖 Обзор</strong> - что делает модуль и основные возможности</li>
+<li><strong>🏗️ Архитектура</strong> - структура кода и поток данных</li>
+<li><strong>🔌 API</strong> - функции и классы с параметрами</li>
+<li><strong>📊 БД</strong> - структура таблиц с примерами</li>
+<li><strong>🎯 Обработчики</strong> - Telegram обработчики сообщений</li>
+<li><strong>💻 Примеры</strong> - готовые фрагменты кода для копирования</li>
+<li><strong>🔧 Интеграция</strong> - как подключить к main_bot.py</li>
+<li><strong>🧪 Тестирование</strong> - примеры unit тестов</li>
+<li><strong>🚀 Расширение</strong> - идеи для новых функций</li>
+</ol>
+<hr />
+<h2>🔗 Интеграция модулей</h2>
+<h3>Основная цепочка</h3>
+<pre class="codehilite"><code>Main (конфигурация)
+    ↓
+Farm (создание коинов)
+    ↓
+Cubes, Kasik, Roulettes (использование коинов)
+    ↓
+Tournaments, Mafia (использование статистики)
+</code></pre>
+
+<h3>Примеры интеграции</h3>
+<pre class="codehilite"><code class="language-python"># Farm дает коины, Kasik их использует
+from modules.farm import get_balance, subtract_coins
+
+# Tournaments использует информацию о пользователях
+from main.config import about_user_sdk
+
+# Все модули проверяют чёрный список
+black_list = cursor.execute('SELECT user_id FROM black_list').fetchall()
+</code></pre>
+
+<hr />
+<h2>🐛 Частые ошибки</h2>
+<table>
+<thead>
+<tr>
+<th>Ошибка</th>
+<th>Решение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"database is locked"</td>
+<td>Используйте <code>check_same_thread=False</code></td>
+</tr>
+<tr>
+<td>"table not found"</td>
+<td>Название таблицы должно быть в квадратных скобках <code>[123456789]</code></td>
+</tr>
+<tr>
+<td>"no such column"</td>
+<td>Проверьте правильность названия колонки</td>
+</tr>
+<tr>
+<td>Коины не обновляются</td>
+<td>Не забывайте <code>connection.commit()</code></td>
+</tr>
+<tr>
+<td>Игра не сохраняется</td>
+<td>Используйте разные БД для разных модулей</td>
+</tr>
+<tr>
+<td>Команда не срабатывает</td>
+<td>Проверьте обработчик с <code>@dp.message_handler</code></td>
+</tr>
+<tr>
+<td>Main guide не найден</td>
+<td>html/Ошибка интеграции: проверьте DEVELOPERS_GUIDE_MAIN.html в for_developers/</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>📞 Поддержка разработки</h2>
+<h3>Где найти информацию</h3>
+<ul>
+<li><strong>Ядро бота</strong> - <a href="DEVELOPERS_GUIDE_MAIN.html">DEVELOPERS_GUIDE_MAIN.html</a> ⭐</li>
+<li><strong>Основы</strong> - этот файл и <a href="BOOKMARKS_FOR_DEVELOPERS.html">BOOKMARKS_FOR_DEVELOPERS.html</a></li>
+<li><strong>Специфика модуля</strong> - соответствующий гайд (например <a href="DEVELOPERS_GUIDE_TOURNAMENTS.html">DEVELOPERS_GUIDE_TOURNAMENTS.html</a>)</li>
+<li><strong>Пользовательский гайд</strong> - <a href="docs/USER_GUIDE.html">USER_GUIDE.html</a></li>
+</ul>
+<h3>Как добавить новый модуль</h3>
+<ol>
+<li>Создайте файл <code>modules/my_module.py</code></li>
+<li>Реализуйте функциональность с обработчиками</li>
+<li>Создайте гайд <code>html/DEVELOPERS_GUIDE_MYMODULE.html</code> следуя структуре из других гайдов</li>
+<li>Добавьте ссылку сюда</li>
+<li>Обновите матрицу модулей выше</li>
+</ol>
+<hr />
+<h2>📚 Рекомендуемая последовательность изучения</h2>
+<p><strong>Неделя 0:</strong>
+- <a href="DEVELOPERS_GUIDE_MAIN.html">DEVELOPERS_GUIDE_MAIN.html</a> - Понимание ядра</p>
+<p><strong>Неделя 1:</strong>
+- День 1-2: <a href="DEVELOPERS_GUIDE_FARM.html">Farm</a>
+- День 3-4: <a href="BOOKMARKS_FOR_DEVELOPERS.html">Bookmarks</a>
+- День 5-7: <a href="DEVELOPERS_GUIDE_HOTCOLD.html">Hot-Cold</a></p>
+<p><strong>Неделя 2:</strong>
+- День 1-2: <a href="DEVELOPERS_GUIDE_CUBES.html">Cubes</a>
+- День 3-4: <a href="DEVELOPERS_GUIDE_KASIK.html">Kasik</a>
+- День 5-7: <a href="DEVELOPERS_GUIDE_ROULETTES.html">Roulettes</a></p>
+<p><strong>Неделя 3:</strong>
+- День 1-4: <a href="DEVELOPERS_GUIDE_MAFIA.html">Mafia</a>
+- День 5-7: <a href="DEVELOPERS_GUIDE_TOURNAMENTS.html">Tournaments</a></p>
+<p><strong>Неделя 4:</strong>
+- День 1-3: <a href="DEVELOPERS_GUIDE_UTILS.html">Utils</a>
+- День 4-7: Интеграция и собственные расширения</p>
+<hr />
+<h2>✅ Checklist для нового разработчика</h2>
+<ul>
+<li>[ ] Прочитал <a href="DEVELOPERS_GUIDE_MAIN.html">DEVELOPERS_GUIDE_MAIN.html</a></li>
+<li>[ ] Изучил архитектуру ядра бота</li>
+<li>[ ] Изучил <a href="DEVELOPERS_GUIDE_FARM.html">Farm</a></li>
+<li>[ ] Изучил <a href="BOOKMARKS_FOR_DEVELOPERS.html">Bookmarks</a></li>
+<li>[ ] Установил все зависимости из requirements.txt</li>
+<li>[ ] Запустил проект на локальной машине</li>
+<li>[ ] Создал тестовый модуль с обработчиком</li>
+<li>[ ] Интегрировал тестовый модуль в main_bot.py</li>
+<li>[ ] Написал unit тесты для модуля</li>
+<li>[ ] Создал гайд для модуля</li>
+<li>[ ] Готов к production! 🚀</li>
+</ul>
+<hr />
+<h2>📝 Лицензия</h2>
+<p>Часть проекта WERTY | Chat-Manager Bot</p>
+<hr />
+<p><strong>Версия:</strong> 1.1<br />
+<strong>Разработано:</strong> GitHub Copilot<br />
+<strong>Последнее обновление:</strong> 20.12.2025<br />
+<strong>Main module added:</strong> 20.12.2025</p>
+        </div>
+
+        <div class="content">
+            <div class="nav-buttons">
+                <a href="../html/index_site.html" class="nav-button prev">← Вернуться к документации</a>
+                <a href="../html/index.html" class="nav-button">На главную →</a>
+            </div>
+        </div>
+
+        <footer>
+            <p>Chat Manager Bot | Полная документация и структура проекта | Версия 2.0</p>
+            <p style="margin-top: 10px;">
+                <a href="../html/index.html">Главная</a> | 
+                <a href="../html/index_site.html">Документация</a> | 
+                <a href="../html/modules.html">Модули</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

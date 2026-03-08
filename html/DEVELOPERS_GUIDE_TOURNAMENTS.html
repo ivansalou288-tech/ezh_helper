@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏆 Модуль Tournaments (Турниры) - Полное руководство для разработчиков</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .breadcrumb {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .content h1 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .content h2 {
+            color: #764ba2;
+            font-size: 1.6em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+
+        .content h3 {
+            color: #667eea;
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .content h4 {
+            color: #764ba2;
+            font-size: 1.1em;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        .content p {
+            line-height: 1.8;
+            margin: 15px 0;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin: 15px 0;
+            margin-left: 30px;
+            line-height: 1.8;
+        }
+
+        .content li {
+            margin: 8px 0;
+            color: #444;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+            font-size: 0.95em;
+        }
+
+        .content pre {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .content pre code {
+            color: #333;
+            padding: 0;
+            background: none;
+            font-size: 0.9em;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 20px;
+            margin: 20px 0;
+            color: #666;
+            font-style: italic;
+        }
+
+        .content a {
+            color: #667eea;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .content a:hover {
+            border-bottom-color: #667eea;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .content table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .content table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+        }
+
+        .content table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .content hr {
+            border: none;
+            border-top: 2px solid #667eea;
+            margin: 30px 0;
+        }
+
+        .content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+            justify-content: space-between;
+        }
+
+        .nav-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .nav-button:hover {
+            background: #764ba2;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-button.prev {
+            margin-right: auto;
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+            }
+
+            .nav-button.prev {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏆 Модуль Tournaments (Турниры) - Полное руководство для разработчиков</h1>
+            <p style="opacity: 0.9; font-size: 1.1em;">Chat Manager Bot - Документация</p>
+        </header>
+
+        <div class="breadcrumb">
+            <a href="../html/index.html">🏠 Главная</a> / 
+            <a href="../html/index_site.html">📖 Документация</a> / 
+            <span>🏆 Модуль Tournaments (Турниры) - Полное руководство для разработчиков</span>
+        </div>
+
+        <div class="content">
+            
+<p><strong>Версия:</strong> 1.0<br />
+<strong>Дата:</strong> 20.12.2025<br />
+<strong>Статус:</strong> ✅ Готово к production<br />
+<strong>Язык:</strong> Python 3.10+  </p>
+<hr />
+<h2>📖 Обзор</h2>
+<p>Модуль Tournaments (<code>modules/turnaments.py</code>) реализует полнофункциональную систему управления турнирами с поддержкой личных и командных турниров, регистрацией участников, отслеживанием побед и подведением итогов.</p>
+<h3>Основные возможности</h3>
+<p>✅ <strong>Создание турниров</strong> - организаторы создают новые турниры с параметрами<br />
+✅ <strong>Регистрация участников</strong> - как личная, так и командная<br />
+✅ <strong>Управление турниром</strong> - редактирование параметров во время регистрации<br />
+✅ <strong>Отслеживание побед</strong> - система ведения счёта<br />
+✅ <strong>Автоматическое распределение команд</strong> - случайное разделение на группы<br />
+✅ <strong>История турниров</strong> - сохранение всех данных в БД<br />
+✅ <strong>Уникальные ID</strong> - каждый турнир имеет свой идентификатор  </p>
+<hr />
+<h2>🏗️ Архитектура</h2>
+<h3>Структура турнира</h3>
+<pre class="codehilite"><code>Турнир
+├── Основная информация
+│   ├── ID (уникальный 8-символьный код)
+│   ├── Название
+│   ├── Организатор (ID + имя)
+│   ├── Дата и время
+│   ├── Максимум участников
+│   └── Размер команды
+│
+├── Описание
+│   ├── Правила
+│   └── Комментарии
+│
+├── Статус
+│   ├── Регистрация открыта/закрыта
+│   ├── Турнир идёт
+│   └── Завершён
+│
+├── Участники/Команды
+│   ├── Список зарегистрированных
+│   ├── Информация о командах
+│   └── Счёт побед
+│
+└── История
+    └── Сохранение результатов в БД
+</code></pre>
+
+<hr />
+<h2>🔌 API функций турниров</h2>
+<h3>create_tournament()</h3>
+<p>Создаёт новый турнир.</p>
+<pre class="codehilite"><code class="language-python">def create_tournament(
+    moder_id: int,
+    chat_id: int,
+    name: str,
+    date: str,          # &quot;HH:MM:SS DD.MM.YYYY&quot;
+    max_participants: int,
+    rules: str,
+    comments: str,
+    db_path: str = &quot;tournaments.db&quot;
+) -&gt; tuple[bool, str]:
+    &quot;&quot;&quot;
+    Создаёт новый турнир
+    Возвращает: (успех, ID_турнира_или_сообщение_об_ошибке)
+    &quot;&quot;&quot;
+</code></pre>
+
+<p><strong>Параметры:</strong>
+- <code>moder_id</code> (int): ID организатора
+- <code>chat_id</code> (int): ID чата, где создаётся турнир
+- <code>name</code> (str): Название турнира
+- <code>date</code> (str): Дата в формате "HH:MM:SS DD.MM.YYYY"
+- <code>max_participants</code> (int): Максимальное количество участников (1-60)
+- <code>rules</code> (str): Правила турнира
+- <code>comments</code> (str): Дополнительные комментарии
+- <code>db_path</code> (str): Путь к БД</p>
+<p><strong>Возвращает:</strong>
+- <code>(True, tournament_id)</code> - успешно создан
+- <code>(False, error_message)</code> - ошибка создания</p>
+<hr />
+<h2>💻 Примеры использования</h2>
+<h3>Пример 1: Создание турнира</h3>
+<pre class="codehilite"><code class="language-python">def create_tournament_example():
+    &quot;&quot;&quot;Пример создания турнира&quot;&quot;&quot;
+    success, result = create_tournament(
+        moder_id=123456,
+        chat_id=-1001234567890,
+        name=&quot;Чемпионат по PvP 2025&quot;,
+        date=&quot;18:00:00 25.12.2025&quot;,
+        max_participants=16,
+        rules=&quot;No items, Only weapons, Final на платформе&quot;,
+        comments=&quot;Победитель получит 1000 рублей&quot;,
+        db_path=&quot;tournaments.db&quot;
+    )
+
+    if success:
+        print(f&quot;✅ Турнир создан! ID: {result}&quot;)
+    else:
+        print(f&quot;❌ Ошибка: {result}&quot;)
+</code></pre>
+
+<h3>Пример 2: Регистрация участника</h3>
+<pre class="codehilite"><code class="language-python">def register_participant(tournament_id: str, user_id: int, user_name: str, db_path: str) -&gt; bool:
+    &quot;&quot;&quot;Регистрирует участника в турнир&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    try:
+        # Проверяем есть ли место
+        cursor.execute(
+            &quot;SELECT registered_count, max_participants FROM tournaments WHERE id = ?&quot;,
+            (tournament_id,)
+        )
+        result = cursor.fetchone()
+
+        if not result:
+            return False
+
+        registered_count, max_participants = result
+
+        if registered_count &gt;= max_participants:
+            return False  # Нет места
+
+        # Добавляем участника
+        cursor.execute(
+            &quot;INSERT INTO tournament_participants (tournament_id, user_id, user_name) VALUES (?, ?, ?)&quot;,
+            (tournament_id, user_id, user_name)
+        )
+
+        # Увеличиваем счётчик регистрированных
+        cursor.execute(
+            &quot;UPDATE tournaments SET registered_count = registered_count + 1 WHERE id = ?&quot;,
+            (tournament_id,)
+        )
+
+        connection.commit()
+        return True
+    finally:
+        connection.close()
+
+# Использование
+if register_participant(&quot;A1B2C3D4&quot;, 123456, &quot;Ivan&quot;, &quot;tournaments.db&quot;):
+    print(&quot;✅ Регистрация успешна&quot;)
+else:
+    print(&quot;❌ Не удалось зарегистрироваться&quot;)
+</code></pre>
+
+<h3>Пример 3: Регистрация команды</h3>
+<pre class="codehilite"><code class="language-python">def register_team(tournament_id: str, captain_id: int, team_members: list[int], db_path: str) -&gt; bool:
+    &quot;&quot;&quot;Регистрирует команду в турнир&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    try:
+        # Генерируем ID команды
+        import secrets
+        team_id = f&quot;TEAM_{secrets.token_hex(4)}&quot;
+
+        # Добавляем команду
+        cursor.execute(
+            &quot;INSERT INTO tournament_teams (tournament_id, team_id, captain_id) VALUES (?, ?, ?)&quot;,
+            (tournament_id, team_id, captain_id)
+        )
+
+        # Добавляем всех членов команды
+        for member_id in team_members:
+            cursor.execute(
+                &quot;INSERT INTO tournament_team_members (team_id, user_id) VALUES (?, ?)&quot;,
+                (team_id, member_id)
+            )
+
+        connection.commit()
+        return True
+    finally:
+        connection.close()
+
+# Использование
+team_members = [123456, 234567, 345678, 456789]
+if register_team(&quot;A1B2C3D4&quot;, 123456, team_members, &quot;tournaments.db&quot;):
+    print(&quot;✅ Команда зарегистрирована&quot;)
+</code></pre>
+
+<h3>Пример 4: Отслеживание побед</h3>
+<pre class="codehilite"><code class="language-python">def record_victory(tournament_id: str, team_id: str, db_path: str) -&gt; bool:
+    &quot;&quot;&quot;Записывает победу для команды&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute(
+            &quot;UPDATE tournament_teams SET wins = wins + 1 WHERE tournament_id = ? AND team_id = ?&quot;,
+            (tournament_id, team_id)
+        )
+
+        connection.commit()
+        return True
+    finally:
+        connection.close()
+
+# Использование
+if record_victory(&quot;A1B2C3D4&quot;, &quot;TEAM_ABC123&quot;, &quot;tournaments.db&quot;):
+    print(&quot;✅ Победа записана&quot;)
+</code></pre>
+
+<h3>Пример 5: Получение таблицы побед</h3>
+<pre class="codehilite"><code class="language-python">def get_tournament_leaderboard(tournament_id: str, db_path: str) -&gt; list:
+    &quot;&quot;&quot;Получает таблицу лидеров турнира&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    try:
+        leaderboard = cursor.execute(
+            &quot;SELECT team_id, captain_id, wins FROM tournament_teams WHERE tournament_id = ? ORDER BY wins DESC&quot;,
+            (tournament_id,)
+        ).fetchall()
+
+        return leaderboard
+    finally:
+        connection.close()
+
+# Использование
+leaderboard = get_tournament_leaderboard(&quot;A1B2C3D4&quot;, &quot;tournaments.db&quot;)
+for idx, (team_id, captain, wins) in enumerate(leaderboard, 1):
+    print(f&quot;{idx}. Команда {team_id} (капитан {captain}): {wins} побед&quot;)
+</code></pre>
+
+<hr />
+<h2>📊 Структура базы данных</h2>
+<h3>Таблица <code>tournaments</code></h3>
+<pre class="codehilite"><code class="language-sql">CREATE TABLE IF NOT EXISTS tournaments (
+    id TEXT PRIMARY KEY,
+    chat_id INTEGER NOT NULL,
+    organizer_id INTEGER NOT NULL,
+    organizer_name TEXT,
+    name TEXT NOT NULL,
+    date TEXT NOT NULL,
+    max_participants INTEGER NOT NULL,
+    registered_count INTEGER DEFAULT 0,
+    rules TEXT,
+    comments TEXT,
+    status TEXT DEFAULT 'registration',  -- registration, active, finished
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+</code></pre>
+
+<h3>Таблица <code>tournament_participants</code></h3>
+<pre class="codehilite"><code class="language-sql">CREATE TABLE IF NOT EXISTS tournament_participants (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tournament_id TEXT NOT NULL,
+    user_id INTEGER NOT NULL,
+    user_name TEXT,
+    registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(tournament_id) REFERENCES tournaments(id)
+)
+</code></pre>
+
+<h3>Таблица <code>tournament_teams</code></h3>
+<pre class="codehilite"><code class="language-sql">CREATE TABLE IF NOT EXISTS tournament_teams (
+    team_id TEXT PRIMARY KEY,
+    tournament_id TEXT NOT NULL,
+    captain_id INTEGER NOT NULL,
+    wins INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(tournament_id) REFERENCES tournaments(id)
+)
+</code></pre>
+
+<h3>Таблица <code>tournament_team_members</code></h3>
+<pre class="codehilite"><code class="language-sql">CREATE TABLE IF NOT EXISTS tournament_team_members (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    team_id TEXT NOT NULL,
+    user_id INTEGER NOT NULL,
+    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(team_id) REFERENCES tournament_teams(team_id)
+)
+</code></pre>
+
+<hr />
+<h2>🚀 Расширение функциональности</h2>
+<h3>Идея 1: Система плей-офф</h3>
+<pre class="codehilite"><code class="language-python">def generate_playoff_bracket(tournament_id: str, db_path: str) -&gt; list[tuple]:
+    &quot;&quot;&quot;Генерирует кронштейн плей-офф из участников&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    # Получаем всех участников в порядке побед
+    participants = cursor.execute(
+        &quot;SELECT team_id FROM tournament_teams WHERE tournament_id = ? ORDER BY wins DESC&quot;,
+        (tournament_id,)
+    ).fetchall()
+
+    connection.close()
+
+    # Создаём матчи: 1 vs 2, 3 vs 4, и т.д.
+    bracket = []
+    for i in range(0, len(participants), 2):
+        if i + 1 &lt; len(participants):
+            bracket.append((participants[i][0], participants[i+1][0]))
+
+    return bracket
+</code></pre>
+
+<h3>Идея 2: Система групп</h3>
+<pre class="codehilite"><code class="language-python">def divide_into_groups(tournament_id: str, group_size: int = 4, db_path: str = &quot;tournaments.db&quot;) -&gt; dict:
+    &quot;&quot;&quot;Разделяет участников на группы&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    participants = cursor.execute(
+        &quot;SELECT user_id FROM tournament_participants WHERE tournament_id = ?&quot;,
+        (tournament_id,)
+    ).fetchall()
+
+    connection.close()
+
+    groups = {}
+    for i, (user_id,) in enumerate(participants):
+        group_num = i // group_size
+        if group_num not in groups:
+            groups[group_num] = []
+        groups[group_num].append(user_id)
+
+    return groups
+</code></pre>
+
+<h3>Идея 3: Система рейтингов</h3>
+<pre class="codehilite"><code class="language-python">def calculate_tournament_rating(user_id: int, db_path: str) -&gt; float:
+    &quot;&quot;&quot;Расчитывает рейтинг игрока на основе турниров&quot;&quot;&quot;
+    connection = sqlite3.connect(db_path, check_same_thread=False)
+    cursor = connection.cursor()
+
+    # Получаем все турниры где участвовал игрок
+    tournaments = cursor.execute(
+        &quot;SELECT t.id, t.max_participants, tt.wins FROM tournaments t &quot;
+        &quot;JOIN tournament_teams tt ON t.id = tt.tournament_id &quot;
+        &quot;WHERE tt.captain_id = ?&quot;,
+        (user_id,)
+    ).fetchall()
+
+    connection.close()
+
+    rating = 0
+    for tournament_id, max_participants, wins in tournaments:
+        # Рейтинг зависит от размера турнира и побед
+        tournament_rating = (wins / max_participants) * 100
+        rating += tournament_rating
+
+    return rating
+</code></pre>
+
+<hr />
+<h2>🐛 Решение проблем</h2>
+<h3>Проблема: "Турнир не создаётся"</h3>
+<p><strong>Решение:</strong> Проверьте формат даты</p>
+<pre class="codehilite"><code class="language-python"># ✅ Правильно
+date = &quot;18:00:00 25.12.2025&quot;
+datetime.strptime(date, &quot;%H:%M:%S %d.%m.%Y&quot;)
+
+# ❌ Неправильно
+date = &quot;25.12.2025 18:00:00&quot;  # Неверный порядок
+</code></pre>
+
+<h3>Проблема: "ID турнира слишком длинный"</h3>
+<p><strong>Решение:</strong> Используйте 8-символьный код</p>
+<pre class="codehilite"><code class="language-python">from password_generator import PasswordGenerator
+
+pwo = PasswordGenerator()
+tournament_id = pwo.shuffle_password('ASDFGHJKL12345678', 8)  # Ровно 8 символов
+</code></pre>
+
+<h3>Проблема: "Команды не распределяются правильно"</h3>
+<p><strong>Решение:</strong> Убедитесь что используете правильный размер группы</p>
+<pre class="codehilite"><code class="language-python"># Получите размер команды из турнира
+tournament_info = cursor.execute(
+    &quot;SELECT team_size FROM tournaments WHERE id = ?&quot;,
+    (tournament_id,)
+).fetchone()
+
+team_size = tournament_info[0] if tournament_info else 1
+</code></pre>
+
+<hr />
+<h2>📝 Лицензия</h2>
+<p>Часть проекта WERTY | Chat-Manager Bot</p>
+<hr />
+<p><strong>Версия:</strong> 1.0<br />
+<strong>Разработано:</strong> GitHub Copilot<br />
+<strong>Последнее обновление:</strong> 20.12.2025</p>
+        </div>
+
+        <div class="content">
+            <div class="nav-buttons">
+                <a href="../html/index_site.html" class="nav-button prev">← Вернуться к документации</a>
+                <a href="../html/index.html" class="nav-button">На главную →</a>
+            </div>
+        </div>
+
+        <footer>
+            <p>Chat Manager Bot | Полная документация и структура проекта | Версия 2.0</p>
+            <p style="margin-top: 10px;">
+                <a href="../html/index.html">Главная</a> | 
+                <a href="../html/index_site.html">Документация</a> | 
+                <a href="../html/modules.html">Модули</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
