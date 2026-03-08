@@ -160,23 +160,23 @@
 
         /* Стили для контейнера чатов */
         .chats-container {
-            max-width: 1200px;
+            max-width: 100%; /* На всю ширину */
             margin: 0 auto;
-            padding: 20px;
+            padding: 10px 0; /* Уменьшил вертикальные отступы */
         }
 
         .chats-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            padding: 0 10px;
+            margin-bottom: 20px;
+            padding: 0 15px;
         }
 
         .chats-title {
-            font-size: 1.8em;
+            font-size: 1.5em;
             color: #b388ff;
-            font-weight: 700;
+            font-weight: 600;
         }
 
         .add-chat-btn {
@@ -199,16 +199,16 @@
         .chats-grid {
             display: grid;
             grid-template-columns: 1fr; /* Одна колонка на всю ширину */
-            gap: 12px;
+            gap: 10px;
             margin-bottom: 30px;
-            padding: 0 15px;
+            padding: 0 10px; /* Уменьшил боковые отступы */
         }
 
         .chat-card {
             background: linear-gradient(135deg, rgba(15, 15, 35, 0.9), rgba(25, 25, 55, 0.8));
             border: 1px solid rgba(0, 255, 255, 0.2);
-            border-radius: 30px; /* Еще более скругленные */
-            padding: 12px 18px;
+            border-radius: 30px;
+            padding: 15px 20px; /* Увеличил внутренние отступы */
             backdrop-filter: blur(15px);
             transition: all 0.3s ease;
             cursor: pointer;
@@ -217,7 +217,8 @@
             box-shadow: 
                 0 4px 20px rgba(0, 255, 255, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            width: 100%; /* На всю ширину */
+            width: 100%;
+            min-height: 60px; /* Добавил минимальную высоту */
         }
 
         .chat-card::before {
