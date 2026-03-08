@@ -211,9 +211,13 @@ async def verify_chat_admin(chat_id: int, request: Request):
 @app.get("/api/chats")
 async def get_admin_chats(request: Request, current_user: dict = Depends(verify_admin)):
     """Получение списка чатов доступных админу"""
+    print(f"DEBUG: get_admin_chats called for user: {current_user}")  # Отладка
+    
     try:
         # Используем абсолютный путь для базы данных
         db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'databases', 'admin.db')
+        print(f"DEBUG: Database path: {db_path}")  # Отладка
+        
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
