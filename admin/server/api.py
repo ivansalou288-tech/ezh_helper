@@ -35,11 +35,11 @@ class ChatInfo(BaseModel):
     member_count: int
     last_activity: Optional[str] = None
 
-class AdminCreate(BaseModel):
+class ChatAdminCreate(BaseModel):
     user_id: int
     permissions: list[str]
 
-class AdminUpdate(BaseModel):
+class ChatAdminUpdate(BaseModel):
     permissions: list[str]
     is_active: Optional[bool] = None
 
@@ -64,47 +64,32 @@ def init_admin_db():
         )
     ''')
     
-    # Таблица администраторов
+    # Таблица администраторов чатов
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS admins (
+        CREATE TABLE IF NOT EXISTS chat_admins (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER UNIQUE NOT NULL,
+            chat_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
             role TEXT DEFAULT 'admin',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             created_by INTEGER,
-            is_active BOOLEAN DEFAULT 1
+            is_active BOOLEAN DEFAULT 1,
+            UNIQUE(chat_id, user_id)
         )
     ''')
     
-    # Таблица прав администраторов
+    # Таблица прав администраторов чатов
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS admin_permissions (
+        CREATE TABLE IF NOT EXISTS chat_admin_permissions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            admin_id INTEGER NOT NULL,
+            chat_admin_id INTEGER NOT NULL,
             permission_name TEXT NOT NULL,
             enabled BOOLEAN DEFAULT 1,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (admin_id) REFERENCES admins (id) ON DELETE CASCADE,
-            UNIQUE(admin_id, permission_name)
+            FOREIGN KEY (chat_admin_id) REFERENCES chat_admins (id) ON DELETE CASCADE,
+            UNIQUE(chat_admin_id, permission_name)
         )
     ''')
-    
-    # Добавляем супер-админа по умолчанию
-    cursor.execute('''
-        INSERT OR IGNORE INTO admins (user_id, role, created_by) VALUES (?, ?, ?)
-    ''', (817325514, 'super_admin', 817325514))
-    
-    # Добавляем базовые права для супер-админа
-    default_permissions = [
-        'access_admin_panel', 'manage_users', 'moderate_messages', 
-        'manage_admins', 'view_analytics', 'manage_settings'
-    ]
-    admin_id = cursor.lastrowid or cursor.execute('SELECT id FROM admins WHERE user_id = ?', (817325514,)).fetchone()[0]
-    
-    for permission in default_permissions:
-        cursor.execute('''
-            INSERT OR IGNORE INTO admin_permissions (admin_id, permission_name, enabled) VALUES (?, ?, ?)
-        ''', (admin_id, permission, 1))
     
     conn.commit()
     conn.close()
@@ -127,22 +112,55 @@ async def verify_admin(request: Request):
     if not user_data:
         raise HTTPException(status_code=403, detail="Access denied")
     
-    # Проверяем, является ли пользователь администратором
+    # Временно разрешаем доступ для тестирования (супер-админ)
+    # В реальном приложении здесь должна быть проверка на глобального админа
+    if user_data['id'] != 817325514:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    return {
+        'id': user_data['id'],
+        'first_name': user_data.get('first_name', 'Admin'),
+        'is_super_admin': True
+    }
+
+# Проверка прав админа конкретного чата
+async def verify_chat_admin(chat_id: int, request: Request):
+    user_data = None
+    try:
+        # Получаем данные из Telegram WebApp init data
+        init_data = request.headers.get('X-Telegram-Init-Data', '')
+        if init_data:
+            for param in init_data.split('&'):
+                if param.startswith('user='):
+                    user_data = json.loads(param[5:].replace('%22', '"').replace('%20', ' '))
+                    break
+    except:
+        pass
+    
+    if not user_data:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Проверяем, является ли пользователь администратором чата
     db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'databases', 'admin.db')
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
-    cursor.execute('SELECT id, role, is_active FROM admins WHERE user_id = ?', (user_data['id'],))
+    cursor.execute('''
+        SELECT ca.id, ca.role, ca.is_active 
+        FROM chat_admins ca 
+        WHERE ca.chat_id = ? AND ca.user_id = ?
+    ''', (chat_id, user_data['id']))
+    
     admin_data = cursor.fetchone()
     
     if not admin_data or not admin_data[2]:
         conn.close()
         raise HTTPException(status_code=403, detail="Access denied")
     
-    # Получаем права администратора
+    # Получаем права администратора чата
     cursor.execute('''
-        SELECT permission_name FROM admin_permissions 
-        WHERE admin_id = ? AND enabled = 1
+        SELECT permission_name FROM chat_admin_permissions 
+        WHERE chat_admin_id = ? AND enabled = 1
     ''', (admin_data[0],))
     
     permissions = [row[0] for row in cursor.fetchall()]
@@ -151,7 +169,7 @@ async def verify_admin(request: Request):
     return {
         'id': user_data['id'],
         'first_name': user_data.get('first_name', 'Admin'),
-        'admin_id': admin_data[0],
+        'chat_admin_id': admin_data[0],
         'role': admin_data[1],
         'permissions': permissions
     }
@@ -225,25 +243,23 @@ async def get_admin_chats(request: Request, current_user: dict = Depends(verify_
 def check_permission(user_permissions: list[str], required_permission: str) -> bool:
     return required_permission in user_permissions
 
-@app.get("/api/admins")
-async def get_admins(request: Request, current_user: dict = Depends(verify_admin)):
-    """Получение списка администраторов"""
-    if not check_permission(current_user['permissions'], 'manage_admins'):
-        raise HTTPException(status_code=403, detail="Insufficient permissions")
-    
+@app.get("/api/chats/{chat_id}/admins")
+async def get_chat_admins(chat_id: int, request: Request, current_user: dict = Depends(verify_admin)):
+    """Получение списка администраторов чата"""
     try:
         db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'databases', 'admin.db')
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
         cursor.execute('''
-            SELECT a.id, a.user_id, a.role, a.is_active, a.created_at,
-                   GROUP_CONCAT(ap.permission_name, ',') as permissions
-            FROM admins a
-            LEFT JOIN admin_permissions ap ON a.id = ap.admin_id AND ap.enabled = 1
-            GROUP BY a.id
-            ORDER BY a.created_at DESC
-        ''')
+            SELECT ca.id, ca.user_id, ca.role, ca.is_active, ca.created_at,
+                   GROUP_CONCAT(cap.permission_name, ',') as permissions
+            FROM chat_admins ca
+            LEFT JOIN chat_admin_permissions cap ON ca.id = cap.chat_admin_id AND cap.enabled = 1
+            WHERE ca.chat_id = ?
+            GROUP BY ca.id
+            ORDER BY ca.created_at DESC
+        ''', (chat_id,))
         
         admins = []
         for row in cursor.fetchall():
@@ -263,126 +279,114 @@ async def get_admins(request: Request, current_user: dict = Depends(verify_admin
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/admins")
-async def create_admin(admin_data: AdminCreate, request: Request, current_user: dict = Depends(verify_admin)):
-    """Создание нового администратора"""
-    if not check_permission(current_user['permissions'], 'manage_admins'):
-        raise HTTPException(status_code=403, detail="Insufficient permissions")
-    
+@app.post("/api/chats/{chat_id}/admins")
+async def create_chat_admin(chat_id: int, admin_data: ChatAdminCreate, request: Request, current_user: dict = Depends(verify_admin)):
+    """Создание нового администратора чата"""
     try:
         db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'databases', 'admin.db')
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
-        # Проверяем, не существует ли уже такой администратор
-        cursor.execute('SELECT id FROM admins WHERE user_id = ?', (admin_data.user_id,))
+        # Проверяем, не существует ли уже такой администратор в чате
+        cursor.execute('SELECT id FROM chat_admins WHERE chat_id = ? AND user_id = ?', (chat_id, admin_data.user_id))
         if cursor.fetchone():
             conn.close()
-            raise HTTPException(status_code=400, detail="Admin already exists")
+            raise HTTPException(status_code=400, detail="Admin already exists in this chat")
         
-        # Создаем администратора
+        # Создаем администратора чата
         cursor.execute('''
-            INSERT INTO admins (user_id, role, created_by) VALUES (?, ?, ?)
-        ''', (admin_data.user_id, 'admin', current_user['id']))
+            INSERT INTO chat_admins (chat_id, user_id, role, created_by) VALUES (?, ?, ?, ?)
+        ''', (chat_id, admin_data.user_id, 'admin', current_user['id']))
         
-        admin_id = cursor.lastrowid
+        chat_admin_id = cursor.lastrowid
         
         # Добавляем права
         for permission in admin_data.permissions:
             cursor.execute('''
-                INSERT OR IGNORE INTO admin_permissions (admin_id, permission_name, enabled) VALUES (?, ?, ?)
-            ''', (admin_id, permission, 1))
+                INSERT OR IGNORE INTO chat_admin_permissions (chat_admin_id, permission_name, enabled) VALUES (?, ?, ?)
+            ''', (chat_admin_id, permission, 1))
         
         conn.commit()
         conn.close()
         
-        return {'message': 'Admin created successfully', 'admin_id': admin_id}
+        return {'message': 'Chat admin created successfully', 'admin_id': chat_admin_id}
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.put("/api/admins/{admin_id}")
-async def update_admin(admin_id: int, admin_data: AdminUpdate, request: Request, current_user: dict = Depends(verify_admin)):
-    """Обновление администратора"""
-    if not check_permission(current_user['permissions'], 'manage_admins'):
-        raise HTTPException(status_code=403, detail="Insufficient permissions")
-    
+@app.put("/api/chats/{chat_id}/admins/{admin_id}")
+async def update_chat_admin(chat_id: int, admin_id: int, admin_data: ChatAdminUpdate, request: Request, current_user: dict = Depends(verify_admin)):
+    """Обновление администратора чата"""
     try:
         db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'databases', 'admin.db')
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
-        # Проверяем существование администратора
-        cursor.execute('SELECT id FROM admins WHERE id = ?', (admin_id,))
+        # Проверяем существование администратора в чате
+        cursor.execute('SELECT id FROM chat_admins WHERE id = ? AND chat_id = ?', (admin_id, chat_id))
         if not cursor.fetchone():
             conn.close()
-            raise HTTPException(status_code=404, detail="Admin not found")
+            raise HTTPException(status_code=404, detail="Chat admin not found")
         
         # Обновляем статус активности если указан
         if admin_data.is_active is not None:
-            cursor.execute('UPDATE admins SET is_active = ? WHERE id = ?', (admin_data.is_active, admin_id))
+            cursor.execute('UPDATE chat_admins SET is_active = ? WHERE id = ?', (admin_data.is_active, admin_id))
         
         # Обновляем права
-        cursor.execute('DELETE FROM admin_permissions WHERE admin_id = ?', (admin_id,))
+        cursor.execute('DELETE FROM chat_admin_permissions WHERE chat_admin_id = ?', (admin_id,))
         for permission in admin_data.permissions:
             cursor.execute('''
-                INSERT INTO admin_permissions (admin_id, permission_name, enabled) VALUES (?, ?, ?)
+                INSERT INTO chat_admin_permissions (chat_admin_id, permission_name, enabled) VALUES (?, ?, ?)
             ''', (admin_id, permission, 1))
         
         conn.commit()
         conn.close()
         
-        return {'message': 'Admin updated successfully'}
+        return {'message': 'Chat admin updated successfully'}
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.delete("/api/admins/{admin_id}")
-async def delete_admin(admin_id: int, request: Request, current_user: dict = Depends(verify_admin)):
-    """Удаление администратора"""
-    if not check_permission(current_user['permissions'], 'manage_admins'):
-        raise HTTPException(status_code=403, detail="Insufficient permissions")
-    
+@app.delete("/api/chats/{chat_id}/admins/{admin_id}")
+async def delete_chat_admin(chat_id: int, admin_id: int, request: Request, current_user: dict = Depends(verify_admin)):
+    """Удаление администратора чата"""
     try:
         db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'databases', 'admin.db')
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
         # Проверяем, не пытается ли пользователь удалить себя
-        cursor.execute('SELECT user_id FROM admins WHERE id = ?', (admin_id,))
+        cursor.execute('SELECT user_id FROM chat_admins WHERE id = ? AND chat_id = ?', (admin_id, chat_id))
         admin_user = cursor.fetchone()
         if admin_user and admin_user[0] == current_user['id']:
             conn.close()
             raise HTTPException(status_code=400, detail="Cannot delete yourself")
         
-        # Удаляем администратора (каскадно удалятся и права)
-        cursor.execute('DELETE FROM admins WHERE id = ?', (admin_id,))
+        # Удаляем администратора чата (каскадно удалятся и права)
+        cursor.execute('DELETE FROM chat_admins WHERE id = ? AND chat_id = ?', (admin_id, chat_id))
         
         if cursor.rowcount == 0:
             conn.close()
-            raise HTTPException(status_code=404, detail="Admin not found")
+            raise HTTPException(status_code=404, detail="Chat admin not found")
         
         conn.commit()
         conn.close()
         
-        return {'message': 'Admin deleted successfully'}
+        return {'message': 'Chat admin deleted successfully'}
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/admin/permissions")
+@app.get("/api/chat-admin/permissions")
 async def get_available_permissions(request: Request, current_user: dict = Depends(verify_admin)):
-    """Получение списка доступных прав"""
-    if not check_permission(current_user['permissions'], 'manage_admins'):
-        raise HTTPException(status_code=403, detail="Insufficient permissions")
-    
+    """Получение списка доступных прав для администраторов чатов"""
     permissions = [
-        {'name': 'access_admin_panel', 'display_name': 'Доступ к админ-панели'},
-        {'name': 'manage_users', 'display_name': 'Управление пользователями'},
+        {'name': 'send_messages', 'display_name': 'Отправка сообщений от имени бота'},
         {'name': 'moderate_messages', 'display_name': 'Модерация сообщений'},
+        {'name': 'manage_settings', 'display_name': 'Управление настройками чата'},
+        {'name': 'view_statistics', 'display_name': 'Просмотр статистики'},
         {'name': 'manage_admins', 'display_name': 'Управление администраторами'},
-        {'name': 'view_analytics', 'display_name': 'Просмотр аналитики'},
-        {'name': 'manage_settings', 'display_name': 'Управление настройками'}
+        {'name': 'ban_users', 'display_name': 'Блокировка пользователей'}
     ]
     
     return {'permissions': permissions}
