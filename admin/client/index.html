@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .user-profile {
+            position: fixed;
+            top: 95px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 8px 12px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .main-content {
+            padding: 20px;
+            margin-top: 140px;
+        }
+    </style>
+</head>
+<body>
+    <div class="user-profile" id="userProfile">
+        <img class="user-avatar" id="userAvatar" src="" alt="Avatar">
+        <span class="user-name" id="userName">Загрузка...</span>
+    </div>
+
+    <div class="main-content">
+        <h1>Admin Panel</h1>
+        <p>Панель администратора для управления ботом</p>
+    </div>
+
+    <script>
+        // Загрузка профиля пользователя
+        async function loadUserProfile() {
+            try {
+                // Здесь будет запрос к API для получения данных пользователя
+                // Временно используем mock данные
+                const userData = {
+                    name: 'Admin User',
+                    avatar_url: 'https://via.placeholder.com/32x32/0088cc/ffffff?text=A'
+                };
+
+                document.getElementById('userName').textContent = userData.name;
+                document.getElementById('userAvatar').src = userData.avatar_url;
+            } catch (error) {
+                console.error('Ошибка загрузки профиля:', error);
+                document.getElementById('userName').textContent = 'Ошибка загрузки';
+            }
+        }
+
+        // Загрузка профиля при загрузке страницы
+        document.addEventListener('DOMContentLoaded', loadUserProfile);
+    </script>
+</body>
+</html>

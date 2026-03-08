@@ -1,6 +1,7 @@
 import sys
 import os
 import random
+import html
 from datetime import datetime, timedelta
 import sqlite3
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -42,7 +43,7 @@ async def russian_roulette(message: types.Message):
 
     user = message.from_user
     user_id = user.id
-    user_mention = user.get_mention(as_html=True)
+    user_mention = f'<a href="tg://user?id={user_id}">{html.escape(user.full_name or user.username or "Пользователь")}</a>'
     
     # Не даем играть ботам
     if getattr(user, "is_bot", False):

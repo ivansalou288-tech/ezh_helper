@@ -130,7 +130,7 @@ itog = []
 page_c = 0
 
 def get_db_path(chat_id):
-    db_path = curent_path / 'databases' / f'{chat_id}.db'
+    db_path = curent_path / 'databases' / f'{-chat_id}.db'
     return db_path
 
 def init_chat_db(chat_id):
@@ -247,7 +247,7 @@ def init_chat_db(chat_id):
     
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS warns (
-            user_id INTEGER PRIMARY KEY UNIQUE NOT NULL,
+            user_id INTEGER NOT NULL,
             reason TEXT,
             moder_id INTEGER,
             date TEXT

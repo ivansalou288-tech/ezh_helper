@@ -4,6 +4,7 @@ from aiogram.enums import ParseMode
 import asyncio
 import random
 import string
+import html
 from config3 import *
 from aiogram.utils.markdown import hlink
 import sys
@@ -1762,8 +1763,9 @@ async def ban_from_pred(call: types.CallbackQuery, bot: Bot):
     comments = 'Достигнут лимита предупреждений'
     await ban_user(user_id, call.message.chat.id, user_men, moder_men, comments, message_id, call.message, bot)
     await bot.delete_message(call.message.chat.id, call.message.message_id)
+    moder_mention = f'<a href="tg://user?id={call.from_user.id}">{html.escape(call.from_user.full_name or call.from_user.username or "Модератор")}</a>'
     await bot.send_message(call.message.chat.id,
-        f'<b>❗️Внимание❗️</b>\n🔴Злостный нарушитель <a href="tg://user?id={user_id}">{name_narush}</a> Получил достиг лимита предупреждений, получает бан и покидает нас\n👮‍♂Решение принял: {call.from_user.get_mention(as_html=True)}',
+        f'<b>❗️Внимание❗️</b>\n🔴Злостный нарушитель <a href="tg://user?id={user_id}">{name_narush}</a> Получил достиг лимита предупреждений, получает бан и покидает нас\n👮‍♂Решение принял: {moder_mention}',
         parse_mode='html')
     
     connection = sqlite3.connect(get_db_path(call.message.chat.id), check_same_thread=False)
