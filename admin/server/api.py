@@ -131,7 +131,9 @@ async def add_chat_to_admin(chat_id: int, request: Request, current_user: dict =
         raise HTTPException(status_code=500, detail=str(e))
 
 # Раздача статики
-app.mount("/", StaticFiles(directory="../client", html=True), name="static")
+import os
+static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'client')
+app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
 
 if __name__ == "__main__":
     init_admin_db()
