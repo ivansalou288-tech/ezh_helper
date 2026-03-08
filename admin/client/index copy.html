@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+    <title>Главная</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -11,12 +11,74 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             background: #0a0a0a;
             color: #fff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #b388ff;
+            text-shadow: 0 0 20px #b388ff, 0 0 40px #7c4dff;
+            margin-bottom: 50px;
+            font-size: 2.5em;
+        }
+        .container {
+            max-width: 1000px;            
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        .section-card {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border: 2px solid #7c4dff;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(124, 77, 255, 0.3);
+            transition: all 0.3s ease;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: inherit;
+            width: 100%;
+            height: 75px;
+        }
+        .section-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 30px rgba(124, 77, 255, 0.6);
+            border-color: #b388ff;
+        }
+        .section-card.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .section-title {
+            font-size: 1.8em;
+            color: #b388ff;
+            text-shadow: 0 0 10px #b388ff;
+            margin-bottom: 20px;
+        }
+        .btn {
+            background: linear-gradient(145deg, #7c4dff, #b388ff);
+            border: 2px solid #b388ff;
+            color: #fff;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(124, 77, 255, 0.4);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(124, 77, 255, 0.7);
         }
 
         /* Стили профиля пользователя */
@@ -145,18 +207,6 @@
             word-break: break-word;
         }
 
-        .main-content {
-            padding: 20px;
-            margin-top: 80px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #b388ff;
-            text-shadow: 0 0 20px #b388ff, 0 0 40px #7c4dff;
-            margin-bottom: 50px;
-            font-size: 2.5em;
-        }
     </style>
 </head>
 <body>
@@ -176,11 +226,24 @@
         <div id="toastText" class="toast-text"></div>
     </div>
 
-    <div class="main-content">
-        <h1>Admin Panel</h1>
-        <p>Панель администратора для управления ботом</p>
+    <h1>Главная страница</h1>
+    <div class="container">
+        <a href="users.html" class="section-card">
+            <div class="section-title">Пользователи</div>
+        </a>
+        <a href="dks.html" class="section-card">
+            <div class="section-title">Уровень команд</div>
+        </a>
+        <a href="recommendations.html" class="section-card">
+            <div class="section-title">Рекомендации</div>
+        </a>
+        <a href="links.html" class="section-card">
+            <div class="section-title">Создание ссылок</div>
+        </a>
+        <a href="all-links.html" class="section-card">
+            <div class="section-title">Все ссылки</div>
+        </a>
     </div>
-
     <script>
         (function () {
             const tg = window.Telegram?.WebApp;
