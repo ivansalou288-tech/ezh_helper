@@ -64,6 +64,25 @@ def init_admin_db():
         )
     ''')
     
+    # Добавляем тестовые чаты если таблица пустая
+    cursor.execute('SELECT COUNT(*) FROM admin_chats')
+    chat_count = cursor.fetchone()[0]
+    
+    if chat_count == 0:
+        print("DEBUG: Adding test chats to database")  # Отладка
+        test_chats = [
+            (1002143434937, "Тестовый чат 1", "test_chat_1", 150, "2024-01-15 10:30:00"),
+            (1002274082016, "Рабочий чат", "work_chat", 85, "2024-01-15 14:20:00"),
+            (1002439682589, "Друзья", "friends_chat", 42, "2024-01-14 18:45:00"),
+            (-1003012971064, "Общий канал", "general_channel", 1250, "2024-01-15 16:00:00")
+        ]
+        
+        cursor.executemany('''
+            INSERT INTO admin_chats (chat_id, chat_title, chat_username, member_count, last_activity)
+            VALUES (?, ?, ?, ?, ?)
+        ''', test_chats)
+        print(f"DEBUG: Added {len(test_chats)} test chats")  # Отладка
+    
     # Таблица администраторов чатов
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS chat_admins (
@@ -93,6 +112,9 @@ def init_admin_db():
     
     conn.commit()
     conn.close()
+
+# Инициализация базы данных при запуске
+init_admin_db()
 
 # Проверка прав админа
 async def verify_admin(request: Request):
