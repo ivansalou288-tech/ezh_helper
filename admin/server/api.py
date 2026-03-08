@@ -112,15 +112,12 @@ async def verify_admin(request: Request):
     if not user_data:
         raise HTTPException(status_code=403, detail="Access denied")
     
-    # Временно разрешаем доступ для тестирования (супер-админ)
-    # В реальном приложении здесь должна быть проверка на глобального админа
-    if user_data['id'] != 817325514:
-        raise HTTPException(status_code=403, detail="Access denied")
-    
+    # Разрешаем доступ всем авторизованным пользователям к списку чатов
+    # Управление администраторами чатов будет проверяться отдельно
     return {
         'id': user_data['id'],
-        'first_name': user_data.get('first_name', 'Admin'),
-        'is_super_admin': True
+        'first_name': user_data.get('first_name', 'User'),
+        'is_super_admin': user_data['id'] == 817325514
     }
 
 # Проверка прав админа конкретного чата
@@ -139,6 +136,16 @@ async def verify_chat_admin(chat_id: int, request: Request):
     
     if not user_data:
         raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Супер-админ может управлять любыми чатами
+    if user_data['id'] == 817325514:
+        return {
+            'id': user_data['id'],
+            'first_name': user_data.get('first_name', 'Admin'),
+            'chat_admin_id': None,
+            'role': 'super_admin',
+            'permissions': ['all']
+        }
     
     # Проверяем, является ли пользователь администратором чата
     db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'databases', 'admin.db')
@@ -247,6 +254,12 @@ def check_permission(user_permissions: list[str], required_permission: str) -> b
 async def get_chat_admins(chat_id: int, request: Request, current_user: dict = Depends(verify_admin)):
     """Получение списка администраторов чата"""
     try:
+        # Проверяем права на просмотр администраторов
+        if not current_user.get('is_super_admin'):
+            admin_check = await verify_chat_admin(chat_id, request)
+            if 'manage_admins' not in admin_check.get('permissions', []):
+                raise HTTPException(status_code=403, detail="Insufficient permissions")
+        
         db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'databases', 'admin.db')
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
@@ -283,6 +296,12 @@ async def get_chat_admins(chat_id: int, request: Request, current_user: dict = D
 async def create_chat_admin(chat_id: int, admin_data: ChatAdminCreate, request: Request, current_user: dict = Depends(verify_admin)):
     """Создание нового администратора чата"""
     try:
+        # Проверяем права на управление администраторами
+        if not current_user.get('is_super_admin'):
+            admin_check = await verify_chat_admin(chat_id, request)
+            if 'manage_admins' not in admin_check.get('permissions', []):
+                raise HTTPException(status_code=403, detail="Insufficient permissions")
+        
         db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'databases', 'admin.db')
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
@@ -318,6 +337,12 @@ async def create_chat_admin(chat_id: int, admin_data: ChatAdminCreate, request: 
 async def update_chat_admin(chat_id: int, admin_id: int, admin_data: ChatAdminUpdate, request: Request, current_user: dict = Depends(verify_admin)):
     """Обновление администратора чата"""
     try:
+        # Проверяем права на управление администраторами
+        if not current_user.get('is_super_admin'):
+            admin_check = await verify_chat_admin(chat_id, request)
+            if 'manage_admins' not in admin_check.get('permissions', []):
+                raise HTTPException(status_code=403, detail="Insufficient permissions")
+        
         db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'databases', 'admin.db')
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
@@ -351,6 +376,12 @@ async def update_chat_admin(chat_id: int, admin_id: int, admin_data: ChatAdminUp
 async def delete_chat_admin(chat_id: int, admin_id: int, request: Request, current_user: dict = Depends(verify_admin)):
     """Удаление администратора чата"""
     try:
+        # Проверяем права на управление администраторами
+        if not current_user.get('is_super_admin'):
+            admin_check = await verify_chat_admin(chat_id, request)
+            if 'manage_admins' not in admin_check.get('permissions', []):
+                raise HTTPException(status_code=403, detail="Insufficient permissions")
+        
         db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'databases', 'admin.db')
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
