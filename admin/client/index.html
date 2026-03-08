@@ -157,6 +157,186 @@
             margin-bottom: 50px;
             font-size: 2.5em;
         }
+
+        /* Стили для контейнера чатов */
+        .chats-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .chats-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 0 10px;
+        }
+
+        .chats-title {
+            font-size: 1.8em;
+            color: #b388ff;
+            font-weight: 700;
+        }
+
+        .add-chat-btn {
+            background: linear-gradient(145deg, #7c4dff, #b388ff);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(179, 136, 255, 0.3);
+        }
+
+        .add-chat-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(179, 136, 255, 0.4);
+        }
+
+        .chats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #7c4dff, #b388ff);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .chat-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(179, 136, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(179, 136, 255, 0.2);
+        }
+
+        .chat-card:hover::before {
+            opacity: 1;
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .chat-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #7c4dff, #b388ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2em;
+            margin-right: 15px;
+            box-shadow: 0 4px 12px rgba(179, 136, 255, 0.3);
+        }
+
+        .chat-info {
+            flex: 1;
+        }
+
+        .chat-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .chat-username {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9em;
+        }
+
+        .chat-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-members {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9em;
+        }
+
+        .chat-activity {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8em;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-state-text {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .empty-state-subtext {
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .chats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chats-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+            
+            .add-chat-btn {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -178,7 +358,18 @@
 
     <div class="main-content">
         <h1>Admin Panel</h1>
-        <p>Панель администратора для управления ботом</p>
+        
+        <!-- Контейнер чатов -->
+        <div class="chats-container">
+            <div class="chats-header">
+                <h2 class="chats-title">📱 Доступные чаты</h2>
+                <button class="add-chat-btn" onclick="addNewChat()">+ Добавить чат</button>
+            </div>
+            
+            <div id="chatsContent">
+                <div class="loading">Загрузка чатов...</div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -282,6 +473,145 @@
         }
 
         updateUserProfile();
+
+        // Функции для работы с чатами
+        async function loadChats() {
+            const chatsContent = document.getElementById('chatsContent');
+            
+            try {
+                const response = await fetch('https://ezh-dev.ru:3000/api/chats', {
+                    method: 'GET',
+                    headers: {
+                        'X-Telegram-Init-Data': window.Telegram?.WebApp?.initData || ''
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                displayChats(data.chats || []);
+
+            } catch (error) {
+                console.error('Error loading chats:', error);
+                chatsContent.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💬</div>
+                        <div class="empty-state-text">Не удалось загрузить чаты</div>
+                        <div class="empty-state-subtext">${mapErrorToRu(error.message)}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function displayChats(chats) {
+            const chatsContent = document.getElementById('chatsContent');
+            
+            if (!chats || chats.length === 0) {
+                chatsContent.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💬</div>
+                        <div class="empty-state-text">Нет доступных чатов</div>
+                        <div class="empty-state-subtext">Добавьте первый чат с помощью кнопки выше</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const chatsGrid = document.createElement('div');
+            chatsGrid.className = 'chats-grid';
+
+            chats.forEach(chat => {
+                const chatCard = createChatCard(chat);
+                chatsGrid.appendChild(chatCard);
+            });
+
+            chatsContent.innerHTML = '';
+            chatsContent.appendChild(chatsGrid);
+        }
+
+        function createChatCard(chat) {
+            const card = document.createElement('div');
+            card.className = 'chat-card';
+            card.onclick = () => openChat(chat.chat_id);
+
+            const chatInitial = chat.chat_title.charAt(0).toUpperCase();
+            const formattedDate = chat.last_activity ? 
+                new Date(chat.last_activity).toLocaleDateString('ru-RU', {
+                    day: 'numeric',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }) : 'Нет активности';
+
+            card.innerHTML = `
+                <div class="chat-header">
+                    <div class="chat-avatar">${chatInitial}</div>
+                    <div class="chat-info">
+                        <div class="chat-title">${chat.chat_title}</div>
+                        ${chat.chat_username ? `<div class="chat-username">@${chat.chat_username}</div>` : ''}
+                    </div>
+                </div>
+                <div class="chat-stats">
+                    <div class="chat-members">👥 ${chat.member_count} участников</div>
+                    <div class="chat-activity">🕐 ${formattedDate}</div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function openChat(chatId) {
+            // Здесь можно добавить логику перехода к управлению чатом
+            console.log('Open chat:', chatId);
+            showError('Функция управления чатом будет доступна в следующем обновлении');
+        }
+
+        async function addNewChat() {
+            const chatId = prompt('Введите ID чата для добавления:');
+            
+            if (!chatId || isNaN(chatId)) {
+                showError('Пожалуйста, введите корректный ID чата');
+                return;
+            }
+
+            try {
+                const response = await fetch(`https://ezh-dev.ru:3000/api/chats/${parseInt(chatId)}/add`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Telegram-Init-Data': window.Telegram?.WebApp?.initData || ''
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    // Перезагружаем список чатов
+                    loadChats();
+                } else {
+                    throw new Error(result.message || 'Неизвестная ошибка');
+                }
+
+            } catch (error) {
+                console.error('Error adding chat:', error);
+                showError(mapErrorToRu(error.message));
+            }
+        }
+
+        // Загружаем чаты при инициализации
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.Telegram?.WebApp) {
+                loadChats();
+            } else {
+                // Если Telegram WebApp недоступен, все равно пробуем загрузить
+                setTimeout(loadChats, 1000);
+            }
+        });
     </script>
 </body>
 </html>
