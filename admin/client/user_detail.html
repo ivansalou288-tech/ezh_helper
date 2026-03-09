@@ -787,7 +787,7 @@
                             });
 
                             // Нажатие на кнопку "Снять" отправляет POST-запрос
-                            card.querySelector('.warning-remove-btn').addEventListener('click', (e) => {
+                            card.querySelector('.warning-remove-btn').addEventListener('click', async (e) => {
                                 e.stopPropagation();
                                 const btn = e.currentTarget;
                                 const warnNum = parseInt(btn.getAttribute('data-warn-num')) || num;
@@ -796,46 +796,59 @@
                                     alert('Не удалось получить данные профиля Telegram. Открой страницу внутри Telegram Mini App.');
                                     return;
                                 }
-                                fetch('https://ezh-dev.ru:3000/snat_warn', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({
-                                        chat: currentChatId,
-                                        userid: currentUserId,
-                                        num: warnNum,
-                                        admin_id: admin.id,
-                                        admin_name: `${admin.first_name} ${admin.last_name}`.trim() || admin.username,
-                                        admin_username: admin.username
-                                    })
-                                }).then(response => response.json())
-                                .then(data => {
-                                    console.log('Response from snat_warn:', data);
-                                })
-                                .then(() => {
-                                    // Анимированная галочка и плавное удаление карточки
-                                    btn.classList.remove('visible');
-                                    btn.disabled = true;
-                                    openedWarningButton = null;
-
-                                    const icon = document.createElement('div');
-                                    icon.className = 'warning-removed-icon';
-                                    icon.textContent = '✓';
-                                    card.appendChild(icon);
-
-                                    setTimeout(() => {
-                                        card.remove();
-                                        // Если предупреждений больше нет — показать текст
-                                        if (!list.querySelector('.warning-card')) {
-                                            const existingNoWarn = warningsSection.querySelector('.no-warnings');
-                                            if (!existingNoWarn) {
-                                                warningsSection.innerHTML += '<div class="no-warnings">Предупреждений нет</div>';
-                                            }
+                                
+                                try {
+                                    const response = await fetch('https://ezh-dev.ru:3000/snat_warn', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({
+                                            chat: currentChatId,
+                                            userid: currentUserId,
+                                            num: warnNum,
+                                            admin_id: admin.id,
+                                            admin_name: `${admin.first_name} ${admin.last_name}`.trim() || admin.username,
+                                            admin_username: admin.username
+                                        })
+                                    });
+                                    
+                                    if (!response.ok) {
+                                        const errorData = await response.json();
+                                        if (response.status === 400) {
+                                            alert('Нельзя снять предупреждение самому себе');
+                                        } else {
+                                            alert('Ошибка: ' + (errorData.detail || 'Неизвестная ошибка'));
                                         }
-                                    }, 450);
-                                }).catch((err) => {
+                                        return;
+                                    }
+                                    
+                                    const data = await response.json();
+                                    
+                                    if (data.status === 'ok') {
+                                        btn.classList.remove('visible');
+                                        btn.disabled = true;
+                                        openedWarningButton = null;
+
+                                        const icon = document.createElement('div');
+                                        icon.className = 'warning-removed-icon';
+                                        icon.textContent = '✓';
+                                        card.appendChild(icon);
+
+                                        setTimeout(() => {
+                                            card.remove();
+                                            if (!list.querySelector('.warning-card')) {
+                                                const existingNoWarn = warningsSection.querySelector('.no-warnings');
+                                                if (!existingNoWarn) {
+                                                    warningsSection.innerHTML += '<div class="no-warnings">Предупреждений нет</div>';
+                                                }
+                                            }
+                                        }, 450);
+                                    } else {
+                                        alert('Ошибка при снятии предупреждения');
+                                    }
+                                } catch (err) {
                                     console.error('Ошибка при снятии предупреждения:', err);
                                     alert('Ошибка при снятии предупреждения');
-                                });
+                                }
                             });
 
                             list.appendChild(card);
