@@ -13,9 +13,9 @@
         .title { font-size: 2em; color: #b388ff; text-shadow: 0 0 20px #b388ff; margin-bottom: 10px; }
         .subtitle { color: rgba(255, 255, 255, 0.7); }
         .search-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(179, 136, 255, 0.3); border-radius: 10px; padding: 15px; margin-bottom: 20px; }
-        .input-wrapper { display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(179, 136, 255, 0.3); border-radius: 10px; padding: 10px 15px; margin-bottom: 15px; }
-        .at-symbol { color: #b388ff; font-size: 1.2em; font-weight: 600; margin-right: 5px; user-select: none; }
-        .input { flex: 1; background: none; border: none; color: #fff; font-size: 1em; outline: none; }
+        .search-input { width: 100%; padding: 15px 20px; border: 2px solid rgba(179, 136, 255, 0.3); border-radius: 25px; background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); color: #fff; font-size: 16px; outline: none; transition: all 0.3s ease; }
+        .search-input::placeholder { color: rgba(255, 255, 255, 0.5); }
+        .search-input:focus { border-color: rgba(179, 136, 255, 0.6); background: rgba(255, 255, 255, 0.12); box-shadow: 0 0 20px rgba(179, 136, 255, 0.2); }
         .btn { background: linear-gradient(145deg, #7c4dff, #b388ff); border: none; color: #fff; padding: 12px 30px; border-radius: 10px; cursor: pointer; font-size: 1em; font-weight: 600; width: 100%; transition: all 0.3s ease; }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(179, 136, 255, 0.4); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -40,11 +40,7 @@
         </div>
 
         <div class="search-box">
-            <div class="input-wrapper">
-                <span class="at-symbol">@</span>
-                <input type="text" id="usernameInput" class="input" placeholder="введите username">
-            </div>
-            <button class="btn" onclick="searchUsers()">Найти</button>
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Поиск по нику или username...">
         </div>
 
         <div id="usersList" class="users-list"></div>
@@ -73,35 +69,47 @@
         const urlParams = new URLSearchParams(window.location.search);
         const chatId = urlParams.get('chat_id');
         let selectedUser = null;
+        let allUsers = [];
+
+        async function loadAllUsers() {
+            try {
+                const response = await fetch(`https://ezh-dev.ru:3000/users/${chatId}`);
+                const data = await response.json();
+                if (data && typeof data === 'object') {
+                    allUsers = Object.keys(data).map(key => data[key]).filter(u => u && u.nik);
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки пользователей:', error);
+            }
+        }
 
         async function searchUsers() {
-            const username = document.getElementById('usernameInput').value.trim();
+            const searchTerm = document.getElementById('searchInput').value.trim();
             const usersList = document.getElementById('usersList');
             document.getElementById('formBox').style.display = 'none';
 
-            if (!username) {
-                usersList.innerHTML = '<div class="no-results">Введите username для поиска</div>';
+            if (!searchTerm) {
+                usersList.innerHTML = '<div class="no-results">Введите ник или username для поиска</div>';
                 return;
             }
 
-            try {
-                usersList.innerHTML = '<div class="no-results">Поиск...</div>';
-                const response = await fetch(`https://ezh-dev.ru:3000/search-users/${chatId}?q=${encodeURIComponent(username)}`);
-                const data = await response.json();
+            const filtered = allUsers.filter(u => {
+                const searchLower = searchTerm.toLowerCase();
+                return (u.nik && u.nik.toLowerCase().includes(searchLower)) || 
+                       (u.username && u.username.toLowerCase().includes(searchLower));
+            });
 
-                if (data.status === 'success' && data.users && data.users.length > 0) {
-                    usersList.innerHTML = data.users.map(u => `
-                        <div class="user-item" onclick='selectUser(${JSON.stringify({id: u.tg_id, name: u.nik || "Без имени"})})'>
-                            <div class="user-name">${u.nik || 'Без имени'}</div>
-                            <div class="user-id">ID: ${u.tg_id}</div>
-                        </div>
-                    `).join('');
-                } else {
-                    usersList.innerHTML = '<div class="no-results">Пользователи не найдены</div>';
-                }
-            } catch (error) {
-                usersList.innerHTML = '<div class="no-results">Ошибка поиска</div>';
+            if (filtered.length === 0) {
+                usersList.innerHTML = '<div class="no-results">Пользователи не найдены</div>';
+                return;
             }
+
+            usersList.innerHTML = filtered.map(u => `
+                <div class="user-item" onclick='selectUser(${JSON.stringify({id: u.tg_ids, name: u.nik || "Без имени"})})'>
+                    <div class="user-name">${u.nik || 'Без имени'}</div>
+                    <div class="user-id">ID: ${u.tg_ids}</div>
+                </div>
+            `).join('');
         }
 
         function selectUser(user) {
@@ -128,9 +136,8 @@
             // TODO: Добавить API endpoint для выдачи рекомендации
         }
 
-        document.getElementById('usernameInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') searchUsers();
-        });
+        document.getElementById('searchInput').addEventListener('input', searchUsers);
+        loadAllUsers();
     </script>
 </body>
 </html>
