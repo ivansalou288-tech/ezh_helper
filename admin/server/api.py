@@ -15,6 +15,7 @@ from typing import Any, Optional
 import time
 import json
 
+from main.config3 import *
 app = FastAPI()
 
 from fastapi.middleware.cors import CORSMiddleware
