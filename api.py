@@ -60,6 +60,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+class RecomRemoveAction(BaseModel):
+    rec_id: str
+    user_id: Optional[int] = None
+    admin_id: Optional[int] = None
+    admin_name: Optional[str] = None
+    admin_username: Optional[str] = None
 @app.get('/user-admin-chats/{user_id}')
 def get_user_admin_chats(user_id: int):
     """
@@ -533,6 +540,9 @@ def get_recom(chat_id: int, user: int):
         # Получаем рекомендации пользователя
         all_recs = cursor.execute('SELECT * FROM recommendation WHERE user_id = ?', (user,)).fetchall()
         
+        # Получаем ранги для должностей
+        rangs_name = ('Обычный участник', 'Младший Модератор', 'Модератор', 'Старший Модератор', 'Заместитель', 'Менеджер', 'Владелец')
+        
         recommendations = []
         for rec in all_recs:
             # Структура таблицы: user_id, pubg_id, moder, comments, rang, date, recom_id
@@ -544,11 +554,31 @@ def get_recom(chat_id: int, user: int):
             date = rec[5]
             rec_id = rec[6]
             
+            # Получаем имя модератора
+            try:
+                moder_name = cursor.execute("SELECT nik FROM users WHERE tg_id=?", (int(moder_id),)).fetchall()[0][0]
+            except (IndexError, ValueError):
+                moder_name = str(moder_id)
+            
+            # Получаем ранг модератора
+            try:
+                rang_m = cursor.execute("SELECT rang FROM users WHERE tg_id=?", (int(moder_id),)).fetchall()[0][0]
+                # Ensure rang value is within bounds
+                if rang_m < 0:
+                    rang_m = 0
+                elif rang_m >= len(rangs_name):
+                    rang_m = len(rangs_name) - 1
+                moder_rang = rangs_name[rang_m]
+            except (IndexError, ValueError):
+                moder_rang = 'Неизвестная должность'
+            
             recommendation = {
                 "rec_id": rec_id,
                 "user_id": user_id,
                 "pubg_id": pubg_id,
                 "moder_id": moder_id,
+                "moder_name": moder_name,
+                "moder_rang": moder_rang,
                 "reason": reason,
                 "rang": rang,
                 "date": date
@@ -567,6 +597,59 @@ def get_recom_fallback(user: int):
     # Временный fallback для совместимости - используем основной групповой чат
     return get_recom(1003012971064, user)
 
+@app.post('/recom-remove')
+def recom_remove(action: RecomRemoveAction):
+    # Проверка прав доступа - используем основную базу админов
+    try:
+        connection = sqlite3.connect(admin_path, check_same_thread=False)
+        cursor = connection.cursor()
+        cursor.execute('SELECT * FROM admins WHERE user_id = ?', (action.admin_id,))
+        admin_check = cursor.fetchall()
+        connection.close()
+        
+        if not admin_check:
+            raise HTTPException(status_code=403, detail="Access denied")
+    except Exception as e:
+        print(f"Error checking admin rights: {e}")
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Находим подходящий чат для удаления рекомендации
+    chat_found = False
+    deleted_count = 0
+    
+    for chat_name, chat_id in chats_names.items():
+        try:
+            chat_db_path = curent_path / 'databases' / f'{-chat_id}.db'
+            
+            if not chat_db_path.exists():
+                continue
+                
+            connection = sqlite3.connect(chat_db_path, check_same_thread=False)
+            cursor = connection.cursor()
+            
+            if action.user_id is None:
+                cursor.execute('DELETE FROM recommendation WHERE recom_id = ?', (action.rec_id,))
+            else:
+                cursor.execute('DELETE FROM recommendation WHERE recom_id = ? AND user_id = ?', (action.rec_id, action.user_id))
+            
+            deleted = cursor.rowcount
+            if deleted > 0:
+                deleted_count += deleted
+                chat_found = True
+                
+            connection.commit()
+            connection.close()
+            
+        except Exception as e:
+            print(f"Error deleting recommendation from chat {chat_id}: {e}")
+            continue
+    
+    if not chat_found or deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Recommendation not found")
+        
+    print(f"Removed recommendation: rec_id={action.rec_id}, user_id={action.user_id} by admin {action.admin_id} ({action.admin_name})")
+    return {"status": "ok", "deleted": deleted_count}
+
 if  __name__ == '__main__':
-    uvicorn.run('api:app', reload=True, port=8000, host="0.0.0.0", ssl_keyfile='/etc/letsencrypt/live/ezh-dev.ru/privkey.pem', ssl_certfile='/etc/letsencrypt/live/ezh-dev.ru/cert.pem')
+    uvicorn.run('api:app', reload=True, port=3000, host="0.0.0.0", ssl_keyfile='/etc/letsencrypt/live/ezh-dev.ru/privkey.pem', ssl_certfile='/etc/letsencrypt/live/ezh-dev.ru/cert.pem')
 

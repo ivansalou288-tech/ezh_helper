@@ -855,7 +855,7 @@
         }
 
         function loadRecommendations() {
-            fetch(`https://ezh-dev.ru:8000/recom/${currentUserId}`)
+            fetch(`https://ezh-dev.ru:3000/recom/${currentChatId}/${currentUserId}`)
                 .then(res => res.json())
                 .then(data => {
                     const userCard = document.getElementById('userCard');
@@ -891,24 +891,20 @@
                                 </div>
                                 <div class="recommendation-card-body">
                                     <div class="recommendation-field">
-                                        <span class="recommendation-field-label">PUBG ID:</span>
-                                        <span class="recommendation-field-value">${rec?.pubg_id ?? ''}</span>
+                                        <span class="recommendation-field-label">От кого:</span>
+                                        <span class="recommendation-field-value"><a href="tg://user?id=${rec?.moder_id ?? ''}" style="color: #b388ff;">${rec?.moder_name ?? 'ID ' + (rec?.moder_id ?? '')}</a> (${rec?.moder_rang ?? 'Неизвестная должность'})</span>
                                     </div>
                                     <div class="recommendation-field">
-                                        <span class="recommendation-field-label">ID модератора:</span>
-                                        <span class="recommendation-field-value">${rec?.moder_id ?? ''}</span>
-                                    </div>
-                                    <div class="recommendation-field">
-                                        <span class="recommendation-field-label">Причина:</span>
+                                        <span class="recommendation-field-label">Чем отличился:</span>
                                         <span class="recommendation-field-value">${(rec?.reason ?? '').toString().trim()}</span>
                                     </div>
                                     <div class="recommendation-field">
-                                        <span class="recommendation-field-label">Ранг:</span>
+                                        <span class="recommendation-field-label">Рекомендован на:</span>
                                         <span class="recommendation-field-value">${(rec?.rang ?? '').toString().trim()}</span>
                                     </div>
                                     <div class="recommendation-field">
-                                        <span class="recommendation-field-label">ID рекомендации:</span>
-                                        <span class="recommendation-field-value">${rec?.rec_id ?? ''}</span>
+                                        <span class="recommendation-field-label">PUBG ID:</span>
+                                        <span class="recommendation-field-value">${rec?.pubg_id ?? ''}</span>
                                     </div>
                                     <button class="recommendation-remove-btn" data-rec-id="${rec?.rec_id ?? ''}">Снять</button>
                                 </div>
@@ -947,7 +943,7 @@
                                     alert('Не удалось получить данные профиля Telegram. Открой страницу внутри Telegram Mini App.');
                                     return;
                                 }
-                                fetch('https://ezh-dev.ru:8000/recom-remove', {
+                                fetch('https://ezh-dev.ru:3000/recom-remove', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({
