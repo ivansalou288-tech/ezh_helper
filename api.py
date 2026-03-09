@@ -90,7 +90,7 @@ def get_user_admin_chats(user_id: int):
     try:
         connection = sqlite3.connect(admin_path, check_same_thread=False)
         cursor = connection.cursor()
-        
+        print(user_id)
         # Получаем все записи для пользователя из таблицы admins
         cursor.execute('SELECT * FROM admins WHERE user_id = ?', (user_id,))
         rows = cursor.fetchall()
