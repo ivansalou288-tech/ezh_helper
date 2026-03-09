@@ -420,25 +420,34 @@
             profile.style.display = 'flex';
         }
 
-        // Поиск пользователей
+        let allUsers = [];
         const searchInput = document.getElementById('searchInput');
         const resultsContainer = document.getElementById('resultsContainer');
-        let searchTimeout;
 
         searchInput.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            const query = e.target.value.trim();
-            
-            if (query.length < 2) {
-                resultsContainer.innerHTML = '';
-                return;
-            }
-
-            searchTimeout = setTimeout(() => searchUsers(query), 300);
+            filterUsers(e.target.value);
         });
 
-        async function searchUsers(query) {
-            resultsContainer.innerHTML = '<div class="loading">Поиск...</div>';
+        function filterUsers(searchTerm) {
+            if (!searchTerm) {
+                displayResults(allUsers);
+                return;
+            }
+            
+            const filtered = allUsers.filter(user => {
+                const searchLower = searchTerm.toLowerCase();
+                return (
+                    (user.username && user.username.toLowerCase().includes(searchLower)) ||
+                    (user.first_name && user.first_name.toLowerCase().includes(searchLower)) ||
+                    (user.last_name && user.last_name.toLowerCase().includes(searchLower))
+                );
+            });
+            
+            displayResults(filtered);
+        }
+
+        async function loadUsers() {
+            resultsContainer.innerHTML = '<div class="loading">Загрузка...</div>';
             
             try {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -449,7 +458,7 @@
                     return;
                 }
                 
-                const response = await fetch(`/api/search_users?query=${encodeURIComponent(query)}&chat_id=${encodeURIComponent(chatId)}`);
+                const response = await fetch(`/api/search_users?chat_id=${encodeURIComponent(chatId)}`);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -458,17 +467,24 @@
                 const data = await response.json();
                 
                 if (data.users && data.users.length > 0) {
-                    displayResults(data.users);
+                    allUsers = data.users;
+                    displayResults(allUsers);
                 } else {
+                    allUsers = [];
                     resultsContainer.innerHTML = '<div class="no-results">Пользователи не найдены</div>';
                 }
             } catch (error) {
-                console.error('Search error:', error);
-                resultsContainer.innerHTML = `<div class="no-results">Ошибка поиска: ${error.message}</div>`;
+                console.error('Load error:', error);
+                resultsContainer.innerHTML = `<div class="no-results">Ошибка загрузки: ${error.message}</div>`;
             }
         }
 
         function displayResults(users) {
+            if (users.length === 0) {
+                resultsContainer.innerHTML = '<div class="no-results">Пользователи не найдены</div>';
+                return;
+            }
+            
             resultsContainer.innerHTML = users.map(user => {
                 const firstName = user.first_name || '';
                 const lastName = user.last_name || '';
@@ -526,6 +542,7 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             updateUserProfile();
+            loadUsers();
         });
     </script>
 </body>
