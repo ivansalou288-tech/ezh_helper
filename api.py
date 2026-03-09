@@ -22,15 +22,32 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 sys.path.insert(0, ROOT_DIR)
 
 from main.config3 import *
+from main.secret import main_token as bot_token
+
+# Импортируем бота для проверки статуса пользователей
+try:
+    from aiogram import Bot
+    bot = Bot(token=bot_token)
+except ImportError:
+    print("Предупреждение: aiogram не установлен, проверка статуса в чате будет отключена")
+    bot = None
+
 curent_path = (Path(__file__)).parent
 all_path = curent_path / 'databases' / 'All.db'
 admin_path = curent_path / 'databases' / 'admin.db'
+main_path = curent_path / 'databases' / 'Base_bot.db'
 app = FastAPI()
+
+# Словарь имен чатов (из api copy.py)
+chats_names = {
+    'klan': 1002143434937, 
+    'sost-1': 1002274082016, 
+    'sost-2': 1002439682589
+}
 
 def get_db_path(chat_id):
     """Получает путь к базе данных чата"""
     chat_id_str = str(-chat_id)
-
     return curent_path / 'databases' / f'{chat_id_str}.db'
 
 app.add_middleware(
@@ -264,6 +281,86 @@ def get_chat_admin_panel(chat_id: int, user_id: int):
             "message": f"Ошибка при загрузке админ панели: {str(e)}"
         }
 
+async def get_users_sdk(chat: str):
+    """
+    Получение пользователей чата как в api copy.py
+    """
+    if chat not in chats_names:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    
+    connection = sqlite3.connect(main_path, check_same_thread=False)
+    cursor = connection.cursor()
+    
+    # Получаем данные из таблицы чата
+    userss = cursor.execute(f'SELECT * FROM [{chats_names[chat]}]').fetchall()
+    users = {}
+    index = 1
+    
+    for user in userss:
+        tg_ids = user[0]
+        usernames = user[1]
+        names = user[2]
+        age = user[3]
+        nik_pubg = user[4]
+        id_pubg = user[5]
+        nik = user[6]
+        rang = user[7]
+        last_date = user[8]
+        date_vhod = user[9]
+        mess_count = user[10]
+
+        # Проверяем статус участника в чате через Telegram Bot API
+        chat_status = '💔 Не состоит в чате'
+        if bot:
+            try:
+                chat_member = await bot.get_chat_member(-(chats_names[chat]), tg_ids)
+                status = chat_member.status
+                
+                if status == 'administrator':
+                    chat_status = '👨🏻‍🔧 Телеграм-админ этого чата'
+                elif status == 'creator':
+                    chat_status = '👨🏻‍🔧 Создатель этого чата'
+                elif status == 'member' or status == 'restricted':
+                    chat_status = '💚 Состоит в чате'
+                else:
+                    chat_status = '💔 Не состоит в чате'
+            except Exception as e:
+                print(f"Ошибка при проверке статуса пользователя {tg_ids}: {e}")
+                chat_status = '💔 Не состоит в чате'
+
+        users[index] = {
+            'tg_ids': tg_ids,
+            'username': usernames,
+            'name': names,
+            'age': age,
+            'nik_pubg': nik_pubg,
+            'id_pubg': id_pubg,
+            'nik': nik,
+            'rang': rang,
+            'last_date': last_date,
+            'date_vhod': date_vhod,
+            'mess_count': mess_count,
+            'status': chat_status,
+        }
+        index += 1
+    
+    connection.close()
+    return users
+
+@app.get("/users/{chat}")
+async def get_users(chat: str):
+    """
+    Получение пользователей чата (как в api copy.py)
+    """
+    try:
+        if chat in chats_names.keys():
+            users = await get_users_sdk(chat)
+            return users
+        else:
+            raise HTTPException(status_code=404, detail="Chat not found")
+    except Exception as e:
+        print(f"Ошибка в get_users: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 @app.get('/chat-users/{chat_id}')
 def get_chat_users(chat_id: int):
     """

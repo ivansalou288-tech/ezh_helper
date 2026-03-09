@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пользователи</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0a0a0a;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #b388ff;
+            text-shadow: 0 0 20px #b388ff, 0 0 40px #7c4dff;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+        #users {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            gap: 20px;
+        }
+        .user-card {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border: 2px solid #7c4dff;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(124, 77, 255, 0.3), inset 0 0 20px rgba(124, 77, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .user-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 30px rgba(124, 77, 255, 0.6), inset 0 0 30px rgba(124, 77, 255, 0.2);
+            border-color: #b388ff;
+        }
+        .user-name {
+            font-size: 1.5em;
+            color: #b388ff;
+            text-shadow: 0 0 10px #b388ff;
+            margin-bottom: 10px;
+        }
+        .user-info {
+            color: #e0e0e0;
+            line-height: 1.8;
+        }
+        .user-status {
+            margin-top: 8px;
+            font-size: 0.95em;
+            color: #9ccc65;
+            text-shadow: 0 0 8px rgba(156, 204, 101, 0.6);
+        }
+        .label {
+            color: #7c4dff;
+            font-weight: bold;
+        }
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+        .btn {
+            background: linear-gradient(145deg, #7c4dff, #b388ff);
+            border: 2px solid #b388ff;
+            color: #fff;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(124, 77, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(124, 77, 255, 0.7);
+        }
+        .btn.active {
+            background: linear-gradient(145deg, #b388ff, #7c4dff);
+            box-shadow: 0 0 30px rgba(179, 136, 255, 0.8);
+        }
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(145deg, #7c4dff, #b388ff);
+            border: 2px solid #b388ff;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(124, 77, 255, 0.4);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .back-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(124, 77, 255, 0.7);
+        }
+        .field-label {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #e9dcff;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border-radius: 12px;
+            padding: 6px 10px;
+            border: 1px solid rgba(179, 136, 255, 0.4);
+            box-shadow: 0 0 18px rgba(124, 77, 255, 0.35);
+        }
+
+        .input-prefix {
+            padding: 8px 10px;
+            color: #b388ff;
+            font-weight: 600;
+            text-shadow: 0 0 10px #b388ff;
+            user-select: none;
+        }
+
+        #searchInput {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff;
+            font-size: 1.05em;
+            padding: 8px 6px;
+        }
+
+        #searchInput::placeholder {
+            color: rgba(233, 220, 255, 0.45);
+        }
+
+        /* Стили профиля пользователя */
+        .user-profile {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .user-profile:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .profile-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #b388ff;
+            box-shadow: 0 0 10px rgba(179, 136, 255, 0.3);
+        }
+
+        .profile-name {
+            color: #fff;
+            font-size: 0.9em;
+            font-weight: 600;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+            .user-profile {
+                top: 10px;
+                right: 10px;
+                padding: 6px 10px;
+                gap: 8px;
+            }
+
+            .profile-avatar {
+                width: 30px;
+                height: 30px;
+            }
+
+            .profile-name {
+                font-size: 0.8em;
+                max-width: 100px;
+            }
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 16px;
+            transform: translateX(-50%);
+            background: rgba(26, 26, 46, 0.92);
+            border: 1px solid rgba(124, 77, 255, 0.55);
+            box-shadow: 0 0 22px rgba(124, 77, 255, 0.22);
+            color: #fff;
+            padding: 12px 14px;
+            border-radius: 14px;
+            z-index: 2000;
+            max-width: min(560px, calc(100vw - 24px));
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.error {
+            border-color: rgba(255, 82, 82, 0.6);
+            box-shadow: 0 0 22px rgba(255, 82, 82, 0.18);
+        }
+
+        .toast-title {
+            font-weight: 800;
+            margin-bottom: 6px;
+            font-size: 0.95em;
+        }
+
+        .toast-text {
+            opacity: 0.95;
+            font-size: 0.9em;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+    </style>
+</head>
+<body>
+    <!-- Профиль пользователя -->
+    <div id="userProfile" class="user-profile">
+        <img id="profileAvatar" class="profile-avatar" src="" alt="Avatar">
+        <div id="profileName" class="profile-name"></div>
+    </div>
+
+    <div id="toast" class="toast error" role="status" aria-live="polite">
+        <div class="toast-title">Ошибка</div>
+        <div id="toastText" class="toast-text"></div>
+    </div>
+
+    <a href="index.html" class="back-btn">←</a>
+    <h1>Список пользователей</h1>
+    <div class="field-label">Поиск пользователей:</div>
+    <div class="input-row">
+        <div class="input-prefix">@</div>
+        <input id="searchInput" type="text" placeholder="username или ник" autocomplete="off">
+    </div>
+    <div class="buttons">
+        <button class="btn active" onclick="loadUsers('klan')">Клан</button>
+        <button class="btn" onclick="loadUsers('sost-1')">Первый состав</button>
+        <button class="btn" onclick="loadUsers('sost-2')">Второй состав</button>
+        <button class="btn" id="sortBtn" onclick="toggleSort()">Менее активные</button>
+    </div>
+    <div id="users"></div>
+
+    <script>
+        (function () {
+            const tg = window.Telegram?.WebApp;
+            if (!tg) return;
+
+            try {
+                tg.ready();
+                tg.expand();
+                if (tg.setHeaderColor) tg.setHeaderColor('#0a0a0a');
+                if (tg.setBackgroundColor) tg.setBackgroundColor('#0a0a0a');
+                if (tg.BackButton) {
+                    tg.BackButton.show();
+                    tg.BackButton.onClick(() => {
+                        const backBtn = document.querySelector('.back-btn');
+                        if (backBtn) backBtn.click();
+                    });
+                }
+                if (tg.MainButton) tg.MainButton.hide();
+            } catch (_) {
+                // ignore
+            }
+        })();
+
+        let currentUser = null;
+
+        function getCurrentUser() {
+            if (currentUser) return currentUser;
+            const tg = window.Telegram?.WebApp;
+            if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                currentUser = {
+                    id: tg.initDataUnsafe.user.id,
+                    first_name: tg.initDataUnsafe.user.first_name,
+                    last_name: tg.initDataUnsafe.user.last_name || '',
+                    username: tg.initDataUnsafe.user.username || '',
+                    photo_url: tg.initDataUnsafe.user.photo_url || ''
+                };
+            }
+            return currentUser;
+        }
+
+        let toastTimer = null;
+        function showError(message) {
+            const toast = document.getElementById('toast');
+            const toastText = document.getElementById('toastText');
+            if (!toast || !toastText) return;
+            toastText.textContent = mapErrorToRu(message);
+            toast.style.display = 'block';
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3500);
+        }
+
+        function mapErrorToRu(raw) {
+            const msg = (raw || '').toString();
+            const m = msg.toLowerCase();
+            if (!m) return 'Произошла ошибка. Попробуйте ещё раз.';
+            if (m.includes('access denied') || m.includes('403')) return 'Доступ запрещён. У вас нет прав.';
+            if (m.includes('cannot') && m.includes('yourself')) return 'Нельзя выполнять это действие над собой.';
+            if (m.includes('400')) return 'Некорректный запрос. Проверьте данные.';
+            if (m.includes('500')) return 'Ошибка сервера. Попробуйте позже.';
+            return msg;
+        }
+
+        function updateUserProfile() {
+            const user = getCurrentUser();
+            if (!user) {
+                showError('Не удалось определить профиль Telegram. Открой страницу внутри Telegram Mini App.');
+                return;
+            }
+
+            const profile = document.getElementById('userProfile');
+            const avatar = document.getElementById('profileAvatar');
+            const name = document.getElementById('profileName');
+
+            const displayName = `${user.first_name} ${user.last_name}`.trim() || user.username;
+            name.textContent = displayName;
+
+            if (user.photo_url) {
+                avatar.src = user.photo_url;
+                avatar.style.display = 'block';
+            } else {
+                avatar.style.display = 'none';
+            }
+
+            profile.style.display = 'flex';
+        }
+
+        updateUserProfile();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const chat = urlParams.get('chat') || 'klan';
+        let currentChat = chat;
+        let isSorted = false;
+        let currentUsers = [];
+        let searchTerm = '';
+        
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            searchTerm = e.target.value.trim().toLowerCase();
+            renderFilteredUsers();
+        });
+        
+        // Функция для преобразования даты в миллисекунды для сравнения
+        function parseDateToMs(dateString) {
+            if (!dateString) return 0;
+            
+            try {
+                const timePart = dateString.split(' ')[0];
+                const datePart = dateString.split(' ')[1];
+                
+                if (!timePart || !datePart) return 0;
+                
+                const [hours, minutes, seconds] = timePart.split(':').map(Number);
+                const [day, month, year] = datePart.split('.').map(Number);
+                
+                return new Date(year, month - 1, day, hours, minutes, seconds).getTime();
+            } catch (e) {
+                return 0;
+            }
+        }
+        
+        // Функция для преобразования даты в формат "X дней Y часов Z минут назад"
+        function formatTimeAgo(dateString) {
+            if (!dateString) return 'Неизвестно';
+            
+            try {
+                // Парсим дату в формате "ч:мин:сек д.м.гггг"
+                const timePart = dateString.split(' ')[0]; // "ч:мин:сек"
+                const datePart = dateString.split(' ')[1];  // "д.м.гггг"
+                
+                if (!timePart || !datePart) return dateString;
+                
+                const [hours, minutes, seconds] = timePart.split(':').map(Number);
+                const [day, month, year] = datePart.split('.').map(Number);
+                
+                const lastMessageDate = new Date(year, month - 1, day, hours, minutes, seconds);
+                const now = new Date();
+                
+                const diffMs = now - lastMessageDate;
+                if (diffMs < 0) return 'Только что';
+                
+                const diffSeconds = Math.floor(diffMs / 1000);
+                const diffMinutes = Math.floor(diffSeconds / 60);
+                const diffHours = Math.floor(diffMinutes / 60);
+                const diffDays = Math.floor(diffHours / 24);
+                
+                if (diffDays > 0) {
+                    const remainingHours = diffHours % 24;
+                    const remainingMinutes = diffMinutes % 60;
+                    return `${diffDays}д ${remainingHours}ч ${remainingMinutes}м назад`;
+                } else if (diffHours > 0) {
+                    const remainingMinutes = diffMinutes % 60;
+                    return `${diffHours}ч ${remainingMinutes}м назад`;
+                } else if (diffMinutes > 0) {
+                    return `${diffMinutes}м назад`;
+                } else {
+                    return 'Только что';
+                }
+            } catch (e) {
+                return dateString;
+            }
+        }
+        
+        function renderUsers(users) {
+            document.getElementById('users').innerHTML = users.map(user => 
+                `<div class="user-card" onclick="window.location.href='user-detail.html?chat=${currentChat}&id=${user.tg_ids}'">
+                    <div class="user-name">${user.nik}</div>
+                    <div class="user-info">@${user.username || 'без username'}</div>
+                    <div class="user-info" style="color: #7c4dff; margin-top: 10px;">Последнее сообщение: ${formatTimeAgo(user.last_date)}</div>
+                    ${user.status ? `<div class="user-status">${user.status}</div>` : ''}
+                </div>`
+            ).join('');
+        }
+        
+        function renderFilteredUsers() {
+            let usersToRender = [...currentUsers];
+            
+            if (searchTerm) {
+                usersToRender = usersToRender.filter(u => {
+                    const uname = (u.username || '').toLowerCase();
+                    const nik = (u.nik || '').toLowerCase();
+                    return uname.includes(searchTerm) || nik.includes(searchTerm);
+                });
+            }
+            
+            if (isSorted) {
+                usersToRender.sort((a, b) => parseDateToMs(a.last_date) - parseDateToMs(b.last_date));
+            }
+            
+            renderUsers(usersToRender);
+        }
+        
+        function toggleSort() {
+            isSorted = !isSorted;
+            const sortBtn = document.getElementById('sortBtn');
+            
+            if (isSorted) {
+                sortBtn.classList.add('active');
+            } else {
+                sortBtn.classList.remove('active');
+            }
+            
+            renderFilteredUsers();
+        }
+        
+        async function loadUsers(chatName) {
+            currentChat = chatName;
+            isSorted = false;
+            document.getElementById('sortBtn').classList.remove('active');
+            document.querySelectorAll('.btn').forEach(btn => btn.classList.remove('active'));
+            try {
+                const response = await fetch(`https://ezh-dev.ru:8000/users/${chatName}`);
+                const users = await response.json();
+                currentUsers = Object.values(users);
+                renderFilteredUsers();
+            } catch (error) {
+                console.error('Ошибка:', error);
+                document.getElementById('users').innerHTML = '<div style="color: #ff6b6b; text-align: center; padding: 50px;">Не удалось загрузить пользователей.</div>';
+                showError('Не удалось загрузить список пользователей. Проверьте соединение и попробуйте ещё раз.');
+            }
+        }
+        
+        document.querySelectorAll('.btn').forEach(btn => {
+            if (btn.textContent.includes('Клан') && chat === 'klan') btn.classList.add('active');
+            if (btn.textContent.includes('Первый') && chat === 'sost-1') btn.classList.add('active');
+            if (btn.textContent.includes('Второй') && chat === 'sost-2') btn.classList.add('active');
+        });
+        
+        loadUsers(chat);
+    </script>
+</body>
+</html>

@@ -360,6 +360,7 @@
 
         let currentUser = null;
         let currentChatId = null;
+        let currentChatName = null;
         let allUsers = [];
 
         function getCurrentUser() {
@@ -417,13 +418,18 @@
             return urlParams.get('chat_id');
         }
 
+        function getChatNameFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('chat_name') || 'klan'; // По умолчанию 'klan'
+        }
+
         // API functionality
         const API_BASE = 'https://ezh-dev.ru:3000';
 
-        async function fetchChatUsers(chatId) {
+        async function fetchChatUsers(chatName) {
             try {
-                console.log(`Загрузка пользователей для чата: ${chatId}`);
-                const response = await fetch(`${API_BASE}/chat-users/${chatId}`);
+                console.log(`Загрузка пользователей для чата: ${chatName}`);
+                const response = await fetch(`${API_BASE}/users/${chatName}`);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -432,11 +438,9 @@
                 const data = await response.json();
                 console.log('Получены данные:', data);
                 
-                if (data.status === 'success') {
-                    return data.users || [];
-                } else {
-                    throw new Error(data.message || 'Ошибка API');
-                }
+                // Преобразуем объект в массив как в users.html
+                const usersArray = Object.values(data);
+                return usersArray;
             } catch (error) {
                 console.error('Ошибка загрузки:', error);
                 throw error;
@@ -486,20 +490,62 @@
             card.className = 'user-card';
             
             let statusHtml = '';
-            if (user.status === 'admin') {
+            if (user.status && user.status.includes('Телеграм-админ')) {
                 statusHtml = `<div class="user-status"><span class="emoji">🛠️</span> Телеграм-админ этого чата</div>`;
             }
             
             card.innerHTML = `
                 <div class="user-info">
-                    <div class="user-nik">${user.nik}</div>
+                    <div class="user-nik">${user.nik || 'Без ника'}</div>
                     <div class="user-username">@${user.username || 'нет'}</div>
-                    <div class="last-message">Последнее сообщение: ${formatDate(user.last_message_date)}</div>
+                    <div class="last-message">Последнее сообщение: ${formatTimeAgo(user.last_date)}</div>
                     ${statusHtml}
                 </div>
             `;
             
             return card;
+        }
+
+        // Функция для форматирования времени как в users.html
+        function formatTimeAgo(dateString) {
+            if (!dateString) return 'Неизвестно';
+            
+            try {
+                // Парсим дату в формате "ч:мин:сек д.м.гггг"
+                const timePart = dateString.split(' ')[0]; // "ч:мин:сек"
+                const datePart = dateString.split(' ')[1];  // "д.м.гггг"
+                
+                if (!timePart || !datePart) return dateString;
+                
+                const [hours, minutes, seconds] = timePart.split(':').map(Number);
+                const [day, month, year] = datePart.split('.').map(Number);
+                
+                const lastMessageDate = new Date(year, month - 1, day, hours, minutes, seconds);
+                const now = new Date();
+                
+                const diffMs = now - lastMessageDate;
+                if (diffMs < 0) return 'Только что';
+                
+                const diffSeconds = Math.floor(diffMs / 1000);
+                const diffMinutes = Math.floor(diffSeconds / 60);
+                const diffHours = Math.floor(diffMinutes / 60);
+                const diffDays = Math.floor(diffHours / 24);
+                
+                if (diffDays > 0) {
+                    const remainingHours = diffHours % 24;
+                    const remainingMinutes = diffMinutes % 60;
+                    return `${diffDays}д ${remainingHours}ч ${remainingMinutes}м назад`;
+                } else if (diffHours > 0) {
+                    const remainingMinutes = diffMinutes % 60;
+                    return `${diffHours}ч ${remainingMinutes}м назад`;
+                } else if (diffMinutes > 0) {
+                    return `${diffMinutes}м назад`;
+                } else {
+                    return 'Только что';
+                }
+            } catch (e) {
+                return dateString;
+            }
         }
 
         function renderUsers(users) {
@@ -560,21 +606,18 @@
             }
             
             currentChatId = getChatIdFromUrl();
-            if (!currentChatId) {
-                showError('ID чата не указан');
-                return;
-            }
+            currentChatName = getChatNameFromUrl();
             
-            console.log('Начинаю загрузку пользователей...');
+            console.log('Начинаю загрузку пользователей для чата:', currentChatName);
             
             try {
-                const users = await fetchChatUsers(currentChatId);
+                const users = await fetchChatUsers(currentChatName);
                 console.log(`Загружено ${users.length} пользователей`);
                 
                 allUsers = users;
                 
                 // Обновляем заголовок
-                document.getElementById('pageSubtitle').textContent = `${users.length} пользователей`;
+                document.getElementById('pageSubtitle').textContent = `${users.length} пользователей (${currentChatName})`;
                 
                 // Отображаем пользователей
                 renderUsers(users);
@@ -592,25 +635,23 @@
                 // Fallback данные для демонстрации
                 const fallbackUsers = [
                     {
-                        tg_id: 12345,
+                        tg_ids: 12345,
                         nik: "weHIDEKI",
                         username: "hwkw_kw",
-                        status: "admin",
-                        last_message: "Тестовое сообщение админа",
-                        last_message_date: new Date(Date.now() - 4 * 60 * 60 * 1000 - 46 * 60 * 1000).toISOString(), // 4ч 46м назад
-                        join_date: "2023-01-01T00:00:00",
-                        last_active: new Date().toISOString(),
+                        status: "👨🏻‍🔧 Телеграм-админ этого чата",
+                        last_date: "14:30:00 09.01.2024", // 4ч 46м назад
+                        date_vhod: "01.01.2023",
+                        mess_count: 150,
                         rang: 5
                     },
                     {
-                        tg_id: 67890,
+                        tg_ids: 67890,
                         nik: "Тестовый Пользователь",
                         username: "user_test",
-                        status: "member",
-                        last_message: "Тестовое сообщение пользователя",
-                        last_message_date: new Date().toISOString(),
-                        join_date: "2023-02-01T00:00:00",
-                        last_active: new Date().toISOString(),
+                        status: "💚 Состоит в чате",
+                        last_date: "10:15:00 09.01.2024",
+                        date_vhod: "15.02.2023",
+                        mess_count: 25,
                         rang: 1
                     }
                 ];
