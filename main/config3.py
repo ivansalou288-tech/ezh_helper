@@ -1,7 +1,7 @@
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-# from main.secret import main_token as token
+from main.secret import main_token as token, main_token as bot_token
 from datetime import datetime, timedelta
 from aiogram.types import ChatPermissions
 from aiogram import Bot, Dispatcher, types
