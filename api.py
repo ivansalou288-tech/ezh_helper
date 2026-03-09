@@ -676,6 +676,7 @@ def set_permissions(action: SetPermissionsAction):
         
         if existing:
             # Обновляем существующую запись
+            print("Обновляем существующую запись для пользователя в этом чате")
             cursor.execute('''
                 UPDATE admins 
                 SET can_see_users = ?, can_do_admin = ?, can_recom = ?, can_links = ?, can_dk = ?
@@ -691,6 +692,7 @@ def set_permissions(action: SetPermissionsAction):
             ))
         else:
             # Вставляем новую запись
+            print("Вставляем новую запись для пользователя в этом чате")
             cursor.execute('''
                 INSERT INTO admins (user_id, chat_id, can_see_users, can_do_admin, can_recom, can_links, can_dk)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
