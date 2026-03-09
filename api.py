@@ -95,6 +95,10 @@ def get_user_admin_chats(user_id: int):
         cursor.execute('SELECT * FROM admins WHERE user_id = ?', (user_id,))
         rows = cursor.fetchall()
         print(rows)
+        cursor.execute('SELECT * FROM admins')
+        rowrr = cursor.fetchall()
+        print(rowrr)
+        
         if not rows:
             return {"status": "success", "admin_chats": []}
         
