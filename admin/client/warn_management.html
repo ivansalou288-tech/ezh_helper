@@ -139,6 +139,7 @@
             padding: 15px;
             margin-bottom: 15px;
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .warn-card:hover {
@@ -174,6 +175,75 @@
         .warn-moder {
             font-size: 0.9em;
             color: rgba(255, 255, 255, 0.6);
+        }
+
+        .warn-remove-btn {
+            margin-top: 10px;
+            padding: 0 16px;
+            height: 0;
+            border-radius: 8px;
+            border: 1px solid #b388ff;
+            background: linear-gradient(145deg, #7c4dff, #b388ff);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.95em;
+            box-shadow: 0 0 0 rgba(124, 77, 255, 0.0);
+            opacity: 0;
+            overflow: hidden;
+            transform: scale(0.9);
+            transition: height 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, padding-top 0.2s ease, padding-bottom 0.2s ease;
+        }
+
+        .warn-remove-btn.visible {
+            height: 32px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            opacity: 1;
+            transform: scale(1);
+            box-shadow: 0 0 10px rgba(124, 77, 255, 0.5);
+        }
+
+        .warn-remove-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 16px rgba(124, 77, 255, 0.8);
+        }
+
+        .warn-removed-icon {
+            margin-top: 10px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #b388ff;
+            color: #050510;
+            background: radial-gradient(circle at top left, rgba(179, 136, 255, 0.9), rgba(124, 77, 255, 0.9));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 18px;
+            box-shadow: 0 0 0 rgba(124, 77, 255, 0.0);
+            opacity: 0;
+            transform: scale(0.4) rotate(-20deg);
+            animation: warnCheckAppear 0.4s ease-out forwards;
+        }
+
+        @keyframes warnCheckAppear {
+            0% {
+                opacity: 0;
+                transform: scale(0.4) rotate(-20deg) translateY(10px);
+                box-shadow: 0 0 0 rgba(124, 77, 255, 0.0);
+            }
+            60% {
+                opacity: 1;
+                transform: scale(1.1) rotate(5deg) translateY(0);
+                box-shadow: 0 0 14px rgba(124, 77, 255, 0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg) translateY(0);
+                box-shadow: 0 0 8px rgba(124, 77, 255, 0.7);
+            }
         }
 
         .loading {
@@ -323,16 +393,93 @@
                     warnsCount.textContent = `Всего предупреждений: ${data.count}`;
                     warnsContainer.style.display = 'block';
                     
-                    warnsContainer.innerHTML = data.warns.map(warn => `
-                        <div class="warn-card">
+                    let openedWarnButton = null;
+                    warnsContainer.innerHTML = '';
+                    
+                    data.warns.forEach(warn => {
+                        const card = document.createElement('div');
+                        card.className = 'warn-card';
+                        card.innerHTML = `
                             <div class="warn-header">
                                 <div class="warn-user">${escapeHtml(warn.user_name)}</div>
                                 <div class="warn-date">${escapeHtml(warn.date || 'Неизвестна')}</div>
                             </div>
                             <div class="warn-reason">📝 ${escapeHtml(warn.reason)}</div>
                             <div class="warn-moder">👮 Модератор: ${escapeHtml(warn.moder_name)}</div>
-                        </div>
-                    `).join('');
+                            <button class="warn-remove-btn" data-user-id="${warn.user_id}">Снять</button>
+                        `;
+                        
+                        card.addEventListener('click', (e) => {
+                            const btn = card.querySelector('.warn-remove-btn');
+                            if (!btn || e.target === btn) return;
+                            
+                            if (openedWarnButton && openedWarnButton !== btn) {
+                                openedWarnButton.classList.remove('visible');
+                            }
+                            
+                            const isVisible = btn.classList.contains('visible');
+                            if (isVisible) {
+                                btn.classList.remove('visible');
+                                openedWarnButton = null;
+                            } else {
+                                btn.classList.add('visible');
+                                openedWarnButton = btn;
+                            }
+                        });
+                        
+                        card.querySelector('.warn-remove-btn').addEventListener('click', async (e) => {
+                            e.stopPropagation();
+                            const btn = e.currentTarget;
+                            const userId = btn.getAttribute('data-user-id');
+                            const admin = getCurrentUser();
+                            
+                            if (!admin) {
+                                alert('Не удалось получить данные профиля Telegram');
+                                return;
+                            }
+                            
+                            try {
+                                const response = await fetch('https://ezh-dev.ru:3000/snat_warn', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        chat: chatId,
+                                        userid: userId,
+                                        num: 1,
+                                        admin_id: admin.id,
+                                        admin_name: `${admin.first_name} ${admin.last_name}`.trim() || admin.username,
+                                        admin_username: admin.username
+                                    })
+                                });
+                                
+                                const result = await response.json();
+                                console.log('Response:', result);
+                                
+                                btn.classList.remove('visible');
+                                btn.disabled = true;
+                                openedWarnButton = null;
+                                
+                                const icon = document.createElement('div');
+                                icon.className = 'warn-removed-icon';
+                                icon.textContent = '✓';
+                                card.appendChild(icon);
+                                
+                                setTimeout(() => {
+                                    card.remove();
+                                    if (!warnsContainer.querySelector('.warn-card')) {
+                                        warnsContainer.style.display = 'none';
+                                        emptyState.style.display = 'block';
+                                        warnsCount.textContent = 'Нет предупреждений';
+                                    }
+                                }, 450);
+                            } catch (error) {
+                                console.error('Ошибка:', error);
+                                alert('Ошибка при снятии предупреждения');
+                            }
+                        });
+                        
+                        warnsContainer.appendChild(card);
+                    });
                 } else {
                     warnsCount.textContent = 'Нет предупреждений';
                     emptyState.style.display = 'block';
