@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Административные функции</title>
+    <title>Администраторы</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -19,7 +19,6 @@
             padding: 20px;
         }
 
-        /* Стили профиля пользователя */
         .user-profile {
             position: fixed;
             top: 95px;
@@ -90,7 +89,7 @@
 
         .page-header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
         .page-title {
@@ -103,6 +102,121 @@
         .page-subtitle {
             font-size: 1.1em;
             color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-container {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid rgba(179, 136, 255, 0.3);
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-input:focus {
+            border-color: rgba(179, 136, 255, 0.6);
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 20px rgba(179, 136, 255, 0.2);
+        }
+
+        .users-container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .users-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .user-card {
+            background: linear-gradient(135deg, rgba(15, 15, 35, 0.9), rgba(25, 25, 55, 0.8));
+            border: 1px solid rgba(179, 136, 255, 0.3);
+            border-radius: 16px;
+            padding: 16px 20px;
+            backdrop-filter: blur(15px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(179, 136, 255, 0.15), 
+                transparent);
+            transition: left 0.5s ease;
+        }
+
+        .user-card:hover::before {
+            left: 100%;
+        }
+
+        .user-card:hover {
+            background: linear-gradient(135deg, rgba(20, 20, 45, 0.95), rgba(35, 35, 75, 0.9));
+            border-color: rgba(179, 136, 255, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(179, 136, 255, 0.2);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .user-nik {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #b388ff;
+            text-shadow: 0 0 10px rgba(179, 136, 255, 0.5);
+        }
+
+        .user-username {
+            font-size: 0.9em;
+            color: rgba(179, 136, 255, 0.8);
+            font-weight: 500;
+        }
+
+        .last-message {
+            font-size: 0.85em;
+            color: rgba(179, 136, 255, 0.7);
+        }
+
+        .user-status {
+            font-size: 0.9em;
+            color: #4ade80;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .emoji {
+            font-size: 1em;
         }
 
         .empty-state {
@@ -127,185 +241,25 @@
             opacity: 0.7;
         }
 
-        /* Поиск пользователей */
-        .search-container {
-            width: 100%;
-            max-width: 600px;
-            margin-bottom: 30px;
-        }
-
-        .search-box {
-            position: relative;
-            width: 100%;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 15px 50px 15px 20px;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            color: #fff;
-            font-size: 1em;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        .search-input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .search-input:focus {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: #b388ff;
-            box-shadow: 0 0 20px rgba(179, 136, 255, 0.3);
-        }
-
-        .search-icon {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 1.2em;
-        }
-
-        /* Результаты поиска */
-        .results-container {
-            width: 100%;
-            max-width: 600px;
-        }
-
-        .user-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: all 0.3s ease;
-        }
-
-        .user-card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(179, 136, 255, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(179, 136, 255, 0.2);
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex: 1;
-        }
-
-        .user-card-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(145deg, #7c4dff, #b388ff);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-weight: 700;
-            font-size: 1.2em;
-            border: 2px solid rgba(179, 136, 255, 0.5);
-        }
-
-        .user-details {
-            flex: 1;
-        }
-
-        .user-username {
-            font-size: 1.1em;
-            font-weight: 600;
-            color: #fff;
-            margin-bottom: 5px;
-        }
-
-        .user-fullname {
-            font-size: 0.9em;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        /* Тумблер */
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .toggle-label {
-            font-size: 0.9em;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .toggle-switch {
-            position: relative;
-            width: 50px;
-            height: 26px;
-            cursor: pointer;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .toggle-slider {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 26px;
-            transition: all 0.3s ease;
-        }
-
-        .toggle-slider:before {
-            content: "";
-            position: absolute;
-            height: 18px;
-            width: 18px;
-            left: 4px;
-            bottom: 3px;
-            background: #fff;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-        }
-
-        .toggle-switch input:checked + .toggle-slider {
-            background: linear-gradient(145deg, #7c4dff, #b388ff);
-            border-color: #b388ff;
-            box-shadow: 0 0 15px rgba(179, 136, 255, 0.5);
-        }
-
-        .toggle-switch input:checked + .toggle-slider:before {
-            transform: translateX(24px);
-        }
-
         .loading {
             text-align: center;
+            padding: 40px;
             color: rgba(255, 255, 255, 0.6);
-            padding: 20px;
         }
 
-        .no-results {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.5);
-            padding: 40px 20px;
-            font-size: 1em;
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #b388ff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         @media (max-width: 768px) {
@@ -313,15 +267,34 @@
                 margin-top: 115px;
             }
             
-            .search-container,
-            .results-container {
-                max-width: 100%;
+            .search-container {
+                margin-bottom: 20px;
+            }
+            
+            .search-input {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+            
+            .user-card {
+                padding: 12px 16px;
+            }
+            
+            .user-nik {
+                font-size: 1.1em;
+            }
+            
+            .user-username {
+                font-size: 0.85em;
+            }
+            
+            .last-message {
+                font-size: 0.8em;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Профиль пользователя -->
     <div id="userProfile" class="user-profile">
         <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
         <div id="userAvatarFallback" class="user-avatar-fallback"></div>
@@ -329,19 +302,31 @@
     </div>
 
     <div class="main-content">
-        <div class="page-header">
-            <h1 class="page-title">Управление правами</h1>
-            <div class="page-subtitle">Поиск пользователей и выдача прав на чат</div>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div>Загрузка администраторов...</div>
         </div>
 
-        <div class="search-container">
-            <div class="search-box">
-                <input type="text" id="searchInput" class="search-input" placeholder="Введите username...">
-                <span class="search-icon">🔍</span>
+        <div id="usersContent" style="display: none;">
+            <div class="page-header">
+                <h1 class="page-title">Администраторы</h1>
+                <div class="page-subtitle" id="pageSubtitle">Загрузка...</div>
+            </div>
+
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="searchInput" 
+                    placeholder="🔍 Поиск по нику или username..."
+                >
+            </div>
+
+            <div class="users-container">
+                <div class="users-grid" id="usersGrid">
+                </div>
             </div>
         </div>
-
-        <div id="resultsContainer" class="results-container"></div>
     </div>
 
     <script>
@@ -364,11 +349,13 @@
                 if (tg.MainButton) tg.MainButton.hide();
                 if (tg.SettingsButton) tg.SettingsButton.hide();
             } catch (_) {
-                // ignore
             }
         })();
 
         let currentUser = null;
+        let currentChatId = null;
+        let currentChatName = null;
+        let allUsers = [];
 
         function getCurrentUser() {
             if (currentUser) return currentUser;
@@ -420,129 +407,217 @@
             profile.style.display = 'flex';
         }
 
-        let allUsers = [];
-        const searchInput = document.getElementById('searchInput');
-        const resultsContainer = document.getElementById('resultsContainer');
+        function getChatIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('chat_id');
+        }
 
-        searchInput.addEventListener('input', (e) => {
-            filterUsers(e.target.value);
-        });
+        function getChatNameFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('chat_name') || 'klan';
+        }
+
+        const API_BASE = 'https://ezh-dev.ru:3000';
+
+        async function fetchChatUsers(chatId) {
+            try {
+                const response = await fetch(`${API_BASE}/users/${chatId}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data && typeof data === 'object') {
+                    const usersArray = Object.keys(data)
+                        .map(key => data[key])
+                        .filter(user => user && user.nik);
+                    return usersArray;
+                } else {
+                    return [];
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки:', error);
+                throw error;
+            }
+        }
+
+        function formatTimeAgo(dateString) {
+            if (!dateString) return 'Неизвестно';
+            
+            try {
+                const timePart = dateString.split(' ')[0];
+                const datePart = dateString.split(' ')[1];
+                
+                if (!timePart || !datePart) return dateString;
+                
+                const [hours, minutes, seconds] = timePart.split(':').map(Number);
+                const [day, month, year] = datePart.split('.').map(Number);
+                
+                const lastMessageDate = new Date(year, month - 1, day, hours, minutes, seconds);
+                const now = new Date();
+                
+                const diffMs = now - lastMessageDate;
+                if (diffMs < 0) return 'Только что';
+                
+                const diffSeconds = Math.floor(diffMs / 1000);
+                const diffMinutes = Math.floor(diffSeconds / 60);
+                const diffHours = Math.floor(diffMinutes / 60);
+                const diffDays = Math.floor(diffHours / 24);
+                
+                if (diffDays > 0) {
+                    const remainingHours = diffHours % 24;
+                    const remainingMinutes = diffMinutes % 60;
+                    return `${diffDays}д ${remainingHours}ч ${remainingMinutes}м назад`;
+                } else if (diffHours > 0) {
+                    const remainingMinutes = diffMinutes % 60;
+                    return `${diffHours}ч ${remainingMinutes}м назад`;
+                } else if (diffMinutes > 0) {
+                    return `${diffMinutes}м назад`;
+                } else {
+                    return 'Только что';
+                }
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        function createUserCard(user) {
+            const card = document.createElement('div');
+            card.className = 'user-card';
+            
+            card.addEventListener('click', () => {
+                const chatId = getChatIdFromUrl();
+                if (chatId && user.tg_ids) {
+                    window.location.href = `user_detail.html?chat_id=${chatId}&user_id=${user.tg_ids}`;
+                }
+            });
+            
+            let statusHtml = '';
+            if (user.status) {
+                if (user.status.includes('Телеграм-админ') || user.status.includes('Создатель')) {
+                    statusHtml = `<div class="user-status"> ${user.status}</div>`;
+                } else if (user.status.includes('Состоит в чате')) {
+                    statusHtml = `<div class="user-status"> ${user.status}</div>`;
+                } else if (user.status.includes('Не состоит в чате')) {
+                    statusHtml = `<div class="user-status"> ${user.status}</div>`;
+                } else {
+                    statusHtml = `<div class="user-status"><span class="emoji">👤</span> ${user.status}</div>`;
+                }
+            }
+            
+            const displayName = user.nik || user.name || `@${user.username}` || 'Без имени';
+            const lastMessageText = user.last_date ? formatTimeAgo(user.last_date) : 'Нет сообщений';
+            
+            card.innerHTML = `
+                <div class="user-info">
+                    <div class="user-nik">${displayName}</div>
+                    <div class="user-username">@${user.username || 'нет'}</div>
+                    <div class="last-message">Последнее сообщение: ${lastMessageText}</div>
+                    ${statusHtml}
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function renderUsers(users) {
+            const grid = document.getElementById('usersGrid');
+            grid.innerHTML = '';
+            
+            if (users.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+                        <div class="empty-state-text">Администраторы не найдены</div>
+                        <div class="empty-state-subtext">Попробуйте изменить параметры поиска</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            users.forEach(user => {
+                const card = createUserCard(user);
+                grid.appendChild(card);
+            });
+        }
 
         function filterUsers(searchTerm) {
             if (!searchTerm) {
-                displayResults(allUsers);
+                renderUsers(allUsers);
                 return;
             }
             
             const filtered = allUsers.filter(user => {
                 const searchLower = searchTerm.toLowerCase();
                 return (
+                    (user.nik && user.nik.toLowerCase().includes(searchLower)) ||
                     (user.username && user.username.toLowerCase().includes(searchLower)) ||
-                    (user.first_name && user.first_name.toLowerCase().includes(searchLower)) ||
-                    (user.last_name && user.last_name.toLowerCase().includes(searchLower))
+                    (user.name && user.name.toLowerCase().includes(searchLower))
                 );
             });
             
-            displayResults(filtered);
+            renderUsers(filtered);
+        }
+
+        function showError(message) {
+            const grid = document.getElementById('usersGrid');
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">❌</div>
+                    <div class="empty-state-text">Ошибка</div>
+                    <div class="empty-state-subtext">${message}</div>
+                </div>
+            `;
         }
 
         async function loadUsers() {
-            resultsContainer.innerHTML = '<div class="loading">Загрузка...</div>';
-            
-            try {
-                const urlParams = new URLSearchParams(window.location.search);
-                const chatId = urlParams.get('chat_id');
-                
-                if (!chatId) {
-                    resultsContainer.innerHTML = '<div class="no-results">Ошибка: не указан chat_id</div>';
-                    return;
-                }
-                
-                const response = await fetch(`/api/search_users?chat_id=${encodeURIComponent(chatId)}`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                if (data.users && data.users.length > 0) {
-                    allUsers = data.users;
-                    displayResults(allUsers);
-                } else {
-                    allUsers = [];
-                    resultsContainer.innerHTML = '<div class="no-results">Пользователи не найдены</div>';
-                }
-            } catch (error) {
-                console.error('Load error:', error);
-                resultsContainer.innerHTML = `<div class="no-results">Ошибка загрузки: ${error.message}</div>`;
-            }
-        }
-
-        function displayResults(users) {
-            if (users.length === 0) {
-                resultsContainer.innerHTML = '<div class="no-results">Пользователи не найдены</div>';
+            const user = getCurrentUser();
+            if (!user) {
+                showError('Пользователь не определен');
                 return;
             }
             
-            resultsContainer.innerHTML = users.map(user => {
-                const firstName = user.first_name || '';
-                const lastName = user.last_name || '';
-                const username = user.username || '';
-                
-                const initials = ((firstName.slice(0, 1) + lastName.slice(0, 1)) || username.slice(0, 2) || '?').toUpperCase();
-                const fullName = `${firstName} ${lastName}`.trim() || 'Без имени';
-                
-                return `
-                    <div class="user-card">
-                        <div class="user-info">
-                            <div class="user-card-avatar">${initials}</div>
-                            <div class="user-details">
-                                <div class="user-username">@${username || 'unknown'}</div>
-                                <div class="user-fullname">${fullName}</div>
-                            </div>
-                        </div>
-                        <div class="toggle-container">
-                            <span class="toggle-label">Права</span>
-                            <label class="toggle-switch">
-                                <input type="checkbox" ${user.has_access ? 'checked' : ''} onchange="toggleAccess(${user.user_id}, this.checked)">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        async function toggleAccess(userId, hasAccess) {
+            currentChatId = getChatIdFromUrl();
+            currentChatName = getChatNameFromUrl();
+            
+            if (!currentChatId) {
+                showError('ID чата не указан');
+                return;
+            }
+            
             try {
-                const urlParams = new URLSearchParams(window.location.search);
-                const chatId = urlParams.get('chat_id');
+                const users = await fetchChatUsers(currentChatId);
+                const admins = users.filter(u => u.status && (u.status.includes('Телеграм-админ') || u.status.includes('Создатель')));
                 
-                const response = await fetch('/api/toggle_access', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: userId, chat_id: chatId, has_access: hasAccess })
-                });
+                allUsers = admins;
                 
-                const data = await response.json();
-                if (data.success) {
-                    const tg = window.Telegram?.WebApp;
-                    if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-                } else {
-                    const tg = window.Telegram?.WebApp;
-                    if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
-                }
+                document.getElementById('pageSubtitle').textContent = `${admins.length} администраторов (${currentChatName || currentChatId})`;
+                
+                renderUsers(admins);
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('usersContent').style.display = 'block';
+                
             } catch (error) {
-                const tg = window.Telegram?.WebApp;
-                if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+                console.error('Ошибка при загрузке:', error);
+                showError('Не удалось загрузить список администраторов. Проверьте соединение и попробуйте ещё раз.');
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('usersContent').style.display = 'block';
             }
         }
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             updateUserProfile();
             loadUsers();
+            
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    filterUsers(e.target.value);
+                });
+            }
         });
     </script>
 </body>
