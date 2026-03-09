@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выдача прав</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+
+        .user-profile {
+            position: fixed;
+            top: 95px;
+            right: 20px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .user-profile:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #b388ff;
+            box-shadow: 0 0 10px rgba(179, 136, 255, 0.3);
+        }
+
+        .user-avatar-fallback {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #b388ff;
+            box-shadow: 0 0 10px rgba(179, 136, 255, 0.3);
+            background: linear-gradient(145deg, #7c4dff, #b388ff);
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.9em;
+            user-select: none;
+        }
+
+        .user-name {
+            color: #fff;
+            font-size: 0.9em;
+            font-weight: 600;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .main-content {
+            padding: 20px;
+            margin-top: 95px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: calc(100vh - 135px);
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: #b388ff;
+            text-shadow: 0 0 20px #b388ff, 0 0 40px #7c4dff;
+            margin-bottom: 10px;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, rgba(15, 15, 35, 0.9), rgba(25, 25, 55, 0.8));
+            border: 1px solid rgba(179, 136, 255, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(15px);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(179, 136, 255, 0.2);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9em;
+        }
+
+        .info-value {
+            color: #b388ff;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-top: 115px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="userProfile" class="user-profile">
+        <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
+        <div id="userAvatarFallback" class="user-avatar-fallback"></div>
+        <div id="userName" class="user-name"></div>
+    </div>
+
+    <div class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Выдача прав</h1>
+        </div>
+
+        <div class="info-card">
+            <div class="info-row">
+                <div class="info-label">Username:</div>
+                <div class="info-value" id="targetUsername">-</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Ник:</div>
+                <div class="info-value" id="targetNik">-</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">ID пользователя:</div>
+                <div class="info-value" id="targetUserId">-</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const tg = window.Telegram?.WebApp;
+            if (!tg) return;
+
+            try {
+                tg.ready();
+                tg.expand();
+                tg.requestFullscreen();
+                if (tg.setHeaderColor) tg.setHeaderColor('#0a0a0a');
+                if (tg.setBackgroundColor) tg.setBackgroundColor('#0a0a0a');
+                if (tg.BackButton) {
+                    tg.BackButton.show();
+                    tg.BackButton.onClick(() => {
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const chatId = urlParams.get('chat_id');
+                        window.location.href = 'admin_functions.html?chat_id=' + chatId;
+                    });
+                }
+                if (tg.MainButton) tg.MainButton.hide();
+                if (tg.SettingsButton) tg.SettingsButton.hide();
+            } catch (_) {
+            }
+        })();
+
+        let currentUser = null;
+
+        function getCurrentUser() {
+            if (currentUser) return currentUser;
+            const tg = window.Telegram?.WebApp;
+            if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                currentUser = {
+                    id: tg.initDataUnsafe.user.id,
+                    first_name: tg.initDataUnsafe.user.first_name,
+                    last_name: tg.initDataUnsafe.user.last_name || '',
+                    username: tg.initDataUnsafe.user.username || '',
+                    photo_url: tg.initDataUnsafe.user.photo_url || ''
+                };
+            }
+            return currentUser;
+        }
+
+        function updateUserProfile() {
+            const user = getCurrentUser();
+            if (!user) return;
+
+            const profile = document.getElementById('userProfile');
+            const avatar = document.getElementById('userAvatar');
+            const avatarFallback = document.getElementById('userAvatarFallback');
+            const name = document.getElementById('userName');
+
+            const displayName = `${user.first_name} ${user.last_name}`.trim() || user.username;
+            name.textContent = displayName;
+
+            const initials = ((user.first_name || '').slice(0, 1) + (user.last_name || '').slice(0, 1)).toUpperCase() || (user.username || '').slice(0, 2).toUpperCase() || '?';
+            if (avatarFallback) avatarFallback.textContent = initials;
+
+            const showFallback = () => {
+                if (avatar) avatar.style.display = 'none';
+                if (avatarFallback) avatarFallback.style.display = 'flex';
+            };
+
+            if (avatar) {
+                avatar.onerror = showFallback;
+            }
+
+            if (user.photo_url) {
+                if (avatarFallback) avatarFallback.style.display = 'none';
+                avatar.src = user.photo_url;
+                avatar.style.display = 'block';
+            } else {
+                showFallback();
+            }
+
+            profile.style.display = 'flex';
+        }
+
+        function loadTargetUserInfo() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const username = urlParams.get('username');
+            const nik = urlParams.get('nik');
+            const userId = urlParams.get('user_id');
+
+            document.getElementById('targetUsername').textContent = username ? `@${username}` : '-';
+            document.getElementById('targetNik').textContent = nik || '-';
+            document.getElementById('targetUserId').textContent = userId || '-';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUserProfile();
+            loadTargetUserInfo();
+        });
+    </script>
+</body>
+</html>
