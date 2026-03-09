@@ -199,6 +199,267 @@
             padding: 60px;
             color: #ff6b6b;
         }
+        .recommendations-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #7c4dff;
+        }
+        .warnings-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #ff9800;
+        }
+        .warnings-title {
+            font-size: 1.5em;
+            color: #ffc107;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 10px #ff9800;
+        }
+        .no-warnings {
+            text-align: center;
+            color: #bbb;
+            font-size: 1.1em;
+            padding: 20px;
+            background: rgba(255, 152, 0, 0.08);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 193, 7, 0.8);
+        }
+        .warnings-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .warning-card {
+            background: radial-gradient(circle at top left, rgba(255, 193, 7, 0.18), rgba(26, 26, 46, 0.95));
+            border: 2px solid rgba(255, 193, 7, 0.9);
+            border-radius: 10px;
+            padding: 18px 20px;
+            box-shadow: 0 0 18px rgba(255, 193, 7, 0.4);
+            transition: all 0.3s ease;
+        }
+        .warning-card:hover {
+            background: radial-gradient(circle at top left, rgba(255, 193, 7, 0.26), rgba(26, 26, 46, 1));
+            box-shadow: 0 0 26px rgba(255, 193, 7, 0.7);
+            transform: translateY(-2px);
+        }
+        .warning-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .warning-card-title {
+            font-size: 1.15em;
+            color: #ffeb3b;
+            font-weight: bold;
+        }
+        .warning-card-body {
+            color: #f5f5f5;
+            line-height: 1.7;
+        }
+        .warning-field {
+            margin-bottom: 6px;
+        }
+        .warning-field-label {
+            color: #ffc107;
+            font-weight: 600;
+            display: inline-block;
+            min-width: 110px;
+        }
+        .warning-remove-btn {
+            margin-top: 10px;
+            padding: 0 16px;
+            height: 0;
+            border-radius: 8px;
+            border: 1px solid #ffc107;
+            background: linear-gradient(145deg, #ff9800, #ffc107);
+            color: #111;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.95em;
+            box-shadow: 0 0 0 rgba(255, 193, 7, 0.0);
+            opacity: 0;
+            overflow: hidden;
+            transform: scale(0.9);
+            transition: height 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, padding-top 0.2s ease, padding-bottom 0.2s ease;
+        }
+        .warning-remove-btn.visible {
+            height: 32px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            opacity: 1;
+            transform: scale(1);
+            box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+        }
+        .warning-remove-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 16px rgba(255, 193, 7, 0.8);
+        }
+        .warning-removed-icon {
+            margin-top: 10px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ffc107;
+            color: #111;
+            background: radial-gradient(circle at top left, rgba(255, 235, 59, 0.9), rgba(255, 193, 7, 0.9));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 18px;
+            box-shadow: 0 0 0 rgba(255, 193, 7, 0.0);
+            opacity: 0;
+            transform: scale(0.4) rotate(-20deg);
+            animation: warningCheckAppear 0.4s ease-out forwards;
+        }
+        @keyframes warningCheckAppear {
+            0% {
+                opacity: 0;
+                transform: scale(0.4) rotate(-20deg) translateY(10px);
+                box-shadow: 0 0 0 rgba(255, 193, 7, 0.0);
+            }
+            60% {
+                opacity: 1;
+                transform: scale(1.1) rotate(5deg) translateY(0);
+                box-shadow: 0 0 14px rgba(255, 193, 7, 0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg) translateY(0);
+                box-shadow: 0 0 8px rgba(255, 193, 7, 0.7);
+            }
+        }
+        .recommendations-title {
+            font-size: 1.5em;
+            color: #b388ff;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 10px #b388ff;
+        }
+        .no-recommendations {
+            text-align: center;
+            color: #999;
+            font-size: 1.1em;
+            padding: 20px;
+            background: rgba(124, 77, 255, 0.1);
+            border-radius: 10px;
+            border: 1px solid #7c4dff;
+        }
+        .recommendations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .recommendation-card {
+            background: rgba(124, 77, 255, 0.1);
+            border: 2px solid #7c4dff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(124, 77, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        .recommendation-card:hover {
+            background: rgba(124, 77, 255, 0.2);
+            box-shadow: 0 0 20px rgba(124, 77, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        .recommendation-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .recommendation-card-title {
+            font-size: 1.2em;
+            color: #b388ff;
+            font-weight: bold;
+        }
+        .recommendation-card-date {
+            color: #7c4dff;
+            font-size: 0.9em;
+        }
+        .recommendation-card-body {
+            color: #e0e0e0;
+            line-height: 1.8;
+        }
+        .recommendation-field {
+            margin-bottom: 10px;
+        }
+        .recommendation-field-label {
+            color: #7c4dff;
+            font-weight: bold;
+            display: inline-block;
+            min-width: 150px;
+        }
+        .recommendation-field-value {
+            color: #fff;
+        }
+        .recommendation-remove-btn {
+            margin-top: 10px;
+            padding: 0 16px;
+            height: 0;
+            border-radius: 8px;
+            border: 1px solid #b388ff;
+            background: linear-gradient(145deg, #7c4dff, #b388ff);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.95em;
+            box-shadow: 0 0 0 rgba(124, 77, 255, 0.0);
+            opacity: 0;
+            overflow: hidden;
+            transform: scale(0.9);
+            transition: height 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, padding-top 0.2s ease, padding-bottom 0.2s ease;
+        }
+        .recommendation-remove-btn.visible {
+            height: 32px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            opacity: 1;
+            transform: scale(1);
+            box-shadow: 0 0 10px rgba(124, 77, 255, 0.5);
+        }
+        .recommendation-remove-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 16px rgba(124, 77, 255, 0.8);
+        }
+        .recommendation-removed-icon {
+            margin-top: 10px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #b388ff;
+            color: #050510;
+            background: radial-gradient(circle at top left, rgba(179, 136, 255, 0.9), rgba(124, 77, 255, 0.9));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 18px;
+            box-shadow: 0 0 0 rgba(124, 77, 255, 0.0);
+            opacity: 0;
+            transform: scale(0.4) rotate(-20deg);
+            animation: recommendationCheckAppear 0.4s ease-out forwards;
+        }
+        @keyframes recommendationCheckAppear {
+            0% {
+                opacity: 0;
+                transform: scale(0.4) rotate(-20deg) translateY(10px);
+                box-shadow: 0 0 0 rgba(124, 77, 255, 0.0);
+            }
+            60% {
+                opacity: 1;
+                transform: scale(1.1) rotate(5deg) translateY(0);
+                box-shadow: 0 0 14px rgba(124, 77, 255, 0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg) translateY(0);
+                box-shadow: 0 0 8px rgba(124, 77, 255, 0.7);
+            }
+        }
     </style>
 </head>
 <body>
@@ -207,13 +468,6 @@
         <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
         <div id="userAvatarFallback" class="user-avatar-fallback"></div>
         <div id="userName" class="user-name-profile"></div>
-    </div>
-
-    <a href="#" class="back-btn" id="backBtn">← Назад</a>
-    
-    <div class="loading" id="loading">
-        <div class="spinner"></div>
-        <div>Загрузка данных пользователя...</div>
     </div>
 
     <div id="content" style="display: none;">
@@ -242,8 +496,13 @@
                 if (tg.BackButton) {
                     tg.BackButton.show();
                     tg.BackButton.onClick(() => {
-                        const backBtn = document.querySelector('.back-btn');
-                        if (backBtn) backBtn.click();
+                        // Переходим обратно к списку пользователей
+                        const chatId = new URLSearchParams(window.location.search).get('chat_id');
+                        if (chatId) {
+                            window.location.href = `see_users.html?chat_id=${chatId}`;
+                        } else {
+                            window.history.back();
+                        }
                     });
                 }
                 if (tg.MainButton) tg.MainButton.hide();
@@ -431,6 +690,10 @@
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
                 
+                // Загружаем предупреждения и рекомендации
+                loadWarnings();
+                loadRecommendations();
+                
             } catch (error) {
                 console.error('Ошибка при загрузке пользователя:', error);
                 showError('Не удалось загрузить данные пользователя');
@@ -449,17 +712,297 @@
             }
         }
 
+        function loadWarnings() {
+            fetch(`https://ezh-dev.ru:8000/warns/${currentChatId}/${currentUserId}`)
+                .then(res => res.json())
+                .then(data => {
+                    const userCard = document.getElementById('userCard');
+                    // На всякий случай: чтобы не дублировать блок при повторном вызове
+                    const existingSection = userCard.querySelector('.warnings-section');
+                    if (existingSection) existingSection.remove();
+
+                    const warningsSection = document.createElement('div');
+                    warningsSection.className = 'warnings-section';
+                    warningsSection.innerHTML = '<div class="warnings-title">⚠️ Предупреждения</div>';
+
+                    const warnsArray = Array.isArray(data) ? data : Object.values(data || {});
+                    const warns = (warnsArray || []).slice(0, 3);
+
+                    if (!warns || warns.length === 0) {
+                        warningsSection.innerHTML += '<div class="no-warnings">Предупреждений нет</div>';
+                    } else {
+                        const list = document.createElement('div');
+                        list.className = 'warnings-list';
+
+                        let openedWarningButton = null;
+
+                        warns.forEach((w, index) => {
+                            const card = document.createElement('div');
+                            card.className = 'warning-card';
+
+                            const num = w?.num ?? (index + 1);
+                            const reason = (w?.reason ?? '').toString().trim();
+                            const moder = (w?.moder ?? '').toString().trim();
+
+                            card.innerHTML = `
+                                <div class="warning-card-header">
+                                    <div class="warning-card-title">Предупреждение #${num}</div>
+                                </div>
+                                <div class="warning-card-body">
+                                    <div class="warning-field">
+                                        <span class="warning-field-label">Причина:</span>
+                                        <span class="warning-field-value">${reason}</span>
+                                    </div>
+                                    <div class="warning-field">
+                                        <span class="warning-field-label">Модератор:</span>
+                                        <span class="warning-field-value">${moder}</span>
+                                    </div>
+                                    <button class="warning-remove-btn" data-warn-num="${num}">Снять</button>
+                                </div>
+                            `;
+
+                            // При клике на карточку плавно показываем кнопку "Снять"
+                            card.addEventListener('click', (e) => {
+                                const btn = card.querySelector('.warning-remove-btn');
+                                if (!btn) return;
+                                // Не всплываем, если клик по самой кнопке
+                                if (e.target === btn) return;
+                                // Закрываем ранее открытую кнопку, если она есть и это не текущая
+                                if (openedWarningButton && openedWarningButton !== btn) {
+                                    openedWarningButton.classList.remove('visible');
+                                }
+                                // Тогглим текущую
+                                const isVisible = btn.classList.contains('visible');
+                                if (isVisible) {
+                                    btn.classList.remove('visible');
+                                    openedWarningButton = null;
+                                } else {
+                                    btn.classList.add('visible');
+                                    openedWarningButton = btn;
+                                }
+                            });
+
+                            // Нажатие на кнопку "Снять" отправляет POST-запрос
+                            card.querySelector('.warning-remove-btn').addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                const btn = e.currentTarget;
+                                const warnNum = parseInt(btn.getAttribute('data-warn-num')) || num;
+                                const admin = getCurrentUser();
+                                if (!admin) {
+                                    alert('Не удалось получить данные профиля Telegram. Открой страницу внутри Telegram Mini App.');
+                                    return;
+                                }
+                                fetch('https://ezh-dev.ru:8000/snat_warn', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        chat: currentChatId,
+                                        userid: currentUserId,
+                                        num: warnNum,
+                                        admin_id: admin.id,
+                                        admin_name: `${admin.first_name} ${admin.last_name}`.trim() || admin.username,
+                                        admin_username: admin.username
+                                    })
+                                }).then(() => {
+                                    // Анимированная галочка и плавное удаление карточки
+                                    btn.classList.remove('visible');
+                                    btn.disabled = true;
+                                    openedWarningButton = null;
+
+                                    const icon = document.createElement('div');
+                                    icon.className = 'warning-removed-icon';
+                                    icon.textContent = '✓';
+                                    card.appendChild(icon);
+
+                                    setTimeout(() => {
+                                        card.remove();
+                                        // Если предупреждений больше нет — показать текст
+                                        if (!list.querySelector('.warning-card')) {
+                                            const existingNoWarn = warningsSection.querySelector('.no-warnings');
+                                            if (!existingNoWarn) {
+                                                warningsSection.innerHTML += '<div class="no-warnings">Предупреждений нет</div>';
+                                            }
+                                        }
+                                    }, 450);
+                                }).catch((err) => {
+                                    console.error('Ошибка при снятии предупреждения:', err);
+                                    alert('Ошибка при снятии предупреждения');
+                                });
+                            });
+
+                            list.appendChild(card);
+                        });
+
+                        warningsSection.appendChild(list);
+                    }
+
+                    userCard.appendChild(warningsSection);
+                })
+                .catch(err => {
+                    console.error('Ошибка при загрузке предупреждений:', err);
+                    const userCard = document.getElementById('userCard');
+                    const existingSection = userCard.querySelector('.warnings-section');
+                    if (existingSection) existingSection.remove();
+                    const warningsSection = document.createElement('div');
+                    warningsSection.className = 'warnings-section';
+                    warningsSection.innerHTML = '<div class="no-warnings">Ошибка при загрузке предупреждений</div>';
+                    userCard.appendChild(warningsSection);
+                });
+        }
+
+        function loadRecommendations() {
+            fetch(`https://ezh-dev.ru:8000/recom/${currentUserId}`)
+                .then(res => res.json())
+                .then(data => {
+                    const userCard = document.getElementById('userCard');
+                    // На всякий случай: если функция вызовется повторно — не дублируем блок
+                    const existingSection = userCard.querySelector('.recommendations-section');
+                    if (existingSection) existingSection.remove();
+
+                    // API может вернуть как массив, так и объект (например, {"0": {...}, "1": {...}})
+                    const recommendations = Array.isArray(data) ? data : Object.values(data || {});
+
+                    const recommendationsSection = document.createElement('div');
+                    recommendationsSection.className = 'recommendations-section';
+                    recommendationsSection.innerHTML = '<div class="recommendations-title">📋 Рекомендации</div>';
+                    
+                    if (!recommendations || recommendations.length === 0) {
+                        recommendationsSection.innerHTML += '<div class="no-recommendations">Рекомендации отсутствуют</div>';
+                    } else {
+                        const recList = document.createElement('div');
+                        recList.className = 'recommendations-list';
+                        
+                        recommendations.forEach((rec, index) => {
+                            const recCard = document.createElement('div');
+                            recCard.className = 'recommendation-card';
+                            
+                            // Парсим дату в формате "01.12.2025"
+                            const dateStr = (rec?.date ?? '').toString().trim();
+                            const recDate = dateStr;
+                            
+                            recCard.innerHTML = `
+                                <div class="recommendation-card-header">
+                                    <div class="recommendation-card-title">Рекомендация #${index + 1}</div>
+                                    <div class="recommendation-card-date">${recDate}</div>
+                                </div>
+                                <div class="recommendation-card-body">
+                                    <div class="recommendation-field">
+                                        <span class="recommendation-field-label">PUBG ID:</span>
+                                        <span class="recommendation-field-value">${rec?.pubg_id ?? ''}</span>
+                                    </div>
+                                    <div class="recommendation-field">
+                                        <span class="recommendation-field-label">ID модератора:</span>
+                                        <span class="recommendation-field-value">${rec?.moder_id ?? ''}</span>
+                                    </div>
+                                    <div class="recommendation-field">
+                                        <span class="recommendation-field-label">Причина:</span>
+                                        <span class="recommendation-field-value">${(rec?.reason ?? '').toString().trim()}</span>
+                                    </div>
+                                    <div class="recommendation-field">
+                                        <span class="recommendation-field-label">Ранг:</span>
+                                        <span class="recommendation-field-value">${(rec?.rang ?? '').toString().trim()}</span>
+                                    </div>
+                                    <div class="recommendation-field">
+                                        <span class="recommendation-field-label">ID рекомендации:</span>
+                                        <span class="recommendation-field-value">${rec?.rec_id ?? ''}</span>
+                                    </div>
+                                    <button class="recommendation-remove-btn" data-rec-id="${rec?.rec_id ?? ''}">Снять</button>
+                                </div>
+                            `;
+                            
+                            // Add click handler to show/hide remove button
+                            let openedRecommendationButton = null;
+                            
+                            recCard.addEventListener('click', (e) => {
+                                const btn = recCard.querySelector('.recommendation-remove-btn');
+                                if (!btn) return;
+                                // Don't bubble if clicked on button
+                                if (e.target === btn) return;
+                                // Close previously opened button
+                                if (openedRecommendationButton && openedRecommendationButton !== btn) {
+                                    openedRecommendationButton.classList.remove('visible');
+                                }
+                                // Toggle current button
+                                const isVisible = btn.classList.contains('visible');
+                                if (isVisible) {
+                                    btn.classList.remove('visible');
+                                    openedRecommendationButton = null;
+                                } else {
+                                    btn.classList.add('visible');
+                                    openedRecommendationButton = btn;
+                                }
+                            });
+                            
+                            // Add click handler to remove button
+                            recCard.querySelector('.recommendation-remove-btn').addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                const btn = e.currentTarget;
+                                const recId = btn.getAttribute('data-rec-id');
+                                const admin = getCurrentUser();
+                                if (!admin) {
+                                    alert('Не удалось получить данные профиля Telegram. Открой страницу внутри Telegram Mini App.');
+                                    return;
+                                }
+                                fetch('https://ezh-dev.ru:8000/recom-remove', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        rec_id: recId,
+                                        user_id: currentUserId,
+                                        admin_id: admin.id,
+                                        admin_name: `${admin.first_name} ${admin.last_name}`.trim() || admin.username,
+                                        admin_username: admin.username
+                                    })
+                                }).then(() => {
+                                    // Animate checkmark and remove card
+                                    btn.classList.remove('visible');
+                                    btn.disabled = true;
+                                    openedRecommendationButton = null;
+                                    
+                                    const icon = document.createElement('div');
+                                    icon.className = 'recommendation-removed-icon';
+                                    icon.textContent = '✓';
+                                    recCard.appendChild(icon);
+                                    
+                                    setTimeout(() => {
+                                        recCard.remove();
+                                        // If no recommendations left, show message
+                                        if (!recList.querySelector('.recommendation-card')) {
+                                            const existingNoRec = recommendationsSection.querySelector('.no-recommendations');
+                                            if (!existingNoRec) {
+                                                recommendationsSection.innerHTML += '<div class="no-recommendations">Рекомендации отсутствуют</div>';
+                                            }
+                                        }
+                                    }, 450);
+                                }).catch((err) => {
+                                    console.error('Ошибка при снятии рекомендации:', err);
+                                    alert('Ошибка при снятии рекомендации');
+                                });
+                            });
+                            
+                            recList.appendChild(recCard);
+                        });
+                        
+                        recommendationsSection.appendChild(recList);
+                    }
+                    
+                    userCard.appendChild(recommendationsSection);
+                })
+                .catch(err => {
+                    console.error('Ошибка при загрузке рекомендаций:', err);
+                    const userCard = document.getElementById('userCard');
+                    const existingSection = userCard.querySelector('.recommendations-section');
+                    if (existingSection) existingSection.remove();
+                    const recommendationsSection = document.createElement('div');
+                    recommendationsSection.className = 'recommendations-section';
+                    recommendationsSection.innerHTML = '<div class="no-recommendations">Ошибка при загрузке рекомендаций</div>';
+                    userCard.appendChild(recommendationsSection);
+                });
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             updateUserProfile();
-            
-            // Устанавливаем ссылку для кнопки "назад"
-            const backBtn = document.getElementById('backBtn');
-            const chatId = getChatIdFromUrl();
-            if (backBtn && chatId) {
-                backBtn.href = `see_users.html?chat_id=${chatId}`;
-            }
-            
             loadUser();
         });
     </script>
