@@ -112,25 +112,33 @@ def get_chat_avatar(chat_id: int):
             photo = chat_info.get("photo")
             
             print(f"DEBUG: Photo data: {photo}")
+            print(f"DEBUG: Photo keys: {list(photo.keys()) if photo else 'None'}")
             
             if photo:
                 # Ищем фото в разных размерах
                 avatar_file_id = None
                 
                 # Проверяем все возможные размеры фото
-                for size_key in ["big", "small", "thumb"]:
-                    if size_key in photo:
-                        avatar_file_id = photo[size_key].get("file_id")
-                        print(f"DEBUG: Found {size_key} photo with file_id: {avatar_file_id}")
-                        break
+                if "big_file_id" in photo:
+                    avatar_file_id = photo["big_file_id"]
+                    print(f"DEBUG: Found big_file_id: {avatar_file_id}")
+                elif "small_file_id" in photo:
+                    avatar_file_id = photo["small_file_id"]
+                    print(f"DEBUG: Found small_file_id: {avatar_file_id}")
+                elif "file_id" in photo:
+                    avatar_file_id = photo["file_id"]
+                    print(f"DEBUG: Found file_id: {avatar_file_id}")
                 
                 if avatar_file_id:
                     # Получаем URL файла
                     file_url = f"https://api.telegram.org/bot{bot_token}/getFile?file_id={avatar_file_id}"
+                    print(f"DEBUG: Requesting file from: {file_url}")
+                    
                     file_response = requests.get(file_url)
                     file_data = file_response.json()
                     
-                    print(f"DEBUG: File response: {file_data}")
+                    print(f"DEBUG: File response status: {file_response.status_code}")
+                    print(f"DEBUG: File response data: {file_data}")
                     
                     if file_data.get("ok"):
                         file_path = file_data["result"]["file_path"]
@@ -142,9 +150,13 @@ def get_chat_avatar(chat_id: int):
                             "status": "success",
                             "avatar_url": avatar_url
                         }
-        
+                    else:
+                        print(f"DEBUG: getFile failed: {file_data}")
+                else:
+                    print("DEBUG: No file_id found in photo data")
+            
         # Если фото нет или произошла ошибка, возвращаем пустой результат
-        print("DEBUG: No photo found, returning None")
+        print("DEBUG: No photo found or getFile failed, returning None")
         return {
             "status": "success",
             "avatar_url": None
