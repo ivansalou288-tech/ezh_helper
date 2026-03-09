@@ -15,6 +15,13 @@ from typing import Any, Optional
 import time
 import json
 
+import sys
+import os
+
+# Добавляем корневую директорию проекта в путь
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, ROOT_DIR)
+
 from main.config3 import *
 app = FastAPI()
 
