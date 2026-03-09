@@ -424,13 +424,13 @@
             return urlParams.get('chat_name') || 'klan'; // По умолчанию 'klan'
         }
 
-        // API functionality - используем endpoint /chat-users/{chat_id}
+        // API functionality - используем endpoint /users/{chat_id}
         const API_BASE = 'https://ezh-dev.ru:3000';
 
         async function fetchChatUsers(chatId) {
             try {
                 console.log(`Загрузка пользователей для чата: ${chatId}`);
-                const response = await fetch(`${API_BASE}/chat-users/${chatId}`);
+                const response = await fetch(`${API_BASE}/users/${chatId}`);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -439,11 +439,14 @@
                 const data = await response.json();
                 console.log('Получены данные:', data);
                 
-                // Используем данные из response.users
-                if (data.status === 'success') {
-                    return data.users || [];
+                // Преобразуем объект с числовыми ключами в массив
+                if (data && typeof data === 'object') {
+                    const usersArray = Object.keys(data)
+                        .map(key => data[key])
+                        .filter(user => user && user.nik); // Фильтруем только валидные пользователи
+                    return usersArray;
                 } else {
-                    throw new Error(data.message || 'Ошибка API');
+                    return [];
                 }
             } catch (error) {
                 console.error('Ошибка загрузки:', error);
@@ -493,15 +496,31 @@
             const card = document.createElement('div');
             card.className = 'user-card';
             
-
-            statusHtml = `<div class="user-status">${user.status}</div>`;
-
+            // Определяем статус
+            let statusHtml = '';
+            if (user.status) {
+                if (user.status.includes('Телеграм-админ') || user.status.includes('Создатель')) {
+                    statusHtml = `<div class="user-status"><span class="emoji">👨🏻‍🔧</span> ${user.status}</div>`;
+                } else if (user.status.includes('Состоит в чате')) {
+                    statusHtml = `<div class="user-status"><span class="emoji">💚</span> ${user.status}</div>`;
+                } else if (user.status.includes('Не состоит в чате')) {
+                    statusHtml = `<div class="user-status"><span class="emoji">💔</span> ${user.status}</div>`;
+                } else {
+                    statusHtml = `<div class="user-status"><span class="emoji">👤</span> ${user.status}</div>`;
+                }
+            }
+            
+            // Форматируем ник - если нет ника, используем имя или username
+            const displayName = user.nik || user.name || `@${user.username}` || 'Без имени';
+            
+            // Форматируем последнее сообщение
+            const lastMessageText = user.last_date ? formatTimeAgo(user.last_date) : 'Нет сообщений';
             
             card.innerHTML = `
                 <div class="user-info">
-                    <div class="user-nik">${user.nik || 'Без ника'}</div>
+                    <div class="user-nik">${displayName}</div>
                     <div class="user-username">@${user.username || 'нет'}</div>
-                    <div class="last-message">Последнее сообщение: ${formatTimeAgo(user.last_date)}</div>
+                    <div class="last-message">Последнее сообщение: ${lastMessageText}</div>
                     ${statusHtml}
                 </div>
             `;
