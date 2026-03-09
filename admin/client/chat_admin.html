@@ -78,30 +78,6 @@
             white-space: nowrap;
         }
 
-        .back-button {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: rgba(179, 136, 255, 0.2);
-            border: 1px solid rgba(179, 136, 255, 0.4);
-            color: #fff;
-            padding: 10px 15px;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            z-index: 1000;
-        }
-
-        .back-button:hover {
-            background: rgba(179, 136, 255, 0.3);
-            border-color: rgba(179, 136, 255, 0.6);
-            transform: translateY(-2px);
-        }
-
         .toast {
             position: fixed;
             left: 50%;
@@ -269,11 +245,6 @@
     </style>
 </head>
 <body>
-    <!-- Кнопка назад -->
-    <a href="index.html" class="back-button">
-        ← Назад
-    </a>
-
     <!-- Профиль пользователя -->
     <div id="userProfile" class="user-profile">
         <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
@@ -315,7 +286,12 @@
                 tg.requestFullscreen();
                 if (tg.setHeaderColor) tg.setHeaderColor('#0a0a0a');
                 if (tg.setBackgroundColor) tg.setBackgroundColor('#0a0a0a');
-                if (tg.BackButton) tg.BackButton.hide();
+                if (tg.BackButton) {
+                    tg.BackButton.show();
+                    tg.BackButton.onClick(() => {
+                        window.location.href = 'index.html';
+                    });
+                }
                 if (tg.MainButton) tg.MainButton.hide();
                 if (tg.SettingsButton) tg.SettingsButton.hide();
             } catch (_) {
