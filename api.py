@@ -671,7 +671,7 @@ def set_permissions(action: SetPermissionsAction):
         cursor = connection.cursor()
         
         # Проверяем, есть ли уже запись для этого пользователя и чата
-        cursor.execute('SELECT * FROM admins WHERE user_id = ? AND chat_id = ?', (action.user_id, action.chat_id))
+        cursor.execute('SELECT * FROM admins WHERE user_id = ? AND chat_id = ?', (int(action.user_id), int(action.chat_id)))
         existing = cursor.fetchone()
         
         if existing:
