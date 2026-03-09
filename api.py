@@ -435,7 +435,7 @@ async def get_user_warnings(chat: int, user_id: int):
             # Получаем имя модератора
             try:
                 moder_cursor = connection.cursor()
-                moder_cursor.execute("SELECT nik FROM users WHERE tg_ids=?", (moder_id,))
+                moder_cursor.execute("SELECT nik FROM users WHERE tg_id=?", (moder_id,))
                 moder_result = moder_cursor.fetchall()
                 moder_name = moder_result[0][0] if moder_result else f"ID: {moder_id}"
             except:

@@ -759,7 +759,7 @@
                                     </div>
                                     <div class="warning-field">
                                         <span class="warning-field-label">Модератор:</span>
-                                        <span class="warning-field-value">${moder}</span>
+                                        <span class="warning-field-value"><a href="tg://user?id=${w?.moder_id ?? ''}" style="color: #ffc107;">${moder}</a></span>
                                     </div>
                                     <button class="warning-remove-btn" data-warn-num="${num}">Снять</button>
                                 </div>
@@ -892,7 +892,7 @@
                                 <div class="recommendation-card-body">
                                     <div class="recommendation-field">
                                         <span class="recommendation-field-label">От кого:</span>
-                                        <span class="recommendation-field-value"><a href="tg://user?id=${rec?.moder_id ?? ''}" style="color: #b388ff;">${rec?.moder_name ?? 'ID ' + (rec?.moder_id ?? '')}</a> (${rec?.moder_rang ?? 'Неизвестная должность'})</span>
+                                        <span class="recommendation-field-value"><a href="tg://user?id=${rec?.moder_id ?? ''}" style="color: #b388ff;">${rec?.moder_name ?? 'Модератор'}</a> (${rec?.moder_rang ?? 'Неизвестная должность'})</span>
                                     </div>
                                     <div class="recommendation-field">
                                         <span class="recommendation-field-label">Чем отличился:</span>
