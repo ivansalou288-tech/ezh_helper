@@ -453,4 +453,4 @@ def get_chat_users(chat_id: int):
         }
 
 if  __name__ == '__main__':
-    uvicorn.run('api:app', reload=True,port=3000, host="0.0.0.0", ssl_keyfile='/etc/letsencrypt/live/ezh-dev.ru/privkey.pem', ssl_certfile='/etc/letsencrypt/live/ezh-dev.ru/cert.pem')
+    uvicorn.run('api:app', reload=True, port=8000, host="0.0.0.0")

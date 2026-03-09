@@ -361,6 +361,7 @@
         let currentUser = null;
         let currentChatId = null;
         let currentChatName = null;
+        let currentUsers = []; // Добавлено как в users.html
         let allUsers = [];
 
         function getCurrentUser() {
@@ -423,23 +424,23 @@
             return urlParams.get('chat_name') || 'klan'; // По умолчанию 'klan'
         }
 
-        // API functionality
-        const API_BASE = 'https://ezh-dev.ru:3000';
+        // API functionality - точно как в users.html
+        const API_BASE = 'https://ezh-dev.ru:8000'; // Порт 8000 как в users.html
 
         async function fetchChatUsers(chatName) {
             try {
                 console.log(`Загрузка пользователей для чата: ${chatName}`);
-                const response = await fetch(`${API_BASE}/users/${chatName}`);
+                const response = await fetch(`${API_BASE}/users/${chatName}`); // Endpoint как в users.html
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
-                const data = await response.json();
-                console.log('Получены данные:', data);
+                const users = await response.json();
+                console.log('Получены данные:', users);
                 
                 // Преобразуем объект в массив как в users.html
-                const usersArray = Object.values(data);
+                const usersArray = Object.values(users);
                 return usersArray;
             } catch (error) {
                 console.error('Ошибка загрузки:', error);
@@ -615,6 +616,7 @@
                 console.log(`Загружено ${users.length} пользователей`);
                 
                 allUsers = users;
+                currentUsers = users; // Добавляем как в users.html
                 
                 // Обновляем заголовок
                 document.getElementById('pageSubtitle').textContent = `${users.length} пользователей (${currentChatName})`;
@@ -629,36 +631,9 @@
             } catch (error) {
                 console.error('Ошибка при загрузке:', error);
                 
-                // Показываем ошибку и fallback данные
-                showError(`Ошибка загрузки: ${error.message}. Показаны тестовые данные.`);
-                
-                // Fallback данные для демонстрации
-                const fallbackUsers = [
-                    {
-                        tg_ids: 12345,
-                        nik: "weHIDEKI",
-                        username: "hwkw_kw",
-                        status: "👨🏻‍🔧 Телеграм-админ этого чата",
-                        last_date: "14:30:00 09.01.2024", // 4ч 46м назад
-                        date_vhod: "01.01.2023",
-                        mess_count: 150,
-                        rang: 5
-                    },
-                    {
-                        tg_ids: 67890,
-                        nik: "Тестовый Пользователь",
-                        username: "user_test",
-                        status: "💚 Состоит в чате",
-                        last_date: "10:15:00 09.01.2024",
-                        date_vhod: "15.02.2023",
-                        mess_count: 25,
-                        rang: 1
-                    }
-                ];
-                
-                allUsers = fallbackUsers;
-                document.getElementById('pageSubtitle').textContent = `${fallbackUsers.length} пользователей (тестовые данные)`;
-                renderUsers(fallbackUsers);
+                // Показываем ошибку как в users.html
+                document.getElementById('usersGrid').innerHTML = '<div style="color: #ff6b6b; text-align: center; padding: 50px;">Не удалось загрузить пользователей.</div>';
+                showError('Не удалось загрузить список пользователей. Проверьте соединение и попробуйте ещё раз.');
                 
                 // Скрываем загрузку и показываем контент
                 document.getElementById('loading').style.display = 'none';
