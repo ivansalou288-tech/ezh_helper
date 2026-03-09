@@ -158,48 +158,7 @@
             font-size: 2.5em;
         }
 
-        /* Навигация */
-        .admin-nav {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            padding: 0 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 15px;
-        }
-
-        .nav-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .nav-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.3);
-            color: #fff;
-        }
-
-        .nav-btn.active {
-            background: linear-gradient(145deg, #7c4dff, #b388ff);
-            color: white;
-            border-color: #b388ff;
-            box-shadow: 0 4px 15px rgba(179, 136, 255, 0.3);
-        }
-
         /* Стили для контейнера чатов */
-        .chats-container {
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 10px 0;
-        }
-
         .admin-chats-container {
             max-width: 800px;
             margin: 0 auto;
@@ -218,23 +177,6 @@
             font-size: 1.5em;
             color: #b388ff;
             font-weight: 600;
-        }
-
-        .add-chat-btn {
-            background: linear-gradient(145deg, #7c4dff, #b388ff);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(179, 136, 255, 0.3);
-        }
-
-        .add-chat-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(179, 136, 255, 0.4);
         }
 
         .chats-grid {
@@ -345,10 +287,6 @@
             50% { opacity: 1; transform: scale(1.05); }
         }
 
-        .chat-info {
-            flex: 1;
-        }
-
         .chat-title {
             font-size: 1.2em;
             font-weight: 600;
@@ -356,208 +294,6 @@
             text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
             letter-spacing: 0.3px;
             margin: 0;
-        }
-
-        .chat-username {
-            display: none;
-        }
-
-        .chat-stats {
-            display: none;
-        }
-
-        /* Стили для администраторов */
-        .admins-container {
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 10px 0;
-        }
-
-        .admins-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 0 15px;
-        }
-
-        .admins-title {
-            font-size: 1.5em;
-            color: #b388ff;
-            font-weight: 600;
-        }
-
-        .add-admin-btn {
-            background: linear-gradient(145deg, #7c4dff, #b388ff);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(179, 136, 255, 0.3);
-        }
-
-        .add-admin-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(179, 136, 255, 0.4);
-        }
-
-        .admins-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-            margin-bottom: 30px;
-            padding: 0 10px;
-        }
-
-        .admin-card {
-            background: linear-gradient(135deg, rgba(15, 15, 35, 0.9), rgba(25, 25, 55, 0.8));
-            border: 1px solid rgba(179, 136, 255, 0.2);
-            border-radius: 20px;
-            padding: 20px;
-            backdrop-filter: blur(15px);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 
-                0 4px 20px rgba(179, 136, 255, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        }
-
-        .admin-card:hover {
-            background: linear-gradient(135deg, rgba(20, 20, 45, 0.95), rgba(35, 35, 75, 0.9));
-            border-color: rgba(179, 136, 255, 0.4);
-            transform: translateY(-2px);
-            box-shadow: 
-                0 8px 30px rgba(179, 136, 255, 0.2),
-                0 0 20px rgba(179, 136, 255, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        }
-
-        .admin-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .admin-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #b388ff, #7c4dff);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 1.2em;
-            margin-right: 15px;
-            box-shadow: 
-                0 0 15px rgba(179, 136, 255, 0.4),
-                0 3px 10px rgba(124, 77, 255, 0.3);
-        }
-
-        .admin-info {
-            flex: 1;
-        }
-
-        .admin-name {
-            font-size: 1.1em;
-            font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 4px;
-            text-shadow: 0 0 8px rgba(179, 136, 255, 0.4);
-        }
-
-        .admin-id {
-            color: rgba(179, 136, 255, 0.6);
-            font-size: 0.85em;
-            font-weight: 400;
-        }
-
-        .admin-status {
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: 600;
-        }
-
-        .admin-status.active {
-            background: rgba(76, 175, 80, 0.2);
-            color: #4caf50;
-            border: 1px solid rgba(76, 175, 80, 0.3);
-        }
-
-        .admin-status.inactive {
-            background: rgba(244, 67, 54, 0.2);
-            color: #f44336;
-            border: 1px solid rgba(244, 67, 54, 0.3);
-        }
-
-        .admin-permissions {
-            margin: 15px 0;
-        }
-
-        .permissions-title {
-            font-size: 0.9em;
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 8px;
-        }
-
-        .permission-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .permission-tag {
-            background: rgba(179, 136, 255, 0.1);
-            color: #b388ff;
-            border: 1px solid rgba(179, 136, 255, 0.3);
-            padding: 4px 8px;
-            border-radius: 8px;
-            font-size: 0.75em;
-            font-weight: 500;
-        }
-
-        .admin-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .admin-btn {
-            padding: 8px 16px;
-            border-radius: 15px;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.9em;
-            transition: all 0.3s ease;
-        }
-
-        .edit-btn {
-            background: rgba(33, 150, 243, 0.2);
-            color: #2196f3;
-            border: 1px solid rgba(33, 150, 243, 0.3);
-        }
-
-        .edit-btn:hover {
-            background: rgba(33, 150, 243, 0.3);
-            transform: translateY(-1px);
-        }
-
-        .delete-btn {
-            background: rgba(244, 67, 54, 0.2);
-            color: #f44336;
-            border: 1px solid rgba(244, 67, 54, 0.3);
-        }
-
-        .delete-btn:hover {
-            background: rgba(244, 67, 54, 0.3);
-            transform: translateY(-1px);
         }
 
         .empty-state {
@@ -583,18 +319,14 @@
         }
 
         @media (max-width: 768px) {
-            .chats-grid, .admins-grid {
+            .chats-grid {
                 grid-template-columns: 1fr;
             }
             
-            .chats-header, .admins-header {
+            .chats-header {
                 flex-direction: column;
                 gap: 15px;
                 align-items: stretch;
-            }
-            
-            .add-chat-btn, .add-admin-btn {
-                width: 100%;
             }
         }
     </style>
@@ -765,7 +497,7 @@
             }
         }
 
-        function renderAdminChats(chats) {
+        async function renderAdminChats(chats) {
             const mainContent = document.querySelector('.main-content') || document.body;
             
             // Remove existing content if any
@@ -795,10 +527,14 @@
                     </div>
                 `;
             } else {
-                chats.forEach(chat => {
-                    const card = createChatCard(chat);
-                    grid.appendChild(card);
+                // Загружаем аватары параллельно
+                const chatPromises = chats.map(async chat => {
+                    const card = await createChatCard(chat);
+                    return card;
                 });
+                
+                const cards = await Promise.all(chatPromises);
+                cards.forEach(card => grid.appendChild(card));
             }
             
             container.appendChild(header);
@@ -828,31 +564,10 @@
             return card;
         }
 
-        function getBotToken() {
-            // В реальном приложении токен должен быть получен с сервера
-            // Это заглушка для демонстрации
-            return 'YOUR_BOT_TOKEN';
-        }
-
-        function createPermissionTags(permissions) {
-            const permissionLabels = {
-                can_see_users: '👥 Пользователи',
-                can_do_admin: '⚙️ Админка',
-                can_recom: '📝 Рекомендации',
-                can_links: '🔗 Ссылки',
-                can_dk: '🎮 Команды'
-            };
-            
-            return Object.entries(permissions)
-                .filter(([_, hasPermission]) => hasPermission)
-                .map(([key, _]) => `<span class="permission-tag">${permissionLabels[key] || key}</span>`)
-                .join('');
-        }
-
         // Load admin chats on page load
         async function loadAdminChats() {
             const chats = await fetchUserAdminChats();
-            renderAdminChats(chats);
+            await renderAdminChats(chats);
         }
 
         // Initialize
