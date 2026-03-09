@@ -589,13 +589,12 @@
             
             try {
                 const users = await fetchChatUsers(currentChatId);
-                const admins = users.filter(u => u.status && (u.status.includes('Телеграм-админ') || u.status.includes('Создатель')));
                 
-                allUsers = admins;
+                allUsers = users;
                 
-                document.getElementById('pageSubtitle').textContent = `${admins.length} администраторов (${currentChatName || currentChatId})`;
+                document.getElementById('pageSubtitle').textContent = `${users.length} пользователей (${currentChatName || currentChatId})`;
                 
-                renderUsers(admins);
+                renderUsers(users);
                 
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('usersContent').style.display = 'block';
