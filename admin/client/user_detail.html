@@ -807,7 +807,11 @@
                                         admin_name: `${admin.first_name} ${admin.last_name}`.trim() || admin.username,
                                         admin_username: admin.username
                                     })
-                                }).then(() => {
+                                }).then(response => response.json())
+                                .then(data => {
+                                    console.log('Response from snat_warn:', data);
+                                })
+                                .then(() => {
                                     // Анимированная галочка и плавное удаление карточки
                                     btn.classList.remove('visible');
                                     btn.disabled = true;
@@ -949,11 +953,16 @@
                                     body: JSON.stringify({
                                         rec_id: recId,
                                         user_id: currentUserId,
+                                        chat_id: currentChatId,
                                         admin_id: admin.id,
                                         admin_name: `${admin.first_name} ${admin.last_name}`.trim() || admin.username,
                                         admin_username: admin.username
                                     })
-                                }).then(() => {
+                                }).then(response => response.json())
+                                .then(data => {
+                                    console.log('Response from recom-remove:', data);
+                                })
+                                .then(() => {
                                     // Animate checkmark and remove card
                                     btn.classList.remove('visible');
                                     btn.disabled = true;

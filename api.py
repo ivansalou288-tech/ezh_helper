@@ -64,6 +64,15 @@ app.add_middleware(
 class RecomRemoveAction(BaseModel):
     rec_id: str
     user_id: Optional[int] = None
+    chat_id: Optional[int] = None
+    admin_id: Optional[int] = None
+    admin_name: Optional[str] = None
+    admin_username: Optional[str] = None
+
+class SnatWarnAction(BaseModel):
+    chat: str
+    userid: str
+    num: int
     admin_id: Optional[int] = None
     admin_name: Optional[str] = None
     admin_username: Optional[str] = None
@@ -613,16 +622,23 @@ def recom_remove(action: RecomRemoveAction):
         print(f"Error checking admin rights: {e}")
         raise HTTPException(status_code=403, detail="Access denied")
     
-    # Находим подходящий чат для удаления рекомендации
-    chat_found = False
-    deleted_count = 0
+    # Печатаем полученные данные
+    print(f"=== RECOM REMOVE DATA ===")
+    print(f"rec_id: {action.rec_id}")
+    print(f"user_id: {action.user_id}")
+    print(f"chat_id: {action.chat_id}")
+    print(f"admin_id: {action.admin_id}")
+    print(f"admin_name: {action.admin_name}")
+    print(f"admin_username: {action.admin_username}")
+    print(f"========================")
     
-    for chat_name, chat_id in chats_names.items():
+    # Если указан конкретный chat_id, используем только его
+    if action.chat_id:
         try:
-            chat_db_path = curent_path / 'databases' / f'{-chat_id}.db'
+            chat_db_path = curent_path / 'databases' / f'{-action.chat_id}.db'
             
             if not chat_db_path.exists():
-                continue
+                raise HTTPException(status_code=404, detail="Chat database not found")
                 
             connection = sqlite3.connect(chat_db_path, check_same_thread=False)
             cursor = connection.cursor()
@@ -633,23 +649,104 @@ def recom_remove(action: RecomRemoveAction):
                 cursor.execute('DELETE FROM recommendation WHERE recom_id = ? AND user_id = ?', (action.rec_id, action.user_id))
             
             deleted = cursor.rowcount
-            if deleted > 0:
-                deleted_count += deleted
-                chat_found = True
-                
             connection.commit()
             connection.close()
             
+            if deleted == 0:
+                raise HTTPException(status_code=404, detail="Recommendation not found")
+                
+            print(f"Successfully removed recommendation: rec_id={action.rec_id} from chat {action.chat_id}")
+            return {"status": "ok", "deleted": deleted, "chat_id": action.chat_id}
+            
         except Exception as e:
-            print(f"Error deleting recommendation from chat {chat_id}: {e}")
-            continue
+            print(f"Error deleting recommendation: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
     
-    if not chat_found or deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Recommendation not found")
+    # Иначе ищем по всем чатам (старое поведение)
+    else:
+        chat_found = False
+        deleted_count = 0
         
-    print(f"Removed recommendation: rec_id={action.rec_id}, user_id={action.user_id} by admin {action.admin_id} ({action.admin_name})")
-    return {"status": "ok", "deleted": deleted_count}
+        for chat_name, chat_id in chats_names.items():
+            try:
+                chat_db_path = curent_path / 'databases' / f'{-chat_id}.db'
+                
+                if not chat_db_path.exists():
+                    continue
+                    
+                connection = sqlite3.connect(chat_db_path, check_same_thread=False)
+                cursor = connection.cursor()
+                
+                if action.user_id is None:
+                    cursor.execute('DELETE FROM recommendation WHERE recom_id = ?', (action.rec_id,))
+                else:
+                    cursor.execute('DELETE FROM recommendation WHERE recom_id = ? AND user_id = ?', (action.rec_id, action.user_id))
+                
+                deleted = cursor.rowcount
+                if deleted > 0:
+                    deleted_count += deleted
+                    chat_found = True
+                    
+                connection.commit()
+                connection.close()
+                
+            except Exception as e:
+                print(f"Error deleting recommendation from chat {chat_id}: {e}")
+                continue
+        
+        if not chat_found or deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Recommendation not found")
+            
+        print(f"Removed recommendation: rec_id={action.rec_id}, user_id={action.user_id} by admin {action.admin_id} ({action.admin_name})")
+        return {"status": "ok", "deleted": deleted_count}
+
+@app.post("/snat_warn")
+async def snat_warn(action: SnatWarnAction):
+    # Проверка прав доступа
+    try:
+        connection = sqlite3.connect(admin_path, check_same_thread=False)
+        cursor = connection.cursor()
+        cursor.execute('SELECT * FROM admins WHERE user_id = ?', (action.admin_id,))
+        admin_check = cursor.fetchall()
+        connection.close()
+        
+        if not admin_check:
+            raise HTTPException(status_code=403, detail="Access denied")
+    except Exception as e:
+        print(f"Error checking admin rights: {e}")
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Печатаем полученные данные
+    print(f"=== SNAT WARN DATA ===")
+    print(f"chat: {action.chat}")
+    print(f"userid: {action.userid}")
+    print(f"num: {action.num}")
+    print(f"admin_id: {action.admin_id}")
+    print(f"admin_name: {action.admin_name}")
+    print(f"admin_username: {action.admin_username}")
+    print(f"====================")
+    
+    try:
+        # Используем базу данных предупреждений
+        warn_path = curent_path / 'databases' / 'warn_list.db'
+        connection = sqlite3.connect(warn_path, check_same_thread=False)
+        cursor = connection.cursor()
+        
+        # Получаем текущее количество предупреждений
+        cursor.execute(f"SELECT warns_count FROM [{(action.chat)}] WHERE tg_id=?", (action.userid,))
+        row = cursor.fetchone()
+        cnt = row[0] if row else 0
+        
+        # Вызываем функцию удаления предупреждения из config3
+        from main.config3 import admin_warn_dell
+        await admin_warn_dell(int(action.userid), int(action.chat), action.num, max(cnt - 1, 0), action.admin_name)
+        
+        print(f'Successfully removed warning {action.num} from user {action.userid} in chat {action.chat} by admin {action.admin_id} ({action.admin_name})')
+        return {"status": "ok"}
+        
+    except Exception as e:
+        print(f"Error removing warning: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 if  __name__ == '__main__':
     uvicorn.run('api:app', reload=True, port=3000, host="0.0.0.0", ssl_keyfile='/etc/letsencrypt/live/ezh-dev.ru/privkey.pem', ssl_certfile='/etc/letsencrypt/live/ezh-dev.ru/cert.pem')
-
