@@ -306,6 +306,12 @@
             margin: 0;
         }
 
+        .chat-permissions {
+            font-size: 0.8em;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 5px;
+        }
+
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -575,12 +581,19 @@
             
             console.log(`DEBUG: Avatar URL for ${chatName}: ${chatAvatarUrl}`);
             
+            card.onclick = () => {
+                window.location.href = `chat_admin.html?chat_id=${chat.chat_id}`;
+            };
+            
             card.innerHTML = `
                 <div class="chat-header">
                     <div class="chat-avatar" id="avatar-${chat.chat_id}">
                         ${chatAvatarUrl ? `<img src="${chatAvatarUrl}" alt="${chatName}" onerror="this.style.display='none'; this.parentElement.innerHTML='${firstLetter}'">` : firstLetter}
                     </div>
                     <div class="chat-title">${chatName}</div>
+                    <div class="chat-permissions">
+                        ${Object.values(chat.permissions).filter(p => p).length} прав доступно
+                    </div>
                 </div>
             `;
             

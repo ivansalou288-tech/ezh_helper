@@ -3,9 +3,11 @@ import sqlite3
 import os
 import ssl
 import sys
+from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from pydantic import BaseModel
 import asyncio
@@ -15,17 +17,11 @@ from typing import Any, Optional
 import time
 import json
 
-import sys
-import os
-
 # Добавляем корневую директорию проекта в путь
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, ROOT_DIR)
 
 from main.config3 import *
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-import sqlite3
 curent_path = (Path(__file__)).parent
 all_path = curent_path / 'databases' / 'All.db'
 admin_path = curent_path / 'databases' / 'admin.db'
@@ -167,6 +163,146 @@ def get_chat_avatar(chat_id: int):
         return {
             "status": "error",
             "message": f"Ошибка при получении аватара чата: {str(e)}"
+        }
+
+@app.get('/chat-admin-panel/{chat_id}/{user_id}')
+def get_chat_admin_panel(chat_id: int, user_id: int):
+    """
+    Получает данные для админ панели конкретного чата
+    """
+    try:
+        connection = sqlite3.connect(admin_path, check_same_thread=False)
+        cursor = connection.cursor()
+        
+        # Проверяем права пользователя на этот чат
+        cursor.execute('SELECT * FROM admins WHERE user_id = ? AND chat_id = ?', (user_id, chat_id))
+        admin_data = cursor.fetchone()
+        
+        if not admin_data:
+            return {
+                "status": "error",
+                "message": "У вас нет прав на этот чат"
+            }
+        
+        # Получаем информацию о чате
+        chat_name = admin_data[2] if admin_data[2] else f"Chat {chat_id}"
+        
+        # Получаем права пользователя
+        permissions = {
+            "can_see_users": bool(admin_data[3]) if len(admin_data) > 3 else False,
+            "can_do_admin": bool(admin_data[4]) if len(admin_data) > 4 else False,
+            "can_recom": bool(admin_data[5]) if len(admin_data) > 5 else False,
+            "can_links": bool(admin_data[6]) if len(admin_data) > 6 else False,
+            "can_dk": bool(admin_data[7]) if len(admin_data) > 7 else False
+        }
+        
+        # Собираем данные для панели в зависимости от прав
+        panel_data = {
+            "status": "success",
+            "chat_id": chat_id,
+            "chat_name": chat_name,
+            "permissions": permissions,
+            "available_functions": []
+        }
+        
+        # Добавляем доступные функции в зависимости от прав
+        if permissions["can_see_users"]:
+            panel_data["available_functions"].append({
+                "id": "see_users",
+                "name": "Просмотр пользователей",
+                "description": "Просмотр списка пользователей чата"
+            })
+        
+        if permissions["can_do_admin"]:
+            panel_data["available_functions"].extend([
+                {
+                    "id": "admin_functions",
+                    "name": "Административные функции",
+                    "description": "Управление пользователями и настройками чата"
+                },
+                {
+                    "id": "warn_management",
+                    "name": "Управление предупреждениями",
+                    "description": "Выдача и снятие предупреждений"
+                }
+            ])
+        
+        if permissions["can_recom"]:
+            panel_data["available_functions"].append({
+                "id": "recommendations",
+                "name": "Рекомендации",
+                "description": "Управление рекомендациями пользователей"
+            })
+        
+        if permissions["can_links"]:
+            panel_data["available_functions"].append({
+                "id": "links",
+                "name": "Ссылки",
+                "description": "Управление ссылками чата"
+            })
+        
+        if permissions["can_dk"]:
+            panel_data["available_functions"].append({
+                "id": "dk_functions",
+                "name": "DK функции",
+                "description": "Специальные функции DK"
+            })
+        
+        connection.close()
+        return panel_data
+        
+    except Exception as e:
+        print(f"Error getting chat admin panel: {e}")
+        return {
+            "status": "error",
+            "message": f"Ошибка при загрузке админ панели: {str(e)}"
+        }
+
+@app.get('/chat-users/{chat_id}')
+def get_chat_users(chat_id: int):
+    """
+    Получает список пользователей чата
+    """
+    try:
+        # Получаем путь к базе данных чата
+        chat_db_path = get_db_path(chat_id)
+        
+        if not os.path.exists(chat_db_path):
+            return {
+                "status": "error",
+                "message": "База данных чата не найдена"
+            }
+        
+        connection = sqlite3.connect(chat_db_path, check_same_thread=False)
+        cursor = connection.cursor()
+        
+        # Получаем пользователей
+        cursor.execute('SELECT tg_id, nik, rang, date_vhod, last_date FROM users ORDER BY rang DESC, nik')
+        users = cursor.fetchall()
+        
+        users_list = []
+        for user in users:
+            users_list.append({
+                "tg_id": user[0],
+                "nik": user[1] or f"User {user[0]}",
+                "rang": user[2],
+                "join_date": user[3],
+                "last_active": user[4]
+            })
+        
+        connection.close()
+        
+        return {
+            "status": "success",
+            "users": users_list,
+            "count": len(users_list)
+        }
+        
+    except Exception as e:
+        print(f"Error getting chat users: {e}")
+        return {
+            "status": "error",
+            "message": f"Ошибка при получении пользователей: {str(e)}"
         }
 
 if  __name__ == '__main__':

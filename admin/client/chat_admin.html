@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ панель чата</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+
+        /* Стили профиля пользователя */
+        .user-profile {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .user-profile:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #b388ff;
+            box-shadow: 0 0 10px rgba(179, 136, 255, 0.3);
+        }
+
+        .user-avatar-fallback {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #b388ff;
+            box-shadow: 0 0 10px rgba(179, 136, 255, 0.3);
+            background: linear-gradient(145deg, #7c4dff, #b388ff);
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.9em;
+            user-select: none;
+        }
+
+        .user-name {
+            color: #fff;
+            font-size: 0.9em;
+            font-weight: 600;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(179, 136, 255, 0.2);
+            border: 1px solid rgba(179, 136, 255, 0.4);
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+        }
+
+        .back-button:hover {
+            background: rgba(179, 136, 255, 0.3);
+            border-color: rgba(179, 136, 255, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 16px;
+            transform: translateX(-50%);
+            background: rgba(26, 26, 46, 0.92);
+            border: 1px solid rgba(124, 77, 255, 0.55);
+            box-shadow: 0 0 22px rgba(124, 77, 255, 0.22);
+            color: #fff;
+            padding: 12px 14px;
+            border-radius: 14px;
+            z-index: 2000;
+            max-width: min(560px, calc(100vw - 24px));
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.error {
+            border-color: rgba(255, 82, 82, 0.6);
+            box-shadow: 0 0 22px rgba(255, 82, 82, 0.18);
+        }
+
+        .toast-title {
+            font-weight: 800;
+            margin-bottom: 6px;
+            font-size: 0.95em;
+        }
+
+        .toast-text {
+            opacity: 0.95;
+            font-size: 0.9em;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+
+        .main-content {
+            padding: 20px;
+            margin-top: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: calc(100vh - 120px);
+            justify-content: flex-start;
+        }
+
+        .chat-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .chat-title {
+            font-size: 2em;
+            color: #b388ff;
+            text-shadow: 0 0 20px #b388ff, 0 0 40px #7c4dff;
+            margin-bottom: 10px;
+        }
+
+        .chat-subtitle {
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .functions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin-bottom: 30px;
+        }
+
+        .function-card {
+            background: linear-gradient(135deg, rgba(15, 15, 35, 0.9), rgba(25, 25, 55, 0.8));
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(15px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 4px 20px rgba(0, 255, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .function-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(0, 255, 255, 0.15), 
+                transparent);
+            transition: left 0.5s ease;
+        }
+
+        .function-card:hover::before {
+            left: 100%;
+        }
+
+        .function-card:hover {
+            background: linear-gradient(135deg, rgba(20, 20, 45, 0.95), rgba(35, 35, 75, 0.9));
+            border-color: rgba(0, 255, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 30px rgba(0, 255, 255, 0.2),
+                0 0 20px rgba(0, 255, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .function-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .function-name {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #ffffff;
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+            margin-bottom: 10px;
+        }
+
+        .function-description {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.4;
+        }
+
+        .users-section {
+            width: 100%;
+            max-width: 1200px;
+            display: none;
+        }
+
+        .users-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .users-title {
+            font-size: 1.5em;
+            color: #b388ff;
+            font-weight: 600;
+        }
+
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .user-card {
+            background: linear-gradient(135deg, rgba(15, 15, 35, 0.9), rgba(25, 25, 55, 0.8));
+            border: 1px solid rgba(179, 136, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(15px);
+            transition: all 0.3s ease;
+        }
+
+        .user-card:hover {
+            background: linear-gradient(135deg, rgba(20, 20, 45, 0.95), rgba(35, 35, 75, 0.9));
+            border-color: rgba(179, 136, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .user-nik {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .user-rang {
+            font-size: 0.9em;
+            color: #b388ff;
+            margin-bottom: 5px;
+        }
+
+        .user-info {
+            font-size: 0.8em;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #b388ff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .functions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .users-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-content {
+                margin-top: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Кнопка назад -->
+    <a href="index.html" class="back-button">
+        ← Назад
+    </a>
+
+    <!-- Профиль пользователя -->
+    <div id="userProfile" class="user-profile">
+        <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
+        <div id="userAvatarFallback" class="user-avatar-fallback"></div>
+        <div id="userName" class="user-name"></div>
+    </div>
+
+    <div id="toast" class="toast error" role="status" aria-live="polite">
+        <div class="toast-title">Ошибка</div>
+        <div id="toastText" class="toast-text"></div>
+    </div>
+
+    <div class="main-content">
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div>Загрузка админ панели...</div>
+        </div>
+
+        <div id="chatContent" style="display: none;">
+            <div class="chat-header">
+                <h1 class="chat-title" id="chatTitle">Загрузка...</h1>
+                <div class="chat-subtitle" id="chatSubtitle">Админ панель</div>
+            </div>
+
+            <div class="functions-grid" id="functionsGrid">
+                <!-- Функции будут добавлены динамически -->
+            </div>
+
+            <div class="users-section" id="usersSection">
+                <div class="users-header">
+                    <h2 class="users-title">Пользователи чата</h2>
+                    <span id="usersCount"></span>
+                </div>
+                <div class="users-grid" id="usersGrid">
+                    <!-- Пользователи будут добавлены динамически -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const tg = window.Telegram?.WebApp;
+            if (!tg) return;
+
+            try {
+                tg.ready();
+                tg.expand();
+                tg.requestFullscreen();
+                if (tg.setHeaderColor) tg.setHeaderColor('#0a0a0a');
+                if (tg.setBackgroundColor) tg.setBackgroundColor('#0a0a0a');
+                if (tg.BackButton) tg.BackButton.hide();
+                if (tg.MainButton) tg.MainButton.hide();
+                if (tg.SettingsButton) tg.SettingsButton.hide();
+            } catch (_) {
+                // ignore
+            }
+        })();
+
+        let currentUser = null;
+        let currentChatId = null;
+        let currentPanelData = null;
+
+        function getCurrentUser() {
+            if (currentUser) return currentUser;
+            const tg = window.Telegram?.WebApp;
+            if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                currentUser = {
+                    id: tg.initDataUnsafe.user.id,
+                    first_name: tg.initDataUnsafe.user.first_name,
+                    last_name: tg.initDataUnsafe.user.last_name || '',
+                    username: tg.initDataUnsafe.user.username || '',
+                    photo_url: tg.initDataUnsafe.user.photo_url || ''
+                };
+            }
+            return currentUser;
+        }
+
+        function updateUserProfile() {
+            const user = getCurrentUser();
+            if (!user) return;
+
+            const profile = document.getElementById('userProfile');
+            const avatar = document.getElementById('userAvatar');
+            const avatarFallback = document.getElementById('userAvatarFallback');
+            const name = document.getElementById('userName');
+
+            const displayName = `${user.first_name} ${user.last_name}`.trim() || user.username;
+            name.textContent = displayName;
+
+            const initials = ((user.first_name || '').slice(0, 1) + (user.last_name || '').slice(0, 1)).toUpperCase() || (user.username || '').slice(0, 2).toUpperCase() || '?';
+            if (avatarFallback) avatarFallback.textContent = initials;
+
+            const showFallback = () => {
+                if (avatar) avatar.style.display = 'none';
+                if (avatarFallback) avatarFallback.style.display = 'flex';
+            };
+
+            if (avatar) {
+                avatar.onerror = showFallback;
+            }
+
+            if (user.photo_url) {
+                if (avatarFallback) avatarFallback.style.display = 'none';
+                avatar.src = user.photo_url;
+                avatar.style.display = 'block';
+            } else {
+                showFallback();
+            }
+
+            profile.style.display = 'flex';
+        }
+
+        let toastTimer = null;
+        function showError(message) {
+            const toast = document.getElementById('toast');
+            const toastText = document.getElementById('toastText');
+            if (!toast || !toastText) return;
+            toastText.textContent = message;
+            toast.style.display = 'block';
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3500);
+        }
+
+        function showSuccess(message) {
+            const toast = document.getElementById('toast');
+            const toastText = document.getElementById('toastText');
+            if (!toast || !toastText) return;
+            toastText.textContent = message;
+            toast.classList.remove('error');
+            toast.style.display = 'block';
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3500);
+        }
+
+        // API functionality
+        const API_BASE = 'https://ezh-dev.ru:3000';
+        
+        // Получаем ID чата из URL параметров
+        function getChatIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('chat_id');
+        }
+
+        async function fetchChatAdminPanel(chatId, userId) {
+            try {
+                const response = await fetch(`${API_BASE}/chat-admin-panel/${chatId}/${userId}`);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    return data;
+                } else {
+                    showError(data.message || 'Ошибка при загрузке админ панели');
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error fetching admin panel:', error);
+                showError('Ошибка соединения с сервером');
+                return null;
+            }
+        }
+
+        async function fetchChatUsers(chatId) {
+            try {
+                const response = await fetch(`${API_BASE}/chat-users/${chatId}`);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    return data.users || [];
+                } else {
+                    showError(data.message || 'Ошибка при загрузке пользователей');
+                    return [];
+                }
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                showError('Ошибка соединения с сервером');
+                return [];
+            }
+        }
+
+        function getFunctionIcon(functionId) {
+            const icons = {
+                'see_users': '👥',
+                'admin_functions': '⚙️',
+                'warn_management': '⚠️',
+                'recommendations': '⭐',
+                'links': '🔗',
+                'dk_functions': '🎯'
+            };
+            return icons[functionId] || '📋';
+        }
+
+        function renderFunctions(functions) {
+            const grid = document.getElementById('functionsGrid');
+            grid.innerHTML = '';
+            
+            functions.forEach(func => {
+                const card = document.createElement('div');
+                card.className = 'function-card';
+                card.onclick = () => handleFunctionClick(func);
+                
+                card.innerHTML = `
+                    <div class="function-icon">${getFunctionIcon(func.id)}</div>
+                    <div class="function-name">${func.name}</div>
+                    <div class="function-description">${func.description}</div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        async function handleFunctionClick(func) {
+            if (func.id === 'see_users') {
+                await showUsers();
+            } else {
+                showSuccess(`Функция "${func.name}" в разработке`);
+            }
+        }
+
+        async function showUsers() {
+            const usersSection = document.getElementById('usersSection');
+            const usersGrid = document.getElementById('usersGrid');
+            const usersCount = document.getElementById('usersCount');
+            
+            usersSection.style.display = 'block';
+            usersGrid.innerHTML = '<div class="loading"><div class="spinner"></div><div>Загрузка пользователей...</div></div>';
+            
+            const users = await fetchChatUsers(currentChatId);
+            
+            usersCount.textContent = `(${users.length})`;
+            usersGrid.innerHTML = '';
+            
+            if (users.length === 0) {
+                usersGrid.innerHTML = '<div class="empty-state">Пользователи не найдены</div>';
+                return;
+            }
+            
+            const rangNames = [
+                'Обычный участник', 'Младший Модератор', 'Модератор', 
+                'Старший Модератор', 'Заместитель', 'Менеджер', 'Владелец'
+            ];
+            
+            users.forEach(user => {
+                const card = document.createElement('div');
+                card.className = 'user-card';
+                
+                const rangName = rangNames[user.rang] || 'Неизвестный ранг';
+                
+                card.innerHTML = `
+                    <div class="user-nik">${user.nik}</div>
+                    <div class="user-rang">${rangName}</div>
+                    <div class="user-info">ID: ${user.tg_id}</div>
+                    <div class="user-info">В чате с: ${user.join_date || 'Неизвестно'}</div>
+                    <div class="user-info">Последняя активность: ${user.last_active || 'Неизвестно'}</div>
+                `;
+                
+                usersGrid.appendChild(card);
+            });
+        }
+
+        async function loadAdminPanel() {
+            const user = getCurrentUser();
+            if (!user) {
+                showError('Пользователь не определен');
+                return;
+            }
+            
+            currentChatId = getChatIdFromUrl();
+            if (!currentChatId) {
+                showError('ID чата не указан');
+                return;
+            }
+            
+            const panelData = await fetchChatAdminPanel(currentChatId, user.id);
+            if (!panelData) return;
+            
+            currentPanelData = panelData;
+            
+            // Обновляем заголовок
+            document.getElementById('chatTitle').textContent = panelData.chat_name;
+            document.getElementById('chatSubtitle').textContent = `Админ панель • ${panelData.available_functions.length} доступных функций`;
+            
+            // Отображаем функции
+            renderFunctions(panelData.available_functions);
+            
+            // Скрываем загрузку и показываем контент
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('chatContent').style.display = 'block';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUserProfile();
+            loadAdminPanel();
+        });
+    </script>
+</body>
+</html>
