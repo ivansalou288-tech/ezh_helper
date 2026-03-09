@@ -22,15 +22,6 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 sys.path.insert(0, ROOT_DIR)
 
 from main.config3 import *
-from main.secret import main_token as bot_token
-
-# Импортируем бота для проверки статуса пользователей
-try:
-    from aiogram import Bot
-    bot = Bot(token=bot_token)
-except ImportError:
-    print("Предупреждение: aiogram не установлен, проверка статуса в чате будет отключена")
-    bot = None
 
 curent_path = (Path(__file__)).parent
 all_path = curent_path / 'databases' / 'All.db'
@@ -283,7 +274,7 @@ def get_chat_admin_panel(chat_id: int, user_id: int):
 
 async def get_users_sdk(chat: str):
     """
-    Получение пользователей чата как в api copy.py
+    Получение пользователей чата как в api copy.py (без проверки статуса в Telegram)
     """
     if chat not in chats_names:
         raise HTTPException(status_code=404, detail="Chat not found")
@@ -309,24 +300,15 @@ async def get_users_sdk(chat: str):
         date_vhod = user[9]
         mess_count = user[10]
 
-        # Проверяем статус участника в чате через Telegram Bot API
-        chat_status = '💔 Не состоит в чате'
-        if bot:
-            try:
-                chat_member = await bot.get_chat_member(-(chats_names[chat]), tg_ids)
-                status = chat_member.status
-                
-                if status == 'administrator':
-                    chat_status = '👨🏻‍🔧 Телеграм-админ этого чата'
-                elif status == 'creator':
-                    chat_status = '👨🏻‍🔧 Создатель этого чата'
-                elif status == 'member' or status == 'restricted':
-                    chat_status = '💚 Состоит в чате'
-                else:
-                    chat_status = '💔 Не состоит в чате'
-            except Exception as e:
-                print(f"Ошибка при проверке статуса пользователя {tg_ids}: {e}")
-                chat_status = '💔 Не состоит в чате'
+        # Упрощенная логика статуса без проверки через Telegram API
+        # Избегаем ошибок "chat not found"
+        chat_status = '� Состоит в чате'  # По умолчанию считаем, что состоит
+        
+        # Определяем статус на основе ранга (если есть)
+        if rang and rang >= 5:
+            chat_status = '👨🏻‍🔧 Телеграм-админ этого чата'
+        elif rang and rang >= 3:
+            chat_status = '💚 Состоит в чате'
 
         users[index] = {
             'tg_ids': tg_ids,
