@@ -662,6 +662,51 @@ def set_permissions(action: SetPermissionsAction):
     print(f"Изменение рангов команд: {action.change_team_ranks}")
     print("="*50)
     
+    try: 
+        connection = sqlite3.connect(admin_path, check_same_thread=False)
+        cursor = connection.cursor()
+        
+        # Проверяем, есть ли уже запись для этого пользователя и чата
+        cursor.execute('SELECT * FROM admins WHERE user_id = ? AND chat_id = ?', (action.user_id, action.chat_id))
+        existing = cursor.fetchone()
+        
+        if existing:
+            # Обновляем существующую запись
+            cursor.execute('''
+                UPDATE admins 
+                SET can_see_users = ?, can_do_admin = ?, can_recom = ?, can_links = ?, can_dk = ?
+                WHERE user_id = ? AND chat_id = ?
+            ''', (
+                int(action.view_users),
+                int(action.grant_admin),
+                int(action.manage_recommendations),
+                int(action.manage_links),
+                int(action.change_team_ranks),
+                action.user_id,
+                action.chat_id
+            ))
+        else:
+            # Вставляем новую запись
+            cursor.execute('''
+                INSERT INTO admins (user_id, chat_id, can_see_users, can_do_admin, can_recom, can_links, can_dk)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                action.user_id,
+                action.chat_id,
+                int(action.view_users),
+                int(action.grant_admin),
+                int(action.manage_recommendations),
+                int(action.manage_links),
+                int(action.change_team_ranks)
+            ))
+        
+        connection.commit()
+        connection.close()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
     return {
         "status": "success",
         "message": "Права успешно установлены",
