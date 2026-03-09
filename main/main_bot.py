@@ -6,7 +6,7 @@ import random
 import string
 import html
 from datetime import datetime
-from api import admin_path
+
 from config3 import *
 from aiogram.utils.markdown import hlink
 import sys
