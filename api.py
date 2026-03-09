@@ -726,6 +726,9 @@ def recom_give(action: RecomGiveAction):
     print(f"Admin Username: {action.admin_username}")
     print("="*50)
     
+    if action.admin_id == action.user_id:
+        raise HTTPException(status_code=400, detail="Нельзя выдать рекомендацию самому себе")
+    
     return {"status": "ok", "message": "Данные получены"}
 
 @app.post('/set_permissions')

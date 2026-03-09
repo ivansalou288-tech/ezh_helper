@@ -170,7 +170,11 @@
                     alert('Ошибка выдачи рекомендации');
                 }
             } catch (error) {
-                alert('Ошибка: ' + error.message);
+                if (error.message.includes('400')) {
+                    alert('Нельзя выдать рекомендацию самому себе');
+                } else {
+                    alert('Ошибка: ' + error.message);
+                }
             }
         }
 
