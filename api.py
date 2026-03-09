@@ -448,7 +448,7 @@ async def get_user_warnings(chat: int, user_id: int):
                 "moder": moder_name,
                 "date": date
             })
-        
+        print(warns_data)
         connection.close()
         return warns_data
         
