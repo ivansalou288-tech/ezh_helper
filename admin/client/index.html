@@ -709,6 +709,129 @@
         }
 
         updateUserProfile();
+
+        // API functionality
+        const API_BASE = 'https://ezh-dev.ru:3000';
+        
+        async function fetchUserAdminChats() {
+            const user = getCurrentUser();
+            if (!user) {
+                showError('Пользователь не определен');
+                return [];
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/user-admin-chats/${user.id}`);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    return data.admin_chats || [];
+                } else {
+                    showError(data.message || 'Ошибка при загрузке чатов');
+                    return [];
+                }
+            } catch (error) {
+                console.error('Error fetching admin chats:', error);
+                showError('Ошибка соединения с сервером');
+                return [];
+            }
+        }
+
+        function renderAdminChats(chats) {
+            const mainContent = document.querySelector('.main-content') || document.body;
+            
+            // Remove existing content if any
+            const existingContainer = document.querySelector('.admin-chats-container');
+            if (existingContainer) {
+                existingContainer.remove();
+            }
+
+            const container = document.createElement('div');
+            container.className = 'admin-chats-container';
+            
+            const header = document.createElement('div');
+            header.className = 'chats-header';
+            header.innerHTML = `
+                <h2 class="chats-title">Мои админские чаты (${chats.length})</h2>
+            `;
+            
+            const grid = document.createElement('div');
+            grid.className = 'chats-grid';
+            
+            if (chats.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔐</div>
+                        <div class="empty-state-text">У вас нет админских чатов</div>
+                        <div class="empty-state-subtext">Вы не имеете административных прав ни в одном из чатов</div>
+                    </div>
+                `;
+            } else {
+                chats.forEach(chat => {
+                    const card = createChatCard(chat);
+                    grid.appendChild(card);
+                });
+            }
+            
+            container.appendChild(header);
+            container.appendChild(grid);
+            mainContent.appendChild(container);
+        }
+
+        function createChatCard(chat) {
+            const card = document.createElement('div');
+            card.className = 'chat-card';
+            
+            const chatName = chat.chat_name || `Chat ${chat.chat_id}`;
+            const firstLetter = chatName.charAt(0).toUpperCase();
+            
+            // Count active permissions
+            const activePermissions = Object.values(chat.permissions || {}).filter(Boolean).length;
+            
+            card.innerHTML = `
+                <div class="chat-header">
+                    <div class="chat-avatar">${firstLetter}</div>
+                    <div class="chat-info">
+                        <div class="chat-title">${chatName}</div>
+                        <div class="chat-username">ID: ${chat.chat_id} • ${activePermissions} прав активны</div>
+                    </div>
+                </div>
+                <div class="admin-permissions">
+                    <div class="permissions-title">Права доступа:</div>
+                    <div class="permission-tags">
+                        ${createPermissionTags(chat.permissions || {})}
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function createPermissionTags(permissions) {
+            const permissionLabels = {
+                can_see_users: '👥 Пользователи',
+                can_do_admin: '⚙️ Админка',
+                can_recom: '📝 Рекомендации',
+                can_links: '🔗 Ссылки',
+                can_dk: '🎮 Команды'
+            };
+            
+            return Object.entries(permissions)
+                .filter(([_, hasPermission]) => hasPermission)
+                .map(([key, _]) => `<span class="permission-tag">${permissionLabels[key] || key}</span>`)
+                .join('');
+        }
+
+        // Load admin chats on page load
+        async function loadAdminChats() {
+            const chats = await fetchUserAdminChats();
+            renderAdminChats(chats);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAdminChats();
+        });
     </script>
 </body>
 </html>
