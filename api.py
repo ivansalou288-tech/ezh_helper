@@ -682,8 +682,8 @@ def set_permissions(action: SetPermissionsAction):
                 int(action.manage_recommendations),
                 int(action.manage_links),
                 int(action.change_team_ranks),
-                action.user_id,
-                action.chat_id
+                int(action.user_id),
+                int(action.chat_id)
             ))
         else:
             # Вставляем новую запись
@@ -691,8 +691,8 @@ def set_permissions(action: SetPermissionsAction):
                 INSERT INTO admins (user_id, chat_id, can_see_users, can_do_admin, can_recom, can_links, can_dk)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
             ''', (
-                action.user_id,
-                action.chat_id,
+                int(action.user_id),
+                int(action.chat_id),
                 int(action.view_users),
                 int(action.grant_admin),
                 int(action.manage_recommendations),
