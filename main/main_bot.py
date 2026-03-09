@@ -6,6 +6,7 @@ import random
 import string
 import html
 from datetime import datetime
+from api import admin_path
 from config3 import *
 from aiogram.utils.markdown import hlink
 import sys
@@ -3511,7 +3512,7 @@ async def bind_chat_to_admin(message: types.Message, bot: Bot):
             await message.answer(f' {krest} Только владелец чата может использовать эту команду!', parse_mode='html')
             return
         
-        connection = sqlite3.connect(get_db_path(message.chat.id))
+        connection = sqlite3.connect(admin_path)
         cursor = connection.cursor()
 
         cursor.execute('SELECT can_links FROM admins WHERE user_id = ? AND chat_id = ?', (message.from_user.id, message.chat.id))
