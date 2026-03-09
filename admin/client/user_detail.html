@@ -718,7 +718,7 @@
         }
 
         function loadWarnings() {
-            fetch(`https://ezh-dev.ru:8000/warns/${currentChatId}/${currentUserId}`)
+            fetch(`https://ezh-dev.ru:3000/warns/${currentChatId}/${currentUserId}`)
                 .then(res => res.json())
                 .then(data => {
                     const userCard = document.getElementById('userCard');
@@ -730,8 +730,7 @@
                     warningsSection.className = 'warnings-section';
                     warningsSection.innerHTML = '<div class="warnings-title">⚠️ Предупреждения</div>';
 
-                    const warnsArray = Array.isArray(data) ? data : Object.values(data || {});
-                    const warns = (warnsArray || []).slice(0, 3);
+                    const warns = Array.isArray(data) ? data : [];
 
                     if (!warns || warns.length === 0) {
                         warningsSection.innerHTML += '<div class="no-warnings">Предупреждений нет</div>';

@@ -401,6 +401,53 @@ async def get_user(chat: int, user_id: int):
     except Exception as e:
         print(f"Ошибка в get_user: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/warns/{chat}/{user_id}")
+async def get_user_warnings(chat: int, user_id: int):
+    """
+    Получение предупреждений пользователя по chat_id и user_id
+    """
+    try:
+        # Используем базу данных конкретного чата
+        connection = sqlite3.connect(get_db_path(chat), check_same_thread=False)
+        cursor = connection.cursor()
+        
+        cursor.execute("SELECT * FROM warns WHERE user_id=?", (user_id,))
+        warns = cursor.fetchall()
+        
+        if not warns:
+            return []
+        
+        # Формируем массив предупреждений
+        warns_data = []
+        for i, warn in enumerate(warns, 1):
+            reason = warn[1] if warn[1] else 'Без причины'
+            moder_id = warn[2]
+            date = warn[3] if warn[3] else 'Неизвестна'
+            
+            # Получаем имя модератора
+            try:
+                moder_cursor = connection.cursor()
+                moder_cursor.execute("SELECT nik FROM users WHERE tg_ids=?", (moder_id,))
+                moder_result = moder_cursor.fetchall()
+                moder_name = moder_result[0][0] if moder_result else f"ID: {moder_id}"
+            except:
+                moder_name = f"ID: {moder_id}"
+            
+            warns_data.append({
+                "num": i,
+                "reason": reason,
+                "moder_id": moder_id,
+                "moder": moder_name,
+                "date": date
+            })
+        
+        connection.close()
+        return warns_data
+        
+    except Exception as e:
+        print(f"Ошибка в get_user_warnings: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 @app.get('/chat-users/{chat_id}')
 def get_chat_users(chat_id: int):
     """
