@@ -28,12 +28,9 @@ from main.secret import main_token as bot_token
 try:
     from aiogram import Bot
     bot = Bot(token=bot_token)
-    print("Бот для проверки статуса успешно инициализирован")
 except ImportError:
-    print("Предупреждение: aiogram не установлен, проверка статуса в чате будет отключена")
     bot = None
 except Exception as e:
-    print(f"Ошибка инициализации бота: {e}")
     bot = None
 
 curent_path = (Path(__file__)).parent
@@ -119,7 +116,6 @@ def get_user_admin_chats(user_id: int):
         }
         
     except Exception as e:
-        print(f"Error getting user admin chats: {e}")
         return {
             "status": "error",
             "message": f"Ошибка при получении админских чатов: {str(e)}"
@@ -134,8 +130,6 @@ def get_chat_avatar(chat_id: int):
         import requests
         from main.config3 import bot_token
         
-        print(f"DEBUG: Getting avatar for chat_id: {chat_id}")
-        
         # Получаем информацию о чате через Bot API
         url = f"https://api.telegram.org/bot{bot_token}/getChat"
         params = {"chat_id": chat_id}
@@ -143,15 +137,9 @@ def get_chat_avatar(chat_id: int):
         response = requests.get(url, params=params)
         data = response.json()
         
-        print(f"DEBUG: Response status: {response.status_code}")
-        print(f"DEBUG: Response data: {data}")
-        
         if data.get("ok"):
             chat_info = data.get("result", {})
             photo = chat_info.get("photo")
-            
-            print(f"DEBUG: Photo data: {photo}")
-            print(f"DEBUG: Photo keys: {list(photo.keys()) if photo else 'None'}")
             
             if photo:
                 # Ищем фото в разных размерах
@@ -160,49 +148,34 @@ def get_chat_avatar(chat_id: int):
                 # Проверяем все возможные размеры фото
                 if "big_file_id" in photo:
                     avatar_file_id = photo["big_file_id"]
-                    print(f"DEBUG: Found big_file_id: {avatar_file_id}")
                 elif "small_file_id" in photo:
                     avatar_file_id = photo["small_file_id"]
-                    print(f"DEBUG: Found small_file_id: {avatar_file_id}")
                 elif "file_id" in photo:
                     avatar_file_id = photo["file_id"]
-                    print(f"DEBUG: Found file_id: {avatar_file_id}")
                 
                 if avatar_file_id:
                     # Получаем URL файла
                     file_url = f"https://api.telegram.org/bot{bot_token}/getFile?file_id={avatar_file_id}"
-                    print(f"DEBUG: Requesting file from: {file_url}")
                     
                     file_response = requests.get(file_url)
                     file_data = file_response.json()
-                    
-                    print(f"DEBUG: File response status: {file_response.status_code}")
-                    print(f"DEBUG: File response data: {file_data}")
                     
                     if file_data.get("ok"):
                         file_path = file_data["result"]["file_path"]
                         avatar_url = f"https://api.telegram.org/file/bot{bot_token}/{file_path}"
                         
-                        print(f"DEBUG: Final avatar URL: {avatar_url}")
-                        
                         return {
                             "status": "success",
                             "avatar_url": avatar_url
                         }
-                    else:
-                        print(f"DEBUG: getFile failed: {file_data}")
-                else:
-                    print("DEBUG: No file_id found in photo data")
             
         # Если фото нет или произошла ошибка, возвращаем пустой результат
-        print("DEBUG: No photo found or getFile failed, returning None")
         return {
             "status": "success",
             "avatar_url": None
         }
         
     except Exception as e:
-        print(f"ERROR: Exception in get_chat_avatar: {e}")
         return {
             "status": "error",
             "message": f"Ошибка при получении аватара чата: {str(e)}"
@@ -295,7 +268,6 @@ def get_chat_admin_panel(chat_id: int, user_id: int):
         return panel_data
         
     except Exception as e:
-        print(f"Error getting chat admin panel: {e}")
         return {
             "status": "error",
             "message": f"Ошибка при загрузке админ панели: {str(e)}"
@@ -394,7 +366,6 @@ async def get_users(chat: int):
         return users
 
     except Exception as e:
-        print(f"Ошибка в get_users: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/user/{chat}/{user_id}")
@@ -415,7 +386,6 @@ async def get_user(chat: int, user_id: int):
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Ошибка в get_user: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/warns/{chat}/{user_id}")
@@ -457,12 +427,10 @@ async def get_user_warnings(chat: int, user_id: int):
                 "moder": moder_name,
                 "date": date
             })
-        print(warns_data)
         connection.close()
         return warns_data
         
     except Exception as e:
-        print(f"Ошибка в get_user_warnings: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 @app.get('/chat-users/{chat_id}')
 def get_chat_users(chat_id: int):
@@ -470,14 +438,10 @@ def get_chat_users(chat_id: int):
     Получает список пользователей чата
     """
     try:
-        print(f"Запрос пользователей для чата: {chat_id}")
-        
         # Получаем путь к базе данных чата
         chat_db_path = get_db_path(chat_id)
-        print(f"Путь к БД: {chat_db_path}")
         
         if not os.path.exists(chat_db_path):
-            print(f"База данных не найдена: {chat_db_path}")
             return {
                 "status": "error",
                 "message": "База данных чата не найдена"
@@ -486,12 +450,6 @@ def get_chat_users(chat_id: int):
         connection = sqlite3.connect(chat_db_path, check_same_thread=False)
         cursor = connection.cursor()
         
-        # Сначала проверяем структуру таблицы
-        cursor.execute("PRAGMA table_info(users)")
-        columns_info = cursor.fetchall()
-        column_names = [col[1] for col in columns_info]
-        print(f"Доступные колонки: {column_names}")
-        
         # Упрощенный запрос - получаем только то, что точно есть
         cursor.execute('''
             SELECT tg_id, nik, rang, date_vhod, last_date 
@@ -499,7 +457,6 @@ def get_chat_users(chat_id: int):
             ORDER BY rang DESC, nik
         ''')
         users = cursor.fetchall()
-        print(f"Найдено пользователей: {len(users)}")
         
         users_list = []
         for user in users:
@@ -518,7 +475,6 @@ def get_chat_users(chat_id: int):
         
         connection.close()
         
-        print(f"Возвращаем {len(users_list)} пользователей")
         return {
             "status": "success",
             "users": users_list,
@@ -526,9 +482,6 @@ def get_chat_users(chat_id: int):
         }
         
     except Exception as e:
-        print(f"Ошибка в get_chat_users: {e}")
-        import traceback
-        traceback.print_exc()
         return {
             "status": "error",
             "message": f"Ошибка при получении пользователей: {str(e)}"
@@ -598,7 +551,6 @@ def get_recom(chat_id: int, user: int):
         return recommendations
         
     except Exception as e:
-        print(f"Ошибка в get_recom: {e}")
         return []
 
 @app.get('/recom/{user}')
@@ -619,18 +571,7 @@ def recom_remove(action: RecomRemoveAction):
         if not admin_check:
             raise HTTPException(status_code=403, detail="Access denied")
     except Exception as e:
-        print(f"Error checking admin rights: {e}")
         raise HTTPException(status_code=403, detail="Access denied")
-    
-    # Печатаем полученные данные
-    print(f"=== RECOM REMOVE DATA ===")
-    print(f"rec_id: {action.rec_id}")
-    print(f"user_id: {action.user_id}")
-    print(f"chat_id: {action.chat_id}")
-    print(f"admin_id: {action.admin_id}")
-    print(f"admin_name: {action.admin_name}")
-    print(f"admin_username: {action.admin_username}")
-    print(f"========================")
     
     # Если указан конкретный chat_id, используем только его
     if action.chat_id:
@@ -655,11 +596,9 @@ def recom_remove(action: RecomRemoveAction):
             if deleted == 0:
                 raise HTTPException(status_code=404, detail="Recommendation not found")
                 
-            print(f"Successfully removed recommendation: rec_id={action.rec_id} from chat {action.chat_id}")
             return {"status": "ok", "deleted": deleted, "chat_id": action.chat_id}
             
         except Exception as e:
-            print(f"Error deleting recommendation: {e}")
             raise HTTPException(status_code=500, detail=str(e))
     
     # Иначе ищем по всем чатам (старое поведение)
@@ -691,62 +630,115 @@ def recom_remove(action: RecomRemoveAction):
                 connection.close()
                 
             except Exception as e:
-                print(f"Error deleting recommendation from chat {chat_id}: {e}")
                 continue
         
         if not chat_found or deleted_count == 0:
             raise HTTPException(status_code=404, detail="Recommendation not found")
             
-        print(f"Removed recommendation: rec_id={action.rec_id}, user_id={action.user_id} by admin {action.admin_id} ({action.admin_name})")
         return {"status": "ok", "deleted": deleted_count}
 
 @app.post("/snat_warn")
 async def snat_warn(action: SnatWarnAction):
-    # Проверка прав доступа
+    """
+    Снимает предупреждение с пользователя.
+    
+    Логика работы:
+    1. Проверяет права админа в таблице admins
+    2. Получает все предупреждения пользователя из таблицы warns
+    3. Удаляет указанное предупреждение по номеру (1, 2 или 3)
+    4. Сохраняет информацию о снятом предупреждении в таблицу warn_snat
+    5. Возвращает успешный статус
+    
+    Параметры:
+    - chat: ID чата (строка)
+    - userid: ID пользователя (строка)
+    - num: номер предупреждения для снятия (1, 2 или 3)
+    - admin_id: ID админа, который снимает пред
+    - admin_name: имя админа
+    - admin_username: username админа
+    """
+    
+    chat = action.chat
+    userid = action.userid
+    num = action.num
+    admin_id = action.admin_id
+    admin_name = action.admin_name
+    admin_username = action.admin_username
+    
+    # Проверка прав админа
     try:
         connection = sqlite3.connect(admin_path, check_same_thread=False)
         cursor = connection.cursor()
-        cursor.execute('SELECT * FROM admins WHERE user_id = ?', (action.admin_id,))
+        cursor.execute('SELECT * FROM admins WHERE user_id = ?', (admin_id,))
         admin_check = cursor.fetchall()
-        connection.close()
         
         if not admin_check:
             raise HTTPException(status_code=403, detail="Access denied")
     except Exception as e:
-        print(f"Error checking admin rights: {e}")
         raise HTTPException(status_code=403, detail="Access denied")
     
-    # Печатаем полученные данные
-    print(f"=== SNAT WARN DATA ===")
-    print(f"chat: {action.chat}")
-    print(f"userid: {action.userid}")
-    print(f"num: {action.num}")
-    print(f"admin_id: {action.admin_id}")
-    print(f"admin_name: {action.admin_name}")
-    print(f"admin_username: {action.admin_username}")
-    print(f"====================")
-    
     try:
-        # Используем базу данных предупреждений
-        warn_path = curent_path / 'databases' / 'warn_list.db'
-        connection = sqlite3.connect(warn_path, check_same_thread=False)
+        # Получаем путь к базе данных чата
+        chat_db_path = get_db_path(int(chat))
+        
+        connection = sqlite3.connect(chat_db_path, check_same_thread=False)
         cursor = connection.cursor()
         
-        # Получаем текущее количество предупреждений
-        cursor.execute(f"SELECT warns_count FROM [{(action.chat)}] WHERE tg_id=?", (action.userid,))
-        row = cursor.fetchone()
-        cnt = row[0] if row else 0
+        # Получаем все предупреждения пользователя, отсортированные по дате
+        cursor.execute("SELECT * FROM warns WHERE user_id = ? ORDER BY date", (int(userid),))
+        all_warns = cursor.fetchall()
         
-        # Вызываем функцию удаления предупреждения из config3
-        from main.config3 import admin_warn_dell
-        await admin_warn_dell(int(action.userid), int(action.chat), action.num, max(cnt - 1, 0), action.admin_name)
+        if not all_warns:
+            raise HTTPException(status_code=404, detail="У пользователя нет предупреждений")
         
-        print(f'Successfully removed warning {action.num} from user {action.userid} in chat {action.chat} by admin {action.admin_id} ({action.admin_name})')
-        return {"status": "ok"}
+        if num > len(all_warns) or num < 1:
+            raise HTTPException(status_code=400, detail=f"Неверный номер предупреждения. У пользователя {len(all_warns)} предупреждений")
         
+        # Получаем предупреждение для удаления (num - 1, т.к. индексация с 0)
+        warn_index = num - 1
+        warn_to_delete = all_warns[warn_index]
+        
+        # Структура таблицы warns: user_id, reason, moder_id, date
+        warn_reason = warn_to_delete[1] if warn_to_delete[1] else 'Без причины'
+        warn_moder_id = warn_to_delete[2]
+        warn_date = warn_to_delete[3]
+        
+        # Удаляем предупреждение
+        cursor.execute(
+            "DELETE FROM warns WHERE user_id = ? AND reason = ? AND moder_id = ? AND date = ?",
+            (int(userid), warn_reason, warn_moder_id, warn_date)
+        )
+        
+        # Формируем упоминание админа, который снимает пред
+        admin_mention = f'<a href="tg://user?id={admin_id}">{admin_name}</a>'
+        
+        # Формируем информацию о модераторе, который выдал пред
+        moder_give_info = f'ID: {warn_moder_id}'
+        
+        # Сохраняем в историю снятых предупреждений
+        cursor.execute(
+            'INSERT INTO warn_snat (user_id, warn_text, moder_give, moder_snat) VALUES (?, ?, ?, ?)',
+            (int(userid), warn_reason, moder_give_info, admin_mention)
+        )
+        
+        connection.commit()
+        connection.close()
+        
+        # Получаем новое количество предупреждений
+        cnt = len(all_warns) - 1
+        
+        return {
+            "status": "ok",
+            "message": f"Предупреждение #{num} успешно снято",
+            "warns_left": cnt
+        }
+        
+    except HTTPException:
+        raise
     except Exception as e:
-        print(f"Error removing warning: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) 
+
+    
 
 if  __name__ == '__main__':
     uvicorn.run('api:app', reload=True, port=3000, host="0.0.0.0", ssl_keyfile='/etc/letsencrypt/live/ezh-dev.ru/privkey.pem', ssl_certfile='/etc/letsencrypt/live/ezh-dev.ru/cert.pem')
