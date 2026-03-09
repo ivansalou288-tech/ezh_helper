@@ -796,7 +796,7 @@
                                     alert('Не удалось получить данные профиля Telegram. Открой страницу внутри Telegram Mini App.');
                                     return;
                                 }
-                                fetch('https://ezh-dev.ru:8000/snat_warn', {
+                                fetch('https://ezh-dev.ru:3000/snat_warn', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({
