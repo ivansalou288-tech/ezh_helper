@@ -2,6 +2,8 @@ from math import log
 import sqlite3
 import os
 import ssl
+import random
+import string
 import sys
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request
@@ -725,10 +727,17 @@ def recom_give(action: RecomGiveAction):
     print(f"Admin Name: {action.admin_name}")
     print(f"Admin Username: {action.admin_username}")
     print("="*50)
-    
+    connection = sqlite3.connect(get_db_path(action.chat_id), check_same_thread=False)
+    cursor = connection.cursor()
     if action.admin_id == action.user_id:
         raise HTTPException(status_code=400, detail="Нельзя выдать рекомендацию самому себе")
-    
+        return {"status": "error", "message": "Нельзя выдать рекомендацию самому себе"} 
+    id_recom = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+    cursor.execute(
+        'INSERT INTO recommendation (user_id, pubg_id, moder, comments, rang, date, recom_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        (action.user_id, action.chat_id, action.admin_id, action.reason, action.rank, datetime.now(), id_recom))
+    connection.commit()
+    connection.close()
     return {"status": "ok", "message": "Данные получены"}
 
 @app.post('/set_permissions')
@@ -924,6 +933,9 @@ async def snat_warn(action: SnatWarnAction):
     admin_id = action.admin_id
     admin_name = action.admin_name
     admin_username = action.admin_username
+    
+    if admin_id == int(userid):
+        raise HTTPException(status_code=400, detail="Нельзя снять предупреждение самому себе")
     
     # Проверка прав админа
     try:
