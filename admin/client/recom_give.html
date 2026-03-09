@@ -30,6 +30,7 @@
         .form-group { margin-bottom: 15px; }
         .label { display: block; margin-bottom: 5px; color: rgba(255, 255, 255, 0.8); }
         textarea { width: 100%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(179, 136, 255, 0.3); border-radius: 8px; padding: 10px; color: #fff; font-size: 1em; resize: vertical; min-height: 100px; }
+        select { width: 100%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(179, 136, 255, 0.3); border-radius: 8px; padding: 10px; color: #fff; font-size: 1em; }
     </style>
 </head>
 <body>
@@ -47,6 +48,18 @@
 
         <div id="formBox" class="form-box">
             <h3 class="form-title">Выдать рекомендацию: <span id="selectedUserName"></span></h3>
+            <div class="form-group">
+                <label class="label">Должность:</label>
+                <select id="rankSelect">
+                    <option value="0">Обычный участник</option>
+                    <option value="1">Младший Модератор</option>
+                    <option value="2">Модератор</option>
+                    <option value="3">Старший Модератор</option>
+                    <option value="4">Заместитель</option>
+                    <option value="5">Менеджер</option>
+                    <option value="6">Владелец</option>
+                </select>
+            </div>
             <div class="form-group">
                 <label class="label">Причина рекомендации:</label>
                 <textarea id="reasonInput" placeholder="Введите причину рекомендации..."></textarea>
