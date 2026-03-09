@@ -444,7 +444,17 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 const chatId = urlParams.get('chat_id');
                 
-                const response = await fetch(`/api/search_users?query=${encodeURIComponent(query)}&chat_id=${chatId}`);
+                if (!chatId) {
+                    resultsContainer.innerHTML = '<div class="no-results">Ошибка: не указан chat_id</div>';
+                    return;
+                }
+                
+                const response = await fetch(`/api/search_users?query=${encodeURIComponent(query)}&chat_id=${encodeURIComponent(chatId)}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
                 
                 if (data.users && data.users.length > 0) {
@@ -453,21 +463,26 @@
                     resultsContainer.innerHTML = '<div class="no-results">Пользователи не найдены</div>';
                 }
             } catch (error) {
-                resultsContainer.innerHTML = '<div class="no-results">Ошибка поиска</div>';
+                console.error('Search error:', error);
+                resultsContainer.innerHTML = `<div class="no-results">Ошибка поиска: ${error.message}</div>`;
             }
         }
 
         function displayResults(users) {
             resultsContainer.innerHTML = users.map(user => {
-                const initials = (user.first_name?.slice(0, 1) || '') + (user.last_name?.slice(0, 1) || '') || user.username?.slice(0, 2).toUpperCase() || '?';
-                const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Без имени';
+                const firstName = user.first_name || '';
+                const lastName = user.last_name || '';
+                const username = user.username || '';
+                
+                const initials = ((firstName.slice(0, 1) + lastName.slice(0, 1)) || username.slice(0, 2) || '?').toUpperCase();
+                const fullName = `${firstName} ${lastName}`.trim() || 'Без имени';
                 
                 return `
                     <div class="user-card">
                         <div class="user-info">
                             <div class="user-card-avatar">${initials}</div>
                             <div class="user-details">
-                                <div class="user-username">@${user.username || 'unknown'}</div>
+                                <div class="user-username">@${username || 'unknown'}</div>
                                 <div class="user-fullname">${fullName}</div>
                             </div>
                         </div>
