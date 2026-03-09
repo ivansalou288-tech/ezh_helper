@@ -608,20 +608,6 @@
         <div id="toastText" class="toast-text"></div>
     </div>
 
-    <div class="main-content">
-        <h1>Admin Panel</h1>
-        
-        <div class="content">
-            <div id="chatsSection">
-                <div class="section-header">
-                    <h2 class="section-title">� Чаты</h2>
-                </div>
-                <div id="chatsContent">
-                    <div class="loading">Загрузка чатов...</div>
-                </div>
-            </div>
-        </div>
-
     <script>
         (function () {
             const tg = window.Telegram?.WebApp;
@@ -723,110 +709,6 @@
         }
 
         updateUserProfile();
-
-        // Функции для работы с чатами
-        async function loadChats() {
-            const chatsContent = document.getElementById('chatsContent');
-            
-            try {
-                const response = await fetch('https://ezh-dev.ru:3000/api/chats', {
-                    method: 'GET',
-                    headers: {
-                        'X-Telegram-Init-Data': window.Telegram?.WebApp?.initData || ''
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                displayChats(data.chats || []);
-
-            } catch (error) {
-                console.error('Error loading chats:', error);
-                chatsContent.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">💬</div>
-                        <div class="empty-state-text">Не удалось загрузить чаты</div>
-                        <div class="empty-state-subtext">${mapErrorToRu(error.message)}</div>
-                    </div>
-                `;
-            }
-        }
-
-        function displayChats(chats) {
-            const chatsContent = document.getElementById('chatsContent');
-            
-            if (!chats || chats.length === 0) {
-                chatsContent.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">💬</div>
-                        <div class="empty-state-text">Нет доступных чатов</div>
-                        <div class="empty-state-subtext">Добавьте первый чат с помощью кнопки выше</div>
-                    </div>
-                `;
-                return;
-            }
-
-            const chatsGrid = document.createElement('div');
-            chatsGrid.className = 'chats-grid';
-
-            chats.forEach(chat => {
-                const chatCard = createChatCard(chat);
-                chatsGrid.appendChild(chatCard);
-            });
-
-            chatsContent.innerHTML = '';
-            chatsContent.appendChild(chatsGrid);
-        }
-
-        function createChatCard(chat) {
-            const card = document.createElement('div');
-            card.className = 'chat-card';
-            card.onclick = () => openChat(chat.chat_id);
-
-            const chatInitial = chat.chat_title ? chat.chat_title.charAt(0).toUpperCase() : '?';
-            
-            card.innerHTML = `
-                <div class="chat-header">
-                    <div class="chat-avatar">
-                        ${chat.chat_photo_url ? 
-                            `<img src="${chat.chat_photo_url}" 
-                                 onerror="this.style.display='none'; this.parentElement.innerHTML='${chatInitial}'" 
-                                 alt="${chat.chat_title}">` : 
-                            chatInitial}
-                    </div>
-                    <div class="chat-info">
-                        <div class="chat-title">${chat.chat_title || 'Без названия'}</div>
-                        ${chat.chat_username ? `<div class="chat-username">@${chat.chat_username}</div>` : ''}
-                    </div>
-                </div>
-            `;
-
-            return card;
-        }
-
-        function openChat(chatId) {
-            // Переходим на страницу управления чатом
-            window.location.href = `/chat-admin.html?chat_id=${chatId}`;
-        }
-
-        // Загружаем чаты при инициализации
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.Telegram?.WebApp) {
-                loadChats();
-                
-                // Скрываем кнопку "Назад" на главной странице
-                const tg = window.Telegram?.WebApp;
-                if (tg && tg.BackButton) {
-                    tg.BackButton.hide();
-                }
-            } else {
-                // Если Telegram WebApp недоступен, все равно пробуем загрузить
-                setTimeout(loadChats, 1000);
-            }
-        });
     </script>
 </body>
 </html>
