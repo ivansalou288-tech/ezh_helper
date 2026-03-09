@@ -85,5 +85,63 @@ def get_user_admin_chats(user_id: int):
             "status": "error",
             "message": f"Ошибка при получении админских чатов: {str(e)}"
         }
+
+@app.get('/chat-avatar/{chat_id}')
+def get_chat_avatar(chat_id: int):
+    """
+    Получает URL аватара чата через Telegram Bot API
+    """
+    try:
+        import requests
+        from main.config3 import bot_token
+        
+        # Получаем информацию о чате через Bot API
+        url = f"https://api.telegram.org/bot{bot_token}/getChat"
+        params = {"chat_id": chat_id}
+        
+        response = requests.get(url, params=params)
+        data = response.json()
+        
+        if data.get("ok"):
+            chat_info = data.get("result", {})
+            photo = chat_info.get("photo")
+            
+            if photo:
+                # Получаем самый большой размер фото
+                big_photo = None
+                for size in ["big", "small"]:
+                    if size in photo:
+                        big_photo = photo[size]
+                        break
+                
+                if big_photo:
+                    file_id = big_photo.get("file_id")
+                    # Получаем URL файла
+                    file_url = f"https://api.telegram.org/bot{bot_token}/getFile?file_id={file_id}"
+                    file_response = requests.get(file_url)
+                    file_data = file_response.json()
+                    
+                    if file_data.get("ok"):
+                        file_path = file_data["result"]["file_path"]
+                        avatar_url = f"https://api.telegram.org/file/bot{bot_token}/{file_path}"
+                        
+                        return {
+                            "status": "success",
+                            "avatar_url": avatar_url
+                        }
+        
+        # Если фото нет, возвращаем пустой результат
+        return {
+            "status": "success",
+            "avatar_url": None
+        }
+        
+    except Exception as e:
+        print(f"Error getting chat avatar: {e}")
+        return {
+            "status": "error",
+            "message": f"Ошибка при получении аватара чата: {str(e)}"
+        }
+
 if  __name__ == '__main__':
     uvicorn.run('api:app', reload=True,port=3000, host="0.0.0.0", ssl_keyfile='/etc/letsencrypt/live/ezh-dev.ru/privkey.pem', ssl_certfile='/etc/letsencrypt/live/ezh-dev.ru/cert.pem')
