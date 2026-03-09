@@ -380,6 +380,27 @@ async def get_users(chat: int):
     except Exception as e:
         print(f"Ошибка в get_users: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/user/{chat}/{user_id}")
+async def get_user(chat: int, user_id: int):
+    """
+    Получение одного пользователя по chat_id и user_id
+    """
+    try:
+        users = await get_users_sdk(chat)
+        
+        # Ищем пользователя по tg_ids
+        for user_key, user_data in users.items():
+            if user_data and user_data.get('tg_ids') == user_id:
+                return user_data
+        
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Ошибка в get_user: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 @app.get('/chat-users/{chat_id}')
 def get_chat_users(chat_id: int):
     """

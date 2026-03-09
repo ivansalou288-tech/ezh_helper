@@ -496,15 +496,23 @@
             const card = document.createElement('div');
             card.className = 'user-card';
             
+            // Добавляем обработчик клика
+            card.addEventListener('click', () => {
+                const chatId = getChatIdFromUrl();
+                if (chatId && user.tg_ids) {
+                    window.location.href = `user_detail.html?chat_id=${chatId}&user_id=${user.tg_ids}`;
+                }
+            });
+            
             // Определяем статус
             let statusHtml = '';
             if (user.status) {
                 if (user.status.includes('Телеграм-админ') || user.status.includes('Создатель')) {
-                    statusHtml = `<div class="user-status"><span class="emoji">👨🏻‍🔧</span> ${user.status}</div>`;
+                    statusHtml = `<div class="user-status"> ${user.status}</div>`;
                 } else if (user.status.includes('Состоит в чате')) {
-                    statusHtml = `<div class="user-status"><span class="emoji">💚</span> ${user.status}</div>`;
+                    statusHtml = `<div class="user-status"> ${user.status}</div>`;
                 } else if (user.status.includes('Не состоит в чате')) {
-                    statusHtml = `<div class="user-status"><span class="emoji">💔</span> ${user.status}</div>`;
+                    statusHtml = `<div class="user-status"> ${user.status}</div>`;
                 } else {
                     statusHtml = `<div class="user-status"><span class="emoji">👤</span> ${user.status}</div>`;
                 }
