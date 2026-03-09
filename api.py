@@ -95,6 +95,8 @@ def get_chat_avatar(chat_id: int):
         import requests
         from main.config3 import bot_token
         
+        print(f"DEBUG: Getting avatar for chat_id: {chat_id}")
+        
         # Получаем информацию о чате через Bot API
         url = f"https://api.telegram.org/bot{bot_token}/getChat"
         params = {"chat_id": chat_id}
@@ -102,42 +104,54 @@ def get_chat_avatar(chat_id: int):
         response = requests.get(url, params=params)
         data = response.json()
         
+        print(f"DEBUG: Response status: {response.status_code}")
+        print(f"DEBUG: Response data: {data}")
+        
         if data.get("ok"):
             chat_info = data.get("result", {})
             photo = chat_info.get("photo")
             
+            print(f"DEBUG: Photo data: {photo}")
+            
             if photo:
-                # Получаем самый большой размер фото
-                big_photo = None
-                for size in ["big", "small"]:
-                    if size in photo:
-                        big_photo = photo[size]
+                # Ищем фото в разных размерах
+                avatar_file_id = None
+                
+                # Проверяем все возможные размеры фото
+                for size_key in ["big", "small", "thumb"]:
+                    if size_key in photo:
+                        avatar_file_id = photo[size_key].get("file_id")
+                        print(f"DEBUG: Found {size_key} photo with file_id: {avatar_file_id}")
                         break
                 
-                if big_photo:
-                    file_id = big_photo.get("file_id")
+                if avatar_file_id:
                     # Получаем URL файла
-                    file_url = f"https://api.telegram.org/bot{bot_token}/getFile?file_id={file_id}"
+                    file_url = f"https://api.telegram.org/bot{bot_token}/getFile?file_id={avatar_file_id}"
                     file_response = requests.get(file_url)
                     file_data = file_response.json()
+                    
+                    print(f"DEBUG: File response: {file_data}")
                     
                     if file_data.get("ok"):
                         file_path = file_data["result"]["file_path"]
                         avatar_url = f"https://api.telegram.org/file/bot{bot_token}/{file_path}"
+                        
+                        print(f"DEBUG: Final avatar URL: {avatar_url}")
                         
                         return {
                             "status": "success",
                             "avatar_url": avatar_url
                         }
         
-        # Если фото нет, возвращаем пустой результат
+        # Если фото нет или произошла ошибка, возвращаем пустой результат
+        print("DEBUG: No photo found, returning None")
         return {
             "status": "success",
             "avatar_url": None
         }
         
     except Exception as e:
-        print(f"Error getting chat avatar: {e}")
+        print(f"ERROR: Exception in get_chat_avatar: {e}")
         return {
             "status": "error",
             "message": f"Ошибка при получении аватара чата: {str(e)}"

@@ -484,12 +484,17 @@
 
         async function fetchChatAvatar(chatId) {
             try {
+                console.log(`DEBUG: Fetching avatar for chat_id: ${chatId}`);
                 const response = await fetch(`${API_BASE}/chat-avatar/${chatId}`);
                 const data = await response.json();
                 
+                console.log(`DEBUG: Avatar response:`, data);
+                
                 if (data.status === 'success' && data.avatar_url) {
+                    console.log(`DEBUG: Avatar URL found: ${data.avatar_url}`);
                     return data.avatar_url;
                 }
+                console.log(`DEBUG: No avatar URL found for chat_id: ${chatId}`);
                 return null;
             } catch (error) {
                 console.error('Error fetching chat avatar:', error);
@@ -549,8 +554,12 @@
             const chatName = chat.chat_name || `Chat ${chat.chat_id}`;
             const firstLetter = chatName.charAt(0).toUpperCase();
             
+            console.log(`DEBUG: Creating card for chat: ${chatName} (ID: ${chat.chat_id})`);
+            
             // Получаем аватар через наш API
             const chatAvatarUrl = await fetchChatAvatar(chat.chat_id);
+            
+            console.log(`DEBUG: Avatar URL for ${chatName}: ${chatAvatarUrl}`);
             
             card.innerHTML = `
                 <div class="chat-header">
