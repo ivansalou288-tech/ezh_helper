@@ -285,18 +285,17 @@ def get_chat_admin_panel(chat_id: int, user_id: int):
             "message": f"Ошибка при загрузке админ панели: {str(e)}"
         }
 
-async def get_users_sdk(chat: str):
+async def get_users_sdk(chat: int):
     """
     Получение пользователей чата как в api copy.py с правильной обработкой статуса
     """
-    if chat not in chats_names:
-        raise HTTPException(status_code=404, detail="Chat not found")
+
     
-    connection = sqlite3.connect(main_path, check_same_thread=False)
+    connection = sqlite3.connect(get_db_path(chat), check_same_thread=False)
     cursor = connection.cursor()
     
     # Получаем данные из таблицы чата
-    userss = cursor.execute(f'SELECT * FROM [{chats_names[chat]}]').fetchall()
+    userss = cursor.execute(f'SELECT * FROM users').fetchall()
     users = {}
     index = 1
     
@@ -319,7 +318,7 @@ async def get_users_sdk(chat: str):
         
         if bot:
             try:
-                chat_member = await bot.get_chat_member(-(chats_names[chat]), tg_ids)
+                chat_member = await bot.get_chat_member(chat, tg_ids)
                 status = chat_member.status
                 
                 if status == 'administrator':
@@ -369,16 +368,15 @@ async def get_users_sdk(chat: str):
     return users
 
 @app.get("/users/{chat}")
-async def get_users(chat: str):
+async def get_users(chat: int):
     """
     Получение пользователей чата (как в api copy.py)
     """
     try:
-        if chat in chats_names.keys():
-            users = await get_users_sdk(chat)
-            return users
-        else:
-            raise HTTPException(status_code=404, detail="Chat not found")
+        
+        users = await get_users_sdk(chat)
+        return users
+
     except Exception as e:
         print(f"Ошибка в get_users: {e}")
         raise HTTPException(status_code=500, detail=str(e))

@@ -424,24 +424,27 @@
             return urlParams.get('chat_name') || 'klan'; // По умолчанию 'klan'
         }
 
-        // API functionality - точно как в users.html
-        const API_BASE = 'https://ezh-dev.ru:3000'; // Порт 8000 как в users.html
+        // API functionality - используем endpoint /chat-users/{chat_id}
+        const API_BASE = 'https://ezh-dev.ru:3000';
 
-        async function fetchChatUsers(chatName) {
+        async function fetchChatUsers(chatId) {
             try {
-                console.log(`Загрузка пользователей для чата: ${chatName}`);
-                const response = await fetch(`${API_BASE}/users/${chatName}`); // Endpoint как в users.html
+                console.log(`Загрузка пользователей для чата: ${chatId}`);
+                const response = await fetch(`${API_BASE}/chat-users/${chatId}`);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
-                const users = await response.json();
-                console.log('Получены данные:', users);
+                const data = await response.json();
+                console.log('Получены данные:', data);
                 
-                // Преобразуем объект в массив как в users.html
-                const usersArray = Object.values(users);
-                return usersArray;
+                // Используем данные из response.users
+                if (data.status === 'success') {
+                    return data.users || [];
+                } else {
+                    throw new Error(data.message || 'Ошибка API');
+                }
             } catch (error) {
                 console.error('Ошибка загрузки:', error);
                 throw error;
@@ -490,10 +493,9 @@
             const card = document.createElement('div');
             card.className = 'user-card';
             
-            let statusHtml = '';
-            if (user.status && user.status.includes('Телеграм-админ')) {
-                statusHtml = `<div class="user-status"><span class="emoji">🛠️</span> Телеграм-админ этого чата</div>`;
-            }
+
+            statusHtml = `<div class="user-status">${user.status}</div>`;
+
             
             card.innerHTML = `
                 <div class="user-info">
@@ -609,17 +611,22 @@
             currentChatId = getChatIdFromUrl();
             currentChatName = getChatNameFromUrl();
             
-            console.log('Начинаю загрузку пользователей для чата:', currentChatName);
+            if (!currentChatId) {
+                showError('ID чата не указан');
+                return;
+            }
+            
+            console.log('Начинаю загрузку пользователей для чата:', currentChatId);
             
             try {
-                const users = await fetchChatUsers(currentChatName);
+                const users = await fetchChatUsers(currentChatId);
                 console.log(`Загружено ${users.length} пользователей`);
                 
                 allUsers = users;
-                currentUsers = users; // Добавляем как в users.html
+                currentUsers = users;
                 
                 // Обновляем заголовок
-                document.getElementById('pageSubtitle').textContent = `${users.length} пользователей (${currentChatName})`;
+                document.getElementById('pageSubtitle').textContent = `${users.length} пользователей (${currentChatName || currentChatId})`;
                 
                 // Отображаем пользователей
                 renderUsers(users);
