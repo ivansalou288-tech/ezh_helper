@@ -632,6 +632,11 @@ async def recom_check_sdk(tg_id, name_user, chat_id):
             id = moder
         try:
             rang_m = cursor.execute(f"SELECT rang FROM users WHERE tg_id=?", (id,)).fetchall()[0][0]
+            # Ensure rang value is within bounds
+            if rang_m < 0:
+                rang_m = 0
+            elif rang_m >= len(rangs_name):
+                rang_m = len(rangs_name) - 1
             moder_rang.append(rangs_name[rang_m])
         except IndexError:
             moder_rang.append('Неизвестная должность')
@@ -728,6 +733,10 @@ async def about_user_sdk(user_id, chat_id):
     cursor.execute(f"SELECT * FROM users WHERE tg_id=?", (user_id,))
     users = cursor.fetchall()
 
+    if not users:
+        return "Пользователь не найден в базе данных."
+
+    user_about = {}
     for user in users:
         user_about = {
             'tg_id': user[0],
@@ -750,15 +759,22 @@ async def about_user_sdk(user_id, chat_id):
     sm = "🎄"
     stars = ""
     try:
-        for i in range(int(user_about['rang'])):
+        rang_value = int(user_about['rang'])
+        # Ensure rang value is within bounds
+        if rang_value < 0:
+            rang_value = 0
+        elif rang_value >= len(rangs_name):
+            rang_value = len(rangs_name) - 1
+        
+        for i in range(rang_value):
             stars += sm
         if user_about['last_date'] == '' or user_about['last_date'] == None:
             last_date = 'Неизвестно'
-    except UnboundLocalError:
+    except (UnboundLocalError, ValueError, TypeError):
         return
     else:
         last_date = user_about['last_date']
-    text = f"{stars} [{user_about['rang']}] Ранг: <b>{rangs_name[user_about['rang']]}</b>\n<b>👤Имя: </b>{user_about['name']}\n<b>🎂Возраст:</b> {user_about['age']}\n<b>🏷️Клановый Ник:</b> {user_about['nik']}\n<b>👾Игровой Ник:</b> {user_about['nik_pubg']}\n<b>🎮Игровой айди:</b> <code>{user_about['id_pubg']}</code>"
+    text = f"{stars} [{user_about['rang']}] Ранг: <b>{rangs_name[rang_value]}</b>\n<b>👤Имя: </b>{user_about['name']}\n<b>🎂Возраст:</b> {user_about['age']}\n<b>🏷️Клановый Ник:</b> {user_about['nik']}\n<b>👾Игровой Ник:</b> {user_about['nik_pubg']}\n<b>🎮Игровой айди:</b> <code>{user_about['id_pubg']}</code>"
     return text
 
 
