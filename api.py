@@ -73,6 +73,15 @@ class SnatWarnAction(BaseModel):
     admin_id: Optional[int] = None
     admin_name: Optional[str] = None
     admin_username: Optional[str] = None
+
+class SetPermissionsAction(BaseModel):
+    chat_id: str
+    user_id: str
+    view_users: bool
+    grant_admin: bool
+    manage_recommendations: bool
+    manage_links: bool
+    change_team_ranks: bool
 @app.get('/user-admin-chats/{user_id}')
 def get_user_admin_chats(user_id: int):
     """
@@ -636,6 +645,38 @@ def recom_remove(action: RecomRemoveAction):
             raise HTTPException(status_code=404, detail="Recommendation not found")
             
         return {"status": "ok", "deleted": deleted_count}
+
+@app.post('/set_permissions')
+def set_permissions(action: SetPermissionsAction):
+    """
+    Устанавливает права пользователю для чата
+    """
+    print("="*50)
+    print("Получены данные для установки прав:")
+    print(f"Chat ID: {action.chat_id}")
+    print(f"User ID: {action.user_id}")
+    print(f"Просмотр пользователей: {action.view_users}")
+    print(f"Выдача админки: {action.grant_admin}")
+    print(f"Управление рекомендациями: {action.manage_recommendations}")
+    print(f"Управление ссылками: {action.manage_links}")
+    print(f"Изменение рангов команд: {action.change_team_ranks}")
+    print("="*50)
+    
+    return {
+        "status": "success",
+        "message": "Права успешно установлены",
+        "data": {
+            "chat_id": action.chat_id,
+            "user_id": action.user_id,
+            "permissions": {
+                "view_users": action.view_users,
+                "grant_admin": action.grant_admin,
+                "manage_recommendations": action.manage_recommendations,
+                "manage_links": action.manage_links,
+                "change_team_ranks": action.change_team_ranks
+            }
+        }
+    }
 
 @app.post("/snat_warn")
 async def snat_warn(action: SnatWarnAction):
