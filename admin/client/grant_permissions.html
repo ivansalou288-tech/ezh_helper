@@ -278,6 +278,7 @@
         </div>
 
         <button class="submit-btn" onclick="submitPermissions()">Установить</button>
+        <button class="submit-btn" style="background: linear-gradient(135deg, #ff4d4d, #ff6b6b); margin-top: 10px;" onclick="deletePermissions()">Удалить права</button>
     </div>
 
     <script>
@@ -402,6 +403,41 @@
             } catch (error) {
                 console.error('Ошибка:', error);
                 alert('Ошибка при установке прав');
+            }
+        }
+
+        async function deletePermissions() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const chatId = urlParams.get('chat_id');
+            const userId = urlParams.get('user_id');
+
+            if (!confirm('Вы уверены, что хотите удалить все права этого пользователя?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('https://ezh-dev.ru:3000/delete_permissions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        user_id: userId
+                    })
+                });
+
+                const result = await response.json();
+                console.log('Ответ сервера:', result);
+                alert('Права удалены!');
+                
+                // Сбрасываем все тумблеры
+                document.querySelectorAll('.toggle').forEach(toggle => {
+                    toggle.classList.remove('active');
+                });
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Ошибка при удалении прав');
             }
         }
 

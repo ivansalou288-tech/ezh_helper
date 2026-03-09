@@ -82,6 +82,10 @@ class SetPermissionsAction(BaseModel):
     manage_recommendations: bool
     manage_links: bool
     change_team_ranks: bool
+
+class DeletePermissionsAction(BaseModel):
+    chat_id: str
+    user_id: str
 @app.get('/user-admin-chats/{user_id}')
 def get_user_admin_chats(user_id: int):
     """
@@ -728,6 +732,38 @@ def set_permissions(action: SetPermissionsAction):
             }
         }
     }
+
+@app.post('/delete_permissions')
+def delete_permissions(action: DeletePermissionsAction):
+    """
+    Удаляет все права пользователя для чата
+    """
+    print("="*50)
+    print("Получен запрос на удаление прав:")
+    print(f"Chat ID: {action.chat_id}")
+    print(f"User ID: {action.user_id}")
+    print("="*50)
+    
+    try:
+        connection = sqlite3.connect(admin_path, check_same_thread=False)
+        cursor = connection.cursor()
+        
+        cursor.execute('DELETE FROM admins WHERE user_id = ? AND chat_id = ?', (int(action.user_id), int(action.chat_id)))
+        deleted = cursor.rowcount
+        
+        connection.commit()
+        connection.close()
+        
+        print(f"Удалено записей: {deleted}")
+        print("="*50)
+        
+        return {
+            "status": "success",
+            "message": "Права успешно удалены",
+            "deleted": deleted
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/snat_warn")
 async def snat_warn(action: SnatWarnAction):
