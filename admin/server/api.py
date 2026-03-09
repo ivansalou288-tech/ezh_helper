@@ -23,9 +23,11 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 sys.path.insert(0, ROOT_DIR)
 
 from main.config3 import *
-app = FastAPI()
-
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+import sqlite3
+
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
