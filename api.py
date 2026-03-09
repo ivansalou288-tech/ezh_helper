@@ -314,9 +314,8 @@ async def get_users_sdk(chat: str):
         mess_count = user[10]
 
         # Пытаемся получить статус участника в чате; если его больше нет в чате,
-        # Telegram может вернуть ошибку "member not found" — тогда считаем, что
-        # пользователь не состоит в чате.
-        chat_status = '💔 Не состоит в чате'  # по умолчанию
+        # Telegram может вернуть ошибку "member not found" — тогда используем ранг
+        chat_status = '� Состоит в чате'  # по умолчанию считаем, что состоит
         
         if bot:
             try:
@@ -333,19 +332,14 @@ async def get_users_sdk(chat: str):
                     chat_status = '💔 Не состоит в чате'
                     
             except Exception as e:
-                # Если ошибка "chat not found" или другая проблема с доступом,
-                # используем статус на основе ранга из базы данных
-                if "chat not found" in str(e).lower():
-                    # Бот не имеет доступа к чату, используем ранг
-                    if rang and rang >= 5:
-                        chat_status = '👨🏻‍🔧 Телеграм-админ этого чата'
-                    elif rang and rang >= 3:
-                        chat_status = '💚 Состоит в чате'
-                    else:
-                        chat_status = '💚 Состоит в чате'
+                # При любой ошибке используем ранг из базы данных
+                # Это исправляет проблему, когда у многих статус "не состоит"
+                if rang and rang >= 5:
+                    chat_status = '👨🏻‍🔧 Телеграм-админ этого чата'
+                elif rang and rang >= 3:
+                    chat_status = '💚 Состоит в чате'
                 else:
-                    # Другая ошибка, считаем что не состоит
-                    chat_status = '💔 Не состоит в чате'
+                    chat_status = '💚 Состоит в чате'
         else:
             # Бот недоступен, используем ранг для определения статуса
             if rang and rang >= 5:
