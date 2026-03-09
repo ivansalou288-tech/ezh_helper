@@ -27,6 +27,13 @@ all_path = curent_path / 'databases' / 'All.db'
 admin_path = curent_path / 'databases' / 'admin.db'
 app = FastAPI()
 
+def get_db_path(chat_id):
+    """Получает путь к базе данных чата"""
+    chat_id_str = str(chat_id)
+    if chat_id_str.startswith('-100'):
+        chat_id_str = chat_id_str[4:]
+    return curent_path / 'databases' / f'{chat_id_str}.db'
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -276,18 +283,43 @@ def get_chat_users(chat_id: int):
         connection = sqlite3.connect(chat_db_path, check_same_thread=False)
         cursor = connection.cursor()
         
-        # Получаем пользователей
-        cursor.execute('SELECT tg_id, nik, rang, date_vhod, last_date FROM users ORDER BY rang DESC, nik')
+        # Получаем пользователей с информацией о статусе
+        cursor.execute('''
+            SELECT u.tg_id, u.nik, u.rang, u.date_vhod, u.last_date, u.username, u.name,
+                   CASE 
+                       WHEN u.rang >= 5 THEN 'admin'
+                       WHEN u.rang >= 3 THEN 'moderator'
+                       WHEN u.rang >= 1 THEN 'member'
+                       ELSE 'guest'
+                   END as status
+            FROM users u 
+            ORDER BY u.rang DESC, u.nik
+        ''')
         users = cursor.fetchall()
         
         users_list = []
         for user in users:
+            # Получаем последнее сообщение пользователя из закладок если есть
+            cursor.execute('''
+                SELECT message_text, created_at 
+                FROM bookmarks 
+                WHERE author_id = ? 
+                ORDER BY created_at DESC 
+                LIMIT 1
+            ''', (user[0],))
+            last_message = cursor.fetchone()
+            
             users_list.append({
                 "tg_id": user[0],
                 "nik": user[1] or f"User {user[0]}",
                 "rang": user[2],
                 "join_date": user[3],
-                "last_active": user[4]
+                "last_active": user[4],
+                "username": user[5],
+                "name": user[6],
+                "status": user[7],
+                "last_message": last_message[0] if last_message and last_message[0] else "Нет сообщений",
+                "last_message_date": last_message[1] if last_message and last_message[1] else None
             })
         
         connection.close()

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест страницы пользователей</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .search {
+            margin-bottom: 20px;
+        }
+        .search input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .user-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #fafafa;
+        }
+        .user-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #007bff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .user-info {
+            flex: 1;
+        }
+        .user-name {
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+        .user-username {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .user-status {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-admin { background: #dc3545; color: white; }
+        .status-moderator { background: #fd7e14; color: white; }
+        .status-member { background: #28a745; color: white; }
+        .status-guest { background: #6c757d; color: white; }
+        .user-message {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 3px solid #007bff;
+            margin-bottom: 10px;
+        }
+        .user-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85em;
+            color: #666;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Тест страницы пользователей</h1>
+        
+        <div class="search">
+            <input type="text" id="searchInput" placeholder="Поиск по нику или username...">
+        </div>
+        
+        <div id="usersContainer">
+            <div class="loading">Загрузка пользователей...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://ezh-dev.ru:3000';
+        let allUsers = [];
+
+        // Тестовые данные для демонстрации
+        const testUsers = [
+            {
+                tg_id: 12345,
+                nik: "AdminUser",
+                username: "admin123",
+                status: "admin",
+                last_message: "Привет всем! Это тестовое сообщение.",
+                last_message_date: "2024-01-15T10:30:00",
+                join_date: "2023-01-01T00:00:00",
+                last_active: "2024-01-15T10:30:00",
+                rang: 5
+            },
+            {
+                tg_id: 67890,
+                nik: "ModeratorUser",
+                username: "moderator456",
+                status: "moderator",
+                last_message: "Следите за порядком в чате!",
+                last_message_date: "2024-01-14T15:45:00",
+                join_date: "2023-02-15T00:00:00",
+                last_active: "2024-01-14T15:45:00",
+                rang: 3
+            },
+            {
+                tg_id: 11111,
+                nik: "RegularUser",
+                username: "user789",
+                status: "member",
+                last_message: "Как дела у всех?",
+                last_message_date: "2024-01-13T09:20:00",
+                join_date: "2023-03-20T00:00:00",
+                last_active: "2024-01-13T09:20:00",
+                rang: 1
+            }
+        ];
+
+        function getStatusText(status) {
+            const statusMap = {
+                'admin': 'Админ',
+                'moderator': 'Модератор',
+                'member': 'Участник',
+                'guest': 'Гость'
+            };
+            return statusMap[status] || 'Неизвестно';
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Нет данных';
+            
+            try {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diffMs = now - date;
+                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === 0) {
+                    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                    if (diffHours === 0) {
+                        const diffMinutes = Math.floor(diffMs / (1000 * 60));
+                        return diffMinutes <= 1 ? 'Только что' : `${diffMinutes} мин назад`;
+                    }
+                    return `${diffHours} ч назад`;
+                } else if (diffDays === 1) {
+                    return 'Вчера';
+                } else if (diffDays < 7) {
+                    return `${diffDays} дней назад`;
+                } else {
+                    return date.toLocaleDateString('ru-RU');
+                }
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        function createUserCard(user) {
+            const card = document.createElement('div');
+            card.className = 'user-card';
+            
+            const initials = (user.nik || '').slice(0, 2).toUpperCase() || user.tg_id.toString().slice(0, 2);
+            
+            card.innerHTML = `
+                <div class="user-header">
+                    <div class="user-avatar">${initials}</div>
+                    <div class="user-info">
+                        <div class="user-name">${user.nik}</div>
+                        <div class="user-username">${user.username ? '@' + user.username : ''}</div>
+                    </div>
+                    <div class="user-status status-${user.status}">${getStatusText(user.status)}</div>
+                </div>
+                <div class="user-message">
+                    <strong>Последнее сообщение:</strong> ${user.last_message}<br>
+                    <small>${formatDate(user.last_message_date)}</small>
+                </div>
+                <div class="user-meta">
+                    <span>📅 В чате: ${formatDate(user.join_date)}</span>
+                    <span>⏰ Активность: ${formatDate(user.last_active)}</span>
+                    <span>⭐ Ранг: ${user.rang}</span>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function renderUsers(users) {
+            const container = document.getElementById('usersContainer');
+            container.innerHTML = '';
+            
+            if (users.length === 0) {
+                container.innerHTML = '<div class="loading">Пользователи не найдены</div>';
+                return;
+            }
+            
+            users.forEach(user => {
+                const card = createUserCard(user);
+                container.appendChild(card);
+            });
+        }
+
+        function filterUsers(searchTerm) {
+            if (!searchTerm) {
+                renderUsers(allUsers);
+                return;
+            }
+            
+            const filtered = allUsers.filter(user => {
+                const searchLower = searchTerm.toLowerCase();
+                return (
+                    (user.nik && user.nik.toLowerCase().includes(searchLower)) ||
+                    (user.username && user.username.toLowerCase().includes(searchLower))
+                );
+            });
+            
+            renderUsers(filtered);
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            allUsers = testUsers;
+            renderUsers(allUsers);
+            
+            // Добавляем обработчик поиска
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    filterUsers(e.target.value);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

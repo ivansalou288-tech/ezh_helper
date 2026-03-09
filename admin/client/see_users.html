@@ -90,7 +90,7 @@
 
         .page-header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
         .page-title {
@@ -103,6 +103,190 @@
         .page-subtitle {
             font-size: 1.1em;
             color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Стили поиска */
+        .search-container {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid rgba(179, 136, 255, 0.3);
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-input:focus {
+            border-color: rgba(179, 136, 255, 0.6);
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 20px rgba(179, 136, 255, 0.2);
+        }
+
+        /* Стили списка пользователей */
+        .users-container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .users-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .user-card {
+            background: linear-gradient(135deg, rgba(15, 15, 35, 0.9), rgba(25, 25, 55, 0.8));
+            border: 1px solid rgba(179, 136, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(15px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(179, 136, 255, 0.15), 
+                transparent);
+            transition: left 0.5s ease;
+        }
+
+        .user-card:hover::before {
+            left: 100%;
+        }
+
+        .user-card:hover {
+            background: linear-gradient(135deg, rgba(20, 20, 45, 0.95), rgba(35, 35, 75, 0.9));
+            border-color: rgba(179, 136, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(179, 136, 255, 0.2);
+        }
+
+        .user-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #b388ff, #7c4dff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .user-username {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .user-status {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-admin {
+            background: linear-gradient(135deg, #ff4757, #ff6b7a);
+            color: white;
+        }
+
+        .status-moderator {
+            background: linear-gradient(135deg, #ffa502, #ff7675);
+            color: white;
+        }
+
+        .status-member {
+            background: linear-gradient(135deg, #26de81, #20bf6b);
+            color: white;
+        }
+
+        .status-guest {
+            background: linear-gradient(135deg, #747d8c, #57606f);
+            color: white;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .user-message {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border-left: 3px solid #b388ff;
+        }
+
+        .message-preview {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .message-date {
+            font-size: 0.8em;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .user-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85em;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .empty-state {
@@ -127,9 +311,53 @@
             opacity: 0.7;
         }
 
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #b388ff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         @media (max-width: 768px) {
             .main-content {
                 margin-top: 115px;
+            }
+            
+            .search-container {
+                margin-bottom: 20px;
+            }
+            
+            .search-input {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+            
+            .user-card {
+                padding: 15px;
+            }
+            
+            .user-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1em;
+            }
+            
+            .user-name {
+                font-size: 1em;
             }
         }
     </style>
@@ -143,15 +371,31 @@
     </div>
 
     <div class="main-content">
-        <div class="page-header">
-            <h1 class="page-title">Просмотр пользователей</h1>
-            <div class="page-subtitle">Функция в разработке</div>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div>Загрузка пользователей...</div>
         </div>
 
-        <div class="empty-state">
-            <div class="empty-state-icon">👥</div>
-            <div class="empty-state-text">Функция просмотр пользователей</div>
-            <div class="empty-state-subtext">Эта функция находится в разработке и будет доступна в ближайшее время</div>
+        <div id="usersContent" style="display: none;">
+            <div class="page-header">
+                <h1 class="page-title">Пользователи чата</h1>
+                <div class="page-subtitle" id="pageSubtitle">Загрузка...</div>
+            </div>
+
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="searchInput" 
+                    placeholder="🔍 Поиск по нику или username..."
+                >
+            </div>
+
+            <div class="users-container">
+                <div class="users-grid" id="usersGrid">
+                    <!-- Пользователи будут добавлены динамически -->
+                </div>
+            </div>
         </div>
     </div>
 
@@ -180,6 +424,8 @@
         })();
 
         let currentUser = null;
+        let currentChatId = null;
+        let allUsers = [];
 
         function getCurrentUser() {
             if (currentUser) return currentUser;
@@ -231,9 +477,204 @@
             profile.style.display = 'flex';
         }
 
+        function getChatIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('chat_id');
+        }
+
+        // API functionality
+        const API_BASE = 'https://ezh-dev.ru:3000';
+
+        async function fetchChatUsers(chatId) {
+            try {
+                const response = await fetch(`${API_BASE}/chat-users/${chatId}`);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    return data.users || [];
+                } else {
+                    showError(data.message || 'Ошибка при загрузке пользователей');
+                    return [];
+                }
+            } catch (error) {
+                console.error('Error fetching chat users:', error);
+                showError('Ошибка соединения с сервером');
+                return [];
+            }
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'admin': 'Админ',
+                'moderator': 'Модератор',
+                'member': 'Участник',
+                'guest': 'Гость'
+            };
+            return statusMap[status] || 'Неизвестно';
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Нет данных';
+            
+            try {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diffMs = now - date;
+                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === 0) {
+                    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                    if (diffHours === 0) {
+                        const diffMinutes = Math.floor(diffMs / (1000 * 60));
+                        return diffMinutes <= 1 ? 'Только что' : `${diffMinutes} мин назад`;
+                    }
+                    return `${diffHours} ч назад`;
+                } else if (diffDays === 1) {
+                    return 'Вчера';
+                } else if (diffDays < 7) {
+                    return `${diffDays} дней назад`;
+                } else {
+                    return date.toLocaleDateString('ru-RU');
+                }
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        function createUserCard(user) {
+            const card = document.createElement('div');
+            card.className = 'user-card';
+            
+            const initials = (user.nik || '').slice(0, 2).toUpperCase() || user.tg_id.toString().slice(0, 2);
+            
+            card.innerHTML = `
+                <div class="user-header">
+                    <div class="user-avatar">${initials}</div>
+                    <div class="user-info">
+                        <div class="user-name">${user.nik}</div>
+                        <div class="user-username">${user.username ? '@' + user.username : ''}</div>
+                    </div>
+                    <div class="user-status status-${user.status}">${getStatusText(user.status)}</div>
+                </div>
+                <div class="user-details">
+                    <div class="user-message">
+                        <div class="message-preview">${user.last_message}</div>
+                        <div class="message-date">${formatDate(user.last_message_date)}</div>
+                    </div>
+                    <div class="user-meta">
+                        <div class="meta-item">
+                            <span>📅</span>
+                            <span>В чате: ${formatDate(user.join_date)}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>⏰</span>
+                            <span>Активность: ${formatDate(user.last_active)}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>⭐</span>
+                            <span>Ранг: ${user.rang}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function renderUsers(users) {
+            const grid = document.getElementById('usersGrid');
+            grid.innerHTML = '';
+            
+            if (users.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+                        <div class="empty-state-text">Пользователи не найдены</div>
+                        <div class="empty-state-subtext">Попробуйте изменить параметры поиска</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            users.forEach(user => {
+                const card = createUserCard(user);
+                grid.appendChild(card);
+            });
+        }
+
+        function filterUsers(searchTerm) {
+            if (!searchTerm) {
+                renderUsers(allUsers);
+                return;
+            }
+            
+            const filtered = allUsers.filter(user => {
+                const searchLower = searchTerm.toLowerCase();
+                return (
+                    (user.nik && user.nik.toLowerCase().includes(searchLower)) ||
+                    (user.username && user.username.toLowerCase().includes(searchLower)) ||
+                    (user.name && user.name.toLowerCase().includes(searchLower))
+                );
+            });
+            
+            renderUsers(filtered);
+        }
+
+        function showError(message) {
+            const grid = document.getElementById('usersGrid');
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">❌</div>
+                    <div class="empty-state-text">Ошибка</div>
+                    <div class="empty-state-subtext">${message}</div>
+                </div>
+            `;
+        }
+
+        async function loadUsers() {
+            const user = getCurrentUser();
+            if (!user) {
+                showError('Пользователь не определен');
+                return;
+            }
+            
+            currentChatId = getChatIdFromUrl();
+            if (!currentChatId) {
+                showError('ID чата не указан');
+                return;
+            }
+            
+            const users = await fetchChatUsers(currentChatId);
+            if (users.length === 0) {
+                showError('Не удалось загрузить пользователей');
+                return;
+            }
+            
+            allUsers = users;
+            
+            // Обновляем заголовок
+            document.getElementById('pageSubtitle').textContent = `${users.length} пользователей`;
+            
+            // Отображаем пользователей
+            renderUsers(users);
+            
+            // Скрываем загрузку и показываем контент
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('usersContent').style.display = 'block';
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             updateUserProfile();
+            loadUsers();
+            
+            // Добавляем обработчик поиска
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    filterUsers(e.target.value);
+                });
+            }
         });
     </script>
 </body>
