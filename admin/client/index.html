@@ -249,7 +249,7 @@
             background: linear-gradient(135deg, rgba(15, 15, 35, 0.9), rgba(25, 25, 55, 0.8));
             border: 1px solid rgba(0, 255, 255, 0.2);
             border-radius: 30px;
-            padding: 15px 20px;
+            padding: 20px;
             backdrop-filter: blur(15px);
             transition: all 0.3s ease;
             cursor: pointer;
@@ -259,9 +259,10 @@
                 0 4px 20px rgba(0, 255, 255, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.1);
             width: 100%;
-            min-height: 60px;
             display: flex;
+            flex-direction: column;
             align-items: center;
+            text-align: center;
         }
 
         .chat-card::before {
@@ -294,13 +295,14 @@
 
         .chat-header {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            margin-bottom: 0;
+            gap: 15px;
         }
 
         .chat-avatar {
-            width: 50px !important;
-            height: 50px !important;
+            width: 60px !important;
+            height: 60px !important;
             border-radius: 50% !important;
             background: linear-gradient(135deg, #00ffff, #0080ff) !important;
             display: flex !important;
@@ -308,11 +310,11 @@
             justify-content: center !important;
             color: white !important;
             font-weight: 700 !important;
-            font-size: 1.3em !important;
-            margin-right: 15px !important;
+            font-size: 1.5em !important;
+            margin-right: 0 !important;
             box-shadow: 
-                0 0 15px rgba(0, 255, 255, 0.4),
-                0 3px 10px rgba(0, 128, 255, 0.3) !important;
+                0 0 20px rgba(0, 255, 255, 0.4),
+                0 4px 15px rgba(0, 128, 255, 0.3) !important;
             position: relative !important;
             overflow: hidden !important;
             flex-shrink: 0 !important;
@@ -348,18 +350,16 @@
         }
 
         .chat-title {
-            font-size: 1.1em;
+            font-size: 1.2em;
             font-weight: 600;
             color: #ffffff;
-            margin-bottom: 4px;
             text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
             letter-spacing: 0.3px;
+            margin: 0;
         }
 
         .chat-username {
-            color: rgba(0, 255, 255, 0.6);
-            font-size: 0.85em;
-            font-weight: 400;
+            display: none;
         }
 
         .chat-stats {
@@ -799,8 +799,6 @@
             const firstLetter = chatName.charAt(0).toUpperCase();
             
             // Count active permissions
-            const activePermissions = Object.values(chat.permissions || {}).filter(Boolean).length;
-            
             // Generate chat avatar URL using Telegram chat photo API
             const chatAvatarUrl = chat.chat_id ? `https://api.telegram.org/file/bot${getBotToken()}/photos?chat_id=${chat.chat_id}` : null;
             
@@ -809,16 +807,7 @@
                     <div class="chat-avatar" id="avatar-${chat.chat_id}">
                         ${chatAvatarUrl ? `<img src="${chatAvatarUrl}" alt="${chatName}" onerror="this.style.display='none'; this.parentElement.innerHTML='${firstLetter}'">` : firstLetter}
                     </div>
-                    <div class="chat-info">
-                        <div class="chat-title">${chatName}</div>
-                        <div class="chat-username">ID: ${chat.chat_id} • ${activePermissions} прав активны</div>
-                    </div>
-                </div>
-                <div class="admin-permissions">
-                    <div class="permissions-title">Права доступа:</div>
-                    <div class="permission-tags">
-                        ${createPermissionTags(chat.permissions || {})}
-                    </div>
+                    <div class="chat-title">${chatName}</div>
                 </div>
             `;
             
