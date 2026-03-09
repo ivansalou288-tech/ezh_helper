@@ -504,6 +504,56 @@ def get_chat_users(chat_id: int):
             "message": f"Ошибка при получении пользователей: {str(e)}"
         }
 
+@app.get('/search-users/{chat_id}')
+def search_users(chat_id: int, q: str = ''):
+    """
+    Поиск пользователей по частичному совпадению username
+    """
+    try:
+        chat_db_path = get_db_path(chat_id)
+        
+        if not os.path.exists(chat_db_path):
+            return {"status": "error", "message": "База данных чата не найдена"}
+        
+        connection = sqlite3.connect(chat_db_path, check_same_thread=False)
+        cursor = connection.cursor()
+        
+        # Поиск по частичному совпадению (регистронезависимый)
+        search_pattern = f"%{q.lower()}%"
+        cursor.execute('''
+            SELECT tg_id, nik, rang, date_vhod, last_date 
+            FROM users 
+            WHERE LOWER(nik) LIKE ?
+            ORDER BY rang DESC, nik
+            LIMIT 50
+        ''', (search_pattern,))
+        
+        users = cursor.fetchall()
+        
+        users_list = []
+        for user in users:
+            users_list.append({
+                "tg_id": user[0],
+                "nik": user[1] or f"User {user[0]}",
+                "rang": user[2] if user[2] is not None else 0,
+                "join_date": user[3],
+                "last_active": user[4]
+            })
+        
+        connection.close()
+        
+        return {
+            "status": "success",
+            "users": users_list,
+            "count": len(users_list)
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Ошибка поиска: {str(e)}"
+        }
+
 @app.get('/recom/{chat_id}/{user}')
 def get_recom(chat_id: int, user: int):
     try:
