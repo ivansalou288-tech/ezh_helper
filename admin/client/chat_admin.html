@@ -236,64 +236,6 @@
             line-height: 1.4;
         }
 
-        .users-section {
-            width: 100%;
-            max-width: 1200px;
-            display: none;
-        }
-
-        .users-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .users-title {
-            font-size: 1.5em;
-            color: #b388ff;
-            font-weight: 600;
-        }
-
-        .users-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 15px;
-        }
-
-        .user-card {
-            background: linear-gradient(135deg, rgba(15, 15, 35, 0.9), rgba(25, 25, 55, 0.8));
-            border: 1px solid rgba(179, 136, 255, 0.2);
-            border-radius: 15px;
-            padding: 20px;
-            backdrop-filter: blur(15px);
-            transition: all 0.3s ease;
-        }
-
-        .user-card:hover {
-            background: linear-gradient(135deg, rgba(20, 20, 45, 0.95), rgba(35, 35, 75, 0.9));
-            border-color: rgba(179, 136, 255, 0.4);
-            transform: translateY(-2px);
-        }
-
-        .user-nik {
-            font-size: 1.1em;
-            font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 8px;
-        }
-
-        .user-rang {
-            font-size: 0.9em;
-            color: #b388ff;
-            margin-bottom: 5px;
-        }
-
-        .user-info {
-            font-size: 0.8em;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
         .loading {
             text-align: center;
             padding: 40px;
@@ -362,16 +304,6 @@
 
             <div class="functions-grid" id="functionsGrid">
                 <!-- Функции будут добавлены динамически -->
-            </div>
-
-            <div class="users-section" id="usersSection">
-                <div class="users-header">
-                    <h2 class="users-title">Пользователи чата</h2>
-                    <span id="usersCount"></span>
-                </div>
-                <div class="users-grid" id="usersGrid">
-                    <!-- Пользователи будут добавлены динамически -->
-                </div>
             </div>
         </div>
     </div>
@@ -502,24 +434,6 @@
             }
         }
 
-        async function fetchChatUsers(chatId) {
-            try {
-                const response = await fetch(`${API_BASE}/chat-users/${chatId}`);
-                const data = await response.json();
-                
-                if (data.status === 'success') {
-                    return data.users || [];
-                } else {
-                    showError(data.message || 'Ошибка при загрузке пользователей');
-                    return [];
-                }
-            } catch (error) {
-                console.error('Error fetching users:', error);
-                showError('Ошибка соединения с сервером');
-                return [];
-            }
-        }
-
         function getFunctionIcon(functionId) {
             const icons = {
                 'see_users': '👥',
@@ -553,51 +467,20 @@
 
         async function handleFunctionClick(func) {
             if (func.id === 'see_users') {
-                await showUsers();
+                window.location.href = `see_users.html${window.location.search}`;
+            } else if (func.id === 'admin_functions') {
+                window.location.href = `admin_functions.html${window.location.search}`;
+            } else if (func.id === 'warn_management') {
+                window.location.href = `warn_management.html${window.location.search}`;
+            } else if (func.id === 'recommendations') {
+                window.location.href = `recommendations.html${window.location.search}`;
+            } else if (func.id === 'links') {
+                window.location.href = `links.html${window.location.search}`;
+            } else if (func.id === 'dk_functions') {
+                window.location.href = `dk_functions.html${window.location.search}`;
             } else {
                 showSuccess(`Функция "${func.name}" в разработке`);
             }
-        }
-
-        async function showUsers() {
-            const usersSection = document.getElementById('usersSection');
-            const usersGrid = document.getElementById('usersGrid');
-            const usersCount = document.getElementById('usersCount');
-            
-            usersSection.style.display = 'block';
-            usersGrid.innerHTML = '<div class="loading"><div class="spinner"></div><div>Загрузка пользователей...</div></div>';
-            
-            const users = await fetchChatUsers(currentChatId);
-            
-            usersCount.textContent = `(${users.length})`;
-            usersGrid.innerHTML = '';
-            
-            if (users.length === 0) {
-                usersGrid.innerHTML = '<div class="empty-state">Пользователи не найдены</div>';
-                return;
-            }
-            
-            const rangNames = [
-                'Обычный участник', 'Младший Модератор', 'Модератор', 
-                'Старший Модератор', 'Заместитель', 'Менеджер', 'Владелец'
-            ];
-            
-            users.forEach(user => {
-                const card = document.createElement('div');
-                card.className = 'user-card';
-                
-                const rangName = rangNames[user.rang] || 'Неизвестный ранг';
-                
-                card.innerHTML = `
-                    <div class="user-nik">${user.nik}</div>
-                    <div class="user-rang">${rangName}</div>
-                    <div class="user-info">ID: ${user.tg_id}</div>
-                    <div class="user-info">В чате с: ${user.join_date || 'Неизвестно'}</div>
-                    <div class="user-info">Последняя активность: ${user.last_active || 'Неизвестно'}</div>
-                `;
-                
-                usersGrid.appendChild(card);
-            });
         }
 
         async function loadAdminPanel() {
