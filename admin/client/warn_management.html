@@ -451,26 +451,39 @@
                                     })
                                 });
                                 
-                                const result = await response.json();
-                                console.log('Response:', result);
-                                
-                                btn.classList.remove('visible');
-                                btn.disabled = true;
-                                openedWarnButton = null;
-                                
-                                const icon = document.createElement('div');
-                                icon.className = 'warn-removed-icon';
-                                icon.textContent = '✓';
-                                card.appendChild(icon);
-                                
-                                setTimeout(() => {
-                                    card.remove();
-                                    if (!warnsContainer.querySelector('.warn-card')) {
-                                        warnsContainer.style.display = 'none';
-                                        emptyState.style.display = 'block';
-                                        warnsCount.textContent = 'Нет предупреждений';
+                                if (!response.ok) {
+                                    const errorData = await response.json();
+                                    if (response.status === 400) {
+                                        alert('Нельзя снять предупреждение самому себе');
+                                    } else {
+                                        alert('Ошибка: ' + (errorData.detail || 'Неизвестная ошибка'));
                                     }
-                                }, 450);
+                                    return;
+                                }
+                                
+                                const result = await response.json();
+                                
+                                if (result.status === 'ok') {
+                                    btn.classList.remove('visible');
+                                    btn.disabled = true;
+                                    openedWarnButton = null;
+                                    
+                                    const icon = document.createElement('div');
+                                    icon.className = 'warn-removed-icon';
+                                    icon.textContent = '✓';
+                                    card.appendChild(icon);
+                                    
+                                    setTimeout(() => {
+                                        card.remove();
+                                        if (!warnsContainer.querySelector('.warn-card')) {
+                                            warnsContainer.style.display = 'none';
+                                            emptyState.style.display = 'block';
+                                            warnsCount.textContent = 'Нет предупреждений';
+                                        }
+                                    }, 450);
+                                } else {
+                                    alert('Ошибка при снятии предупреждения');
+                                }
                             } catch (error) {
                                 console.error('Ошибка:', error);
                                 alert('Ошибка при снятии предупреждения');
