@@ -148,7 +148,7 @@
             background: linear-gradient(135deg, rgba(15, 15, 35, 0.9), rgba(25, 25, 55, 0.8));
             border: 1px solid rgba(179, 136, 255, 0.3);
             border-radius: 16px;
-            padding: 16px 20px;
+            padding: 12px 20px;
             backdrop-filter: blur(15px);
             transition: all 0.3s ease;
             cursor: pointer;
@@ -183,12 +183,12 @@
 
         .user-info {
             display: flex;
-            flex-direction: column;
-            gap: 6px;
+            align-items: center;
+            gap: 10px;
         }
 
         .user-nik {
-            font-size: 1.3em;
+            font-size: 1.1em;
             font-weight: 600;
             color: #b388ff;
             text-shadow: 0 0 10px rgba(179, 136, 255, 0.5);
@@ -196,28 +196,11 @@
 
         .user-username {
             font-size: 0.9em;
-            color: rgba(179, 136, 255, 0.8);
-            font-weight: 500;
+            color: rgba(179, 136, 255, 0.6);
+            font-weight: 400;
         }
 
-        .last-message {
-            font-size: 0.85em;
-            color: rgba(179, 136, 255, 0.7);
-        }
 
-        .user-status {
-            font-size: 0.9em;
-            color: #4ade80;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 4px;
-        }
-
-        .emoji {
-            font-size: 1em;
-        }
 
         .empty-state {
             text-align: center;
@@ -494,28 +477,12 @@
                 }
             });
             
-            let statusHtml = '';
-            if (user.status) {
-                if (user.status.includes('Телеграм-админ') || user.status.includes('Создатель')) {
-                    statusHtml = `<div class="user-status"> ${user.status}</div>`;
-                } else if (user.status.includes('Состоит в чате')) {
-                    statusHtml = `<div class="user-status"> ${user.status}</div>`;
-                } else if (user.status.includes('Не состоит в чате')) {
-                    statusHtml = `<div class="user-status"> ${user.status}</div>`;
-                } else {
-                    statusHtml = `<div class="user-status"><span class="emoji">👤</span> ${user.status}</div>`;
-                }
-            }
-            
             const displayName = user.nik || user.name || `@${user.username}` || 'Без имени';
-            const lastMessageText = user.last_date ? formatTimeAgo(user.last_date) : 'Нет сообщений';
             
             card.innerHTML = `
                 <div class="user-info">
                     <div class="user-nik">${displayName}</div>
                     <div class="user-username">@${user.username || 'нет'}</div>
-                    <div class="last-message">Последнее сообщение: ${lastMessageText}</div>
-                    ${statusHtml}
                 </div>
             `;
             
