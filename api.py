@@ -35,6 +35,7 @@ def get_db_path(chat_id):
     return curent_path / 'databases' / f'{chat_id_str}.db'
 
 app.add_middleware(
+    CORSMiddleware,
     allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
