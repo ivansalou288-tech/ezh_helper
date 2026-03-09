@@ -1008,7 +1008,7 @@
         }
 
         function loadRecommendations() {
-            fetch(`https://ezh-dev.ru:8000/recom/${userId}`)
+            fetch(`https://ezh-dev.ru:8000/recom/${chat}/${userId}`)
                 .then(res => res.json())
                 .then(data => {
                     const userCard = document.getElementById('userCard');

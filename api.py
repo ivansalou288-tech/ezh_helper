@@ -518,6 +518,55 @@ def get_chat_users(chat_id: int):
             "message": f"Ошибка при получении пользователей: {str(e)}"
         }
 
+@app.get('/recom/{chat_id}/{user}')
+def get_recom(chat_id: int, user: int):
+    try:
+        # Получаем путь к базе данных конкретного чата (как в main_bot.py)
+        chat_db_path = curent_path / 'databases' / f'{-chat_id}.db'
+        
+        if not chat_db_path.exists():
+            return []
+        
+        connection = sqlite3.connect(chat_db_path, check_same_thread=False)
+        cursor = connection.cursor()
+        
+        # Получаем рекомендации пользователя
+        all_recs = cursor.execute('SELECT * FROM recommendation WHERE user_id = ?', (user,)).fetchall()
+        
+        recommendations = []
+        for rec in all_recs:
+            # Структура таблицы: user_id, pubg_id, moder, comments, rang, date, recom_id
+            user_id = rec[0]
+            pubg_id = rec[1]
+            moder_id = rec[2]
+            reason = rec[3]
+            rang = rec[4]
+            date = rec[5]
+            rec_id = rec[6]
+            
+            recommendation = {
+                "rec_id": rec_id,
+                "user_id": user_id,
+                "pubg_id": pubg_id,
+                "moder_id": moder_id,
+                "reason": reason,
+                "rang": rang,
+                "date": date
+            }
+            recommendations.append(recommendation)
+        
+        connection.close()
+        return recommendations
+        
+    except Exception as e:
+        print(f"Ошибка в get_recom: {e}")
+        return []
+
+@app.get('/recom/{user}')
+def get_recom_fallback(user: int):
+    # Временный fallback для совместимости - используем основной групповой чат
+    return get_recom(1003012971064, user)
+
 if  __name__ == '__main__':
-    uvicorn.run('api:app', reload=True, port=3000, host="0.0.0.0", ssl_keyfile='/etc/letsencrypt/live/ezh-dev.ru/privkey.pem', ssl_certfile='/etc/letsencrypt/live/ezh-dev.ru/cert.pem')
+    uvicorn.run('api:app', reload=True, port=8000, host="0.0.0.0", ssl_keyfile='/etc/letsencrypt/live/ezh-dev.ru/privkey.pem', ssl_certfile='/etc/letsencrypt/live/ezh-dev.ru/cert.pem')
 
