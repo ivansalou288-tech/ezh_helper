@@ -487,19 +487,42 @@
 
         async function fetchChatUsers(chatId) {
             try {
-                const response = await fetch(`${API_BASE}/chat-users/${chatId}`);
+                console.log(`Запрос к API: ${API_BASE}/chat-users/${chatId}`);
+                
+                // Добавляем таймаут 10 секунд
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
+                
+                const response = await fetch(`${API_BASE}/chat-users/${chatId}`, {
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                console.log(`Статус ответа: ${response.status}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const data = await response.json();
+                console.log('Данные от API:', data);
                 
                 if (data.status === 'success') {
                     return data.users || [];
                 } else {
-                    showError(data.message || 'Ошибка при загрузке пользователей');
-                    return [];
+                    throw new Error(data.message || 'Ошибка API');
                 }
             } catch (error) {
-                console.error('Error fetching chat users:', error);
-                showError('Ошибка соединения с сервером');
-                return [];
+                console.error('Ошибка в fetchChatUsers:', error);
+                
+                if (error.name === 'AbortError') {
+                    throw new Error('Превышено время ожидания ответа сервера');
+                } else if (error instanceof TypeError && error.message.includes('fetch')) {
+                    throw new Error('Не удалось подключиться к серверу. Проверьте соединение.');
+                } else {
+                    throw error;
+                }
             }
         }
 
@@ -634,33 +657,54 @@
         async function loadUsers() {
             const user = getCurrentUser();
             if (!user) {
+                console.error('Пользователь не определен');
                 showError('Пользователь не определен');
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('usersContent').style.display = 'block';
                 return;
             }
             
             currentChatId = getChatIdFromUrl();
             if (!currentChatId) {
+                console.error('ID чата не указан');
                 showError('ID чата не указан');
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('usersContent').style.display = 'block';
                 return;
             }
             
-            const users = await fetchChatUsers(currentChatId);
-            if (users.length === 0) {
-                showError('Не удалось загрузить пользователей');
-                return;
+            console.log('Загрузка пользователей для чата:', currentChatId);
+            
+            try {
+                const users = await fetchChatUsers(currentChatId);
+                console.log('Получено пользователей:', users.length);
+                
+                if (users.length === 0) {
+                    console.warn('Список пользователей пуст');
+                    showError('Не удалось загрузить пользователей или список пуст');
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('usersContent').style.display = 'block';
+                    return;
+                }
+                
+                allUsers = users;
+                
+                // Обновляем заголовок
+                document.getElementById('pageSubtitle').textContent = `${users.length} пользователей`;
+                
+                // Отображаем пользователей
+                renderUsers(users);
+                
+                // Скрываем загрузку и показываем контент
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('usersContent').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Ошибка при загрузке пользователей:', error);
+                showError('Произошла ошибка при загрузке пользователей');
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('usersContent').style.display = 'block';
             }
-            
-            allUsers = users;
-            
-            // Обновляем заголовок
-            document.getElementById('pageSubtitle').textContent = `${users.length} пользователей`;
-            
-            // Отображаем пользователей
-            renderUsers(users);
-            
-            // Скрываем загрузку и показываем контент
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('usersContent').style.display = 'block';
         }
 
         // Initialize

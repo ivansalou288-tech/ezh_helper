@@ -35,7 +35,6 @@ def get_db_path(chat_id):
     return curent_path / 'databases' / f'{chat_id_str}.db'
 
 app.add_middleware(
-    CORSMiddleware,
     allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
@@ -300,14 +299,30 @@ def get_chat_users(chat_id: int):
         users_list = []
         for user in users:
             # Получаем последнее сообщение пользователя из закладок если есть
-            cursor.execute('''
-                SELECT message_text, created_at 
-                FROM bookmarks 
-                WHERE author_id = ? 
-                ORDER BY created_at DESC 
-                LIMIT 1
-            ''', (user[0],))
-            last_message = cursor.fetchone()
+            last_message_text = "Нет сообщений"
+            last_message_date = None
+            
+            try:
+                cursor.execute('''
+                    SELECT message_text, created_at 
+                    FROM bookmarks 
+                    WHERE author_id = ? 
+                    ORDER BY created_at DESC 
+                    LIMIT 1
+                ''', (user[0],))
+                last_message = cursor.fetchone()
+                
+                if last_message and last_message[0]:
+                    last_message_text = last_message[0]
+                    last_message_date = last_message[1]
+            except sqlite3.OperationalError as e:
+                # Если таблица bookmarks не существует
+                if "no such table" in str(e).lower():
+                    print(f"Таблица bookmarks не найдена для чата {chat_id}")
+                else:
+                    print(f"Ошибка при получении сообщения для пользователя {user[0]}: {e}")
+            except Exception as e:
+                print(f"Неожиданная ошибка при получении сообщения для пользователя {user[0]}: {e}")
             
             users_list.append({
                 "tg_id": user[0],
@@ -318,8 +333,8 @@ def get_chat_users(chat_id: int):
                 "username": user[5],
                 "name": user[6],
                 "status": user[7],
-                "last_message": last_message[0] if last_message and last_message[0] else "Нет сообщений",
-                "last_message_date": last_message[1] if last_message and last_message[1] else None
+                "last_message": last_message_text,
+                "last_message_date": last_message_date
             })
         
         connection.close()
