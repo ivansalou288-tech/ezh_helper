@@ -746,8 +746,7 @@
 
                             const num = w?.num ?? (index + 1);
                             const reason = (w?.reason ?? '').toString().trim();
-                            const moder = (w?.moder ?? '').toString().trim();
-                            const moderId = w?.moder_id ?? '';
+                            const moderLink = w?.moder_link ?? '';
 
                             card.innerHTML = `
                                 <div class="warning-card-header">
@@ -760,7 +759,7 @@
                                     </div>
                                     <div class="warning-field">
                                         <span class="warning-field-label">Модератор:</span>
-                                        <span class="warning-field-value"><a href="tg://user?id=${moderId}" style="color: #ffc107;">${moder}</a></span>
+                                        <span class="warning-field-value">${moderLink}</span>
                                     </div>
                                     <button class="warning-remove-btn" data-warn-num="${num}">Снять</button>
                                 </div>

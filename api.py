@@ -444,7 +444,7 @@ async def get_user_warnings(chat: int, user_id: int):
             warns_data.append({
                 "num": i,
                 "reason": reason,
-                "moder_id": moder_id,
+                "moder_link": GetUserByID(moder_id, chat).mention,
                 "moder": moder_name,
                 "date": date
             })
