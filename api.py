@@ -66,6 +66,15 @@ class RecomRemoveAction(BaseModel):
     admin_name: Optional[str] = None
     admin_username: Optional[str] = None
 
+class RecomGiveAction(BaseModel):
+    user_id: int
+    chat_id: int
+    rank: str
+    reason: str
+    admin_id: Optional[int] = None
+    admin_name: Optional[str] = None
+    admin_username: Optional[str] = None
+
 class SnatWarnAction(BaseModel):
     chat: str
     userid: str
@@ -703,6 +712,21 @@ def recom_remove(action: RecomRemoveAction):
             raise HTTPException(status_code=404, detail="Recommendation not found")
             
         return {"status": "ok", "deleted": deleted_count}
+
+@app.post('/recom-give')
+def recom_give(action: RecomGiveAction):
+    print("="*50)
+    print("Получен запрос на выдачу рекомендации:")
+    print(f"Chat ID: {action.chat_id}")
+    print(f"User ID: {action.user_id}")
+    print(f"Rank: {action.rank}")
+    print(f"Reason: {action.reason}")
+    print(f"Admin ID: {action.admin_id}")
+    print(f"Admin Name: {action.admin_name}")
+    print(f"Admin Username: {action.admin_username}")
+    print("="*50)
+    
+    return {"status": "ok", "message": "Данные получены"}
 
 @app.post('/set_permissions')
 def set_permissions(action: SetPermissionsAction):

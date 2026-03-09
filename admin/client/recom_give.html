@@ -126,7 +126,13 @@
         }
 
         async function giveRecommendation() {
+            const rank = document.getElementById('rankInput').value.trim();
             const reason = document.getElementById('reasonInput').value.trim();
+            
+            if (!rank) {
+                alert('Введите должность');
+                return;
+            }
             
             if (!reason) {
                 alert('Введите причину рекомендации');
@@ -138,8 +144,34 @@
                 return;
             }
 
-            alert('Функция выдачи рекомендации будет реализована после добавления соответствующего API endpoint');
-            // TODO: Добавить API endpoint для выдачи рекомендации
+            try {
+                const user = tg?.initDataUnsafe?.user;
+                const response = await fetch('https://ezh-dev.ru:3000/recom-give', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: selectedUser.id,
+                        chat_id: chatId,
+                        rank: rank,
+                        reason: reason,
+                        admin_id: user?.id,
+                        admin_name: user?.first_name,
+                        admin_username: user?.username
+                    })
+                });
+
+                const result = await response.json();
+                if (result.status === 'ok') {
+                    alert('Рекомендация выдана');
+                    document.getElementById('formBox').style.display = 'none';
+                    document.getElementById('usersList').innerHTML = '';
+                    document.getElementById('searchInput').value = '';
+                } else {
+                    alert('Ошибка выдачи рекомендации');
+                }
+            } catch (error) {
+                alert('Ошибка: ' + error.message);
+            }
         }
 
         document.getElementById('searchInput').addEventListener('input', searchUsers);
