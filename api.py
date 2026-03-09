@@ -30,9 +30,8 @@ app = FastAPI()
 def get_db_path(chat_id):
     """Получает путь к базе данных чата"""
     chat_id_str = str(chat_id)
-    if chat_id_str.startswith('-100'):
-        chat_id_str = chat_id_str[4:]
-    return curent_path / 'databases' / f'{chat_id_str}.db'
+
+    return curent_path / 'databases' / f'{-chat_id_str}.db'
 
 app.add_middleware(
     CORSMiddleware,
