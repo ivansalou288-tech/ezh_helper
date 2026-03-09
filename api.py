@@ -26,7 +26,9 @@ from main.config3 import *
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import sqlite3
-
+curent_path = (Path(__file__)).parent
+all_path = curent_path / 'databases' / 'All.db'
+admin_path = curent_path / 'databases' / 'admin.db'
 app = FastAPI()
 
 app.add_middleware(
