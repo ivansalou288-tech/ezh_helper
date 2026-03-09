@@ -765,6 +765,61 @@ def delete_permissions(action: DeletePermissionsAction):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/chat_warns/{chat_id}")
+async def get_chat_warns(chat_id: int):
+    """
+    Получает все предупреждения чата
+    """
+    try:
+        chat_db_path = get_db_path(chat_id)
+        
+        if not os.path.exists(chat_db_path):
+            return {"status": "error", "message": "База данных чата не найдена"}
+        
+        connection = sqlite3.connect(chat_db_path, check_same_thread=False)
+        cursor = connection.cursor()
+        
+        cursor.execute("SELECT user_id, reason, moder_id, date FROM warns ORDER BY date DESC")
+        warns = cursor.fetchall()
+        
+        warns_list = []
+        for warn in warns:
+            user_id = warn[0]
+            reason = warn[1] if warn[1] else 'Без причины'
+            moder_id = warn[2]
+            date = warn[3]
+            
+            # Получаем имя пользователя
+            try:
+                cursor.execute("SELECT nik FROM users WHERE tg_id=?", (user_id,))
+                user_result = cursor.fetchone()
+                user_name = user_result[0] if user_result else f"ID: {user_id}"
+            except:
+                user_name = f"ID: {user_id}"
+            
+            # Получаем имя модератора
+            try:
+                cursor.execute("SELECT nik FROM users WHERE tg_id=?", (moder_id,))
+                moder_result = cursor.fetchone()
+                moder_name = moder_result[0] if moder_result else f"ID: {moder_id}"
+            except:
+                moder_name = f"ID: {moder_id}"
+            
+            warns_list.append({
+                "user_id": user_id,
+                "user_name": user_name,
+                "reason": reason,
+                "moder_id": moder_id,
+                "moder_name": moder_name,
+                "date": date
+            })
+        
+        connection.close()
+        return {"status": "success", "warns": warns_list, "count": len(warns_list)}
+        
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 @app.post("/snat_warn")
 async def snat_warn(action: SnatWarnAction):
     """

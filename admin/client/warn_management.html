@@ -127,6 +127,61 @@
             opacity: 0.7;
         }
 
+        .warns-container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .warn-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(179, 136, 255, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .warn-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(179, 136, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .warn-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .warn-user {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #b388ff;
+        }
+
+        .warn-date {
+            font-size: 0.85em;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .warn-reason {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .warn-moder {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
         @media (max-width: 768px) {
             .main-content {
                 margin-top: 115px;
@@ -144,15 +199,21 @@
 
     <div class="main-content">
         <div class="page-header">
-            <h1 class="page-title">Управление предупреждениями</h1>
-            <div class="page-subtitle">Функция в разработке</div>
+            <h1 class="page-title">Предупреждения чата</h1>
+            <div class="page-subtitle" id="warnsCount">Загрузка...</div>
         </div>
 
-        <div class="empty-state">
-            <div class="empty-state-icon">⚠️</div>
-            <div class="empty-state-text">Функция управление предупреждениями</div>
-            <div class="empty-state-subtext">Эта функция находится в разработке и будет доступна в ближайшее время</div>
+        <div id="loadingState" class="loading">
+            <div>⏳ Загрузка предупреждений...</div>
         </div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-state-icon">✅</div>
+            <div class="empty-state-text">Нет предупреждений</div>
+            <div class="empty-state-subtext">В этом чате пока нет активных предупреждений</div>
+        </div>
+
+        <div id="warnsContainer" class="warns-container" style="display: none;"></div>
     </div>
 
     <script>
@@ -169,7 +230,8 @@
                 if (tg.BackButton) {
                     tg.BackButton.show();
                     tg.BackButton.onClick(() => {
-                        window.location.href = 'chat_admin.html' + window.location.search;
+                        const params = new URLSearchParams(window.location.search);
+                        window.location.href = 'chat_admin.html?' + params.toString();
                     });
                 }
                 if (tg.MainButton) tg.MainButton.hide();
@@ -231,9 +293,66 @@
             profile.style.display = 'flex';
         }
 
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                chatId: params.get('chat_id')
+            };
+        }
+
+        async function loadWarns() {
+            const { chatId } = getUrlParams();
+            
+            if (!chatId) {
+                document.getElementById('loadingState').innerHTML = '<div>❌ Не указан ID чата</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`https://ezh-dev.ru:3000/chat_warns/${chatId}`);
+                const data = await response.json();
+
+                const loadingState = document.getElementById('loadingState');
+                const emptyState = document.getElementById('emptyState');
+                const warnsContainer = document.getElementById('warnsContainer');
+                const warnsCount = document.getElementById('warnsCount');
+
+                loadingState.style.display = 'none';
+
+                if (data.status === 'success' && data.warns && data.warns.length > 0) {
+                    warnsCount.textContent = `Всего предупреждений: ${data.count}`;
+                    warnsContainer.style.display = 'block';
+                    
+                    warnsContainer.innerHTML = data.warns.map(warn => `
+                        <div class="warn-card">
+                            <div class="warn-header">
+                                <div class="warn-user">${escapeHtml(warn.user_name)}</div>
+                                <div class="warn-date">${escapeHtml(warn.date || 'Неизвестна')}</div>
+                            </div>
+                            <div class="warn-reason">📝 ${escapeHtml(warn.reason)}</div>
+                            <div class="warn-moder">👮 Модератор: ${escapeHtml(warn.moder_name)}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    warnsCount.textContent = 'Нет предупреждений';
+                    emptyState.style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('loadingState').innerHTML = '<div>❌ Ошибка загрузки данных</div>';
+                console.error('Error loading warns:', error);
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             updateUserProfile();
+            loadWarns();
         });
     </script>
 </body>
