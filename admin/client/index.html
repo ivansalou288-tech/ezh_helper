@@ -147,22 +147,32 @@
 
         .main-content {
             padding: 20px;
-            margin-top: 80px;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: calc(100vh - 120px);
+            justify-content: flex-start;
         }
 
-        h1 {
+        .page-title {
             text-align: center;
             color: #b388ff;
             text-shadow: 0 0 20px #b388ff, 0 0 40px #7c4dff;
-            margin-bottom: 50px;
+            margin-bottom: 30px;
             font-size: 2.5em;
+            order: -1;
         }
 
         /* Стили для контейнера чатов */
         .admin-chats-container {
             max-width: 800px;
-            margin: 0 auto;
+            margin: auto auto 0;
             padding: 10px 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .chats-header {
@@ -348,6 +358,10 @@
         <div id="toastText" class="toast-text"></div>
     </div>
 
+    <div class="main-content">
+        <h1 class="page-title">Админ-панель</h1>
+    </div>
+
     <script>
         (function () {
             const tg = window.Telegram?.WebApp;
@@ -503,7 +517,7 @@
         }
 
         async function renderAdminChats(chats) {
-            const mainContent = document.querySelector('.main-content') || document.body;
+            const mainContent = document.querySelector('.main-content');
             
             // Remove existing content if any
             const existingContainer = document.querySelector('.admin-chats-container');
