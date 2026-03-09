@@ -487,26 +487,15 @@
 
         async function fetchChatUsers(chatId) {
             try {
-                console.log(`Запрос к API: ${API_BASE}/chat-users/${chatId}`);
-                
-                // Добавляем таймаут 10 секунд
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 10000);
-                
-                const response = await fetch(`${API_BASE}/chat-users/${chatId}`, {
-                    signal: controller.signal
-                });
-                
-                clearTimeout(timeoutId);
-                
-                console.log(`Статус ответа: ${response.status}`);
+                console.log(`Загрузка пользователей для чата: ${chatId}`);
+                const response = await fetch(`${API_BASE}/chat-users/${chatId}`);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
                 const data = await response.json();
-                console.log('Данные от API:', data);
+                console.log('Получены данные:', data);
                 
                 if (data.status === 'success') {
                     return data.users || [];
@@ -514,15 +503,8 @@
                     throw new Error(data.message || 'Ошибка API');
                 }
             } catch (error) {
-                console.error('Ошибка в fetchChatUsers:', error);
-                
-                if (error.name === 'AbortError') {
-                    throw new Error('Превышено время ожидания ответа сервера');
-                } else if (error instanceof TypeError && error.message.includes('fetch')) {
-                    throw new Error('Не удалось подключиться к серверу. Проверьте соединение.');
-                } else {
-                    throw error;
-                }
+                console.error('Ошибка загрузки:', error);
+                throw error;
             }
         }
 
@@ -657,35 +639,21 @@
         async function loadUsers() {
             const user = getCurrentUser();
             if (!user) {
-                console.error('Пользователь не определен');
                 showError('Пользователь не определен');
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('usersContent').style.display = 'block';
                 return;
             }
             
             currentChatId = getChatIdFromUrl();
             if (!currentChatId) {
-                console.error('ID чата не указан');
                 showError('ID чата не указан');
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('usersContent').style.display = 'block';
                 return;
             }
             
-            console.log('Загрузка пользователей для чата:', currentChatId);
+            console.log('Начинаю загрузку пользователей...');
             
             try {
                 const users = await fetchChatUsers(currentChatId);
-                console.log('Получено пользователей:', users.length);
-                
-                if (users.length === 0) {
-                    console.warn('Список пользователей пуст');
-                    showError('Не удалось загрузить пользователей или список пуст');
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('usersContent').style.display = 'block';
-                    return;
-                }
+                console.log(`Загружено ${users.length} пользователей`);
                 
                 allUsers = users;
                 
@@ -700,8 +668,42 @@
                 document.getElementById('usersContent').style.display = 'block';
                 
             } catch (error) {
-                console.error('Ошибка при загрузке пользователей:', error);
-                showError('Произошла ошибка при загрузке пользователей');
+                console.error('Ошибка при загрузке:', error);
+                
+                // Показываем ошибку и fallback данные
+                showError(`Ошибка загрузки: ${error.message}. Показаны тестовые данные.`);
+                
+                // Fallback данные для демонстрации
+                const fallbackUsers = [
+                    {
+                        tg_id: 12345,
+                        nik: "Тестовый Админ",
+                        username: "admin_test",
+                        status: "admin",
+                        last_message: "Тестовое сообщение админа",
+                        last_message_date: new Date().toISOString(),
+                        join_date: "2023-01-01T00:00:00",
+                        last_active: new Date().toISOString(),
+                        rang: 5
+                    },
+                    {
+                        tg_id: 67890,
+                        nik: "Тестовый Пользователь",
+                        username: "user_test",
+                        status: "member",
+                        last_message: "Тестовое сообщение пользователя",
+                        last_message_date: new Date().toISOString(),
+                        join_date: "2023-02-01T00:00:00",
+                        last_active: new Date().toISOString(),
+                        rang: 1
+                    }
+                ];
+                
+                allUsers = fallbackUsers;
+                document.getElementById('pageSubtitle').textContent = `${fallbackUsers.length} пользователей (тестовые данные)`;
+                renderUsers(fallbackUsers);
+                
+                // Скрываем загрузку и показываем контент
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('usersContent').style.display = 'block';
             }

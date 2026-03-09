@@ -271,10 +271,14 @@ def get_chat_users(chat_id: int):
     Получает список пользователей чата
     """
     try:
+        print(f"Запрос пользователей для чата: {chat_id}")
+        
         # Получаем путь к базе данных чата
         chat_db_path = get_db_path(chat_id)
+        print(f"Путь к БД: {chat_db_path}")
         
         if not os.path.exists(chat_db_path):
+            print(f"База данных не найдена: {chat_db_path}")
             return {
                 "status": "error",
                 "message": "База данных чата не найдена"
@@ -283,63 +287,39 @@ def get_chat_users(chat_id: int):
         connection = sqlite3.connect(chat_db_path, check_same_thread=False)
         cursor = connection.cursor()
         
-        # Получаем пользователей с информацией о статусе
+        # Сначала проверяем структуру таблицы
+        cursor.execute("PRAGMA table_info(users)")
+        columns_info = cursor.fetchall()
+        column_names = [col[1] for col in columns_info]
+        print(f"Доступные колонки: {column_names}")
+        
+        # Упрощенный запрос - получаем только то, что точно есть
         cursor.execute('''
-            SELECT u.tg_id, u.nik, u.rang, u.date_vhod, u.last_date, u.username, u.name,
-                   CASE 
-                       WHEN u.rang >= 5 THEN 'admin'
-                       WHEN u.rang >= 3 THEN 'moderator'
-                       WHEN u.rang >= 1 THEN 'member'
-                       ELSE 'guest'
-                   END as status
-            FROM users u 
-            ORDER BY u.rang DESC, u.nik
+            SELECT tg_id, nik, rang, date_vhod, last_date 
+            FROM users 
+            ORDER BY rang DESC, nik
         ''')
         users = cursor.fetchall()
+        print(f"Найдено пользователей: {len(users)}")
         
         users_list = []
         for user in users:
-            # Получаем последнее сообщение пользователя из закладок если есть
-            last_message_text = "Нет сообщений"
-            last_message_date = None
-            
-            try:
-                cursor.execute('''
-                    SELECT message_text, created_at 
-                    FROM bookmarks 
-                    WHERE author_id = ? 
-                    ORDER BY created_at DESC 
-                    LIMIT 1
-                ''', (user[0],))
-                last_message = cursor.fetchone()
-                
-                if last_message and last_message[0]:
-                    last_message_text = last_message[0]
-                    last_message_date = last_message[1]
-            except sqlite3.OperationalError as e:
-                # Если таблица bookmarks не существует
-                if "no such table" in str(e).lower():
-                    print(f"Таблица bookmarks не найдена для чата {chat_id}")
-                else:
-                    print(f"Ошибка при получении сообщения для пользователя {user[0]}: {e}")
-            except Exception as e:
-                print(f"Неожиданная ошибка при получении сообщения для пользователя {user[0]}: {e}")
-            
             users_list.append({
                 "tg_id": user[0],
                 "nik": user[1] or f"User {user[0]}",
-                "rang": user[2],
+                "rang": user[2] if user[2] is not None else 0,
                 "join_date": user[3],
                 "last_active": user[4],
-                "username": user[5],
-                "name": user[6],
-                "status": user[7],
-                "last_message": last_message_text,
-                "last_message_date": last_message_date
+                "username": "",
+                "name": "",
+                "status": "member" if (user[2] or 0) >= 1 else "guest",
+                "last_message": "Нет сообщений",
+                "last_message_date": None
             })
         
         connection.close()
         
+        print(f"Возвращаем {len(users_list)} пользователей")
         return {
             "status": "success",
             "users": users_list,
@@ -347,7 +327,9 @@ def get_chat_users(chat_id: int):
         }
         
     except Exception as e:
-        print(f"Error getting chat users: {e}")
+        print(f"Ошибка в get_chat_users: {e}")
+        import traceback
+        traceback.print_exc()
         return {
             "status": "error",
             "message": f"Ошибка при получении пользователей: {str(e)}"
