@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Рекомендации пользователя</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0a0a; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; padding-top: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .title { font-size: 2em; color: #b388ff; text-shadow: 0 0 20px #b388ff; margin-bottom: 10px; }
+        .subtitle { color: rgba(255, 255, 255, 0.7); }
+        .search-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(179, 136, 255, 0.3); border-radius: 10px; padding: 15px; margin-bottom: 20px; }
+        .input-wrapper { display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(179, 136, 255, 0.3); border-radius: 10px; padding: 10px 15px; margin-bottom: 15px; }
+        .at-symbol { color: #b388ff; font-size: 1.2em; font-weight: 600; margin-right: 5px; user-select: none; }
+        .input { flex: 1; background: none; border: none; color: #fff; font-size: 1em; outline: none; }
+        .btn { background: linear-gradient(145deg, #7c4dff, #b388ff); border: none; color: #fff; padding: 12px 30px; border-radius: 10px; cursor: pointer; font-size: 1em; font-weight: 600; width: 100%; transition: all 0.3s ease; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(179, 136, 255, 0.4); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .users-list { margin-top: 20px; }
+        .user-item { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(179, 136, 255, 0.2); border-radius: 10px; padding: 15px; margin-bottom: 10px; cursor: pointer; transition: all 0.3s ease; }
+        .user-item:hover { background: rgba(179, 136, 255, 0.1); border-color: rgba(179, 136, 255, 0.4); }
+        .user-name { font-size: 1.1em; margin-bottom: 5px; }
+        .user-id { font-size: 0.9em; color: rgba(255, 255, 255, 0.6); }
+        .no-results { text-align: center; padding: 30px; color: rgba(255, 255, 255, 0.5); }
+        .recom-list { margin-top: 20px; }
+        .recom-item { background: rgba(136, 255, 179, 0.1); border: 1px solid rgba(136, 255, 179, 0.3); border-radius: 10px; padding: 15px; margin-bottom: 10px; }
+        .recom-info { font-size: 0.9em; color: rgba(255, 255, 255, 0.8); margin-bottom: 5px; }
+        .recom-reason { margin-top: 10px; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 5px; }
+        .recom-header { color: #88ffb3; font-size: 1.2em; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">📋 Рекомендации пользователя</h1>
+            <div class="subtitle">Просмотр всех рекомендаций</div>
+        </div>
+
+        <div class="search-box">
+            <div class="input-wrapper">
+                <span class="at-symbol">@</span>
+                <input type="text" id="usernameInput" class="input" placeholder="введите username">
+            </div>
+            <button class="btn" onclick="searchUsers()">Найти</button>
+        </div>
+
+        <div id="usersList" class="users-list"></div>
+        <div id="recomList" class="recom-list"></div>
+    </div>
+
+    <script>
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+            if (tg.BackButton) {
+                tg.BackButton.show();
+                tg.BackButton.onClick(() => window.location.href = 'recommendations.html' + window.location.search);
+            }
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const chatId = urlParams.get('chat_id');
+
+        async function searchUsers() {
+            const username = document.getElementById('usernameInput').value.trim();
+            const usersList = document.getElementById('usersList');
+            const recomList = document.getElementById('recomList');
+            recomList.innerHTML = '';
+
+            if (!username) {
+                usersList.innerHTML = '<div class="no-results">Введите username для поиска</div>';
+                return;
+            }
+
+            try {
+                usersList.innerHTML = '<div class="no-results">Поиск...</div>';
+                const response = await fetch(`https://ezh-dev.ru:3000/chat-users/${chatId}`);
+                const data = await response.json();
+
+                if (data.status === 'success' && data.users) {
+                    const filtered = data.users.filter(u => (u.nik || '').toLowerCase().includes(username.toLowerCase()));
+                    
+                    if (filtered.length === 0) {
+                        usersList.innerHTML = '<div class="no-results">Пользователи не найдены</div>';
+                        return;
+                    }
+
+                    usersList.innerHTML = filtered.map(u => `
+                        <div class="user-item" onclick="loadRecommendations(${u.tg_id}, '${(u.nik || '').replace(/'/g, "\\'")}')">
+                            <div class="user-name">${u.nik || 'Без имени'}</div>
+                            <div class="user-id">ID: ${u.tg_id}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                usersList.innerHTML = '<div class="no-results">Ошибка поиска</div>';
+            }
+        }
+
+        async function loadRecommendations(userId, userName) {
+            const recomList = document.getElementById('recomList');
+            try {
+                recomList.innerHTML = '<div class="no-results">Загрузка рекомендаций...</div>';
+                const response = await fetch(`https://ezh-dev.ru:3000/recom/${chatId}/${userId}`);
+                const data = await response.json();
+
+                if (!data || data.length === 0) {
+                    recomList.innerHTML = '<div class="no-results">У пользователя нет рекомендаций</div>';
+                    return;
+                }
+
+                recomList.innerHTML = `<h3 class="recom-header">Рекомендации: ${userName} (${data.length})</h3>` + 
+                    data.map((r, idx) => `
+                        <div class="recom-item">
+                            <div class="recom-info"><strong>Рекомендация #${idx + 1}</strong></div>
+                            <div class="recom-info">От: ${r.moder_name} (${r.moder_rang})</div>
+                            <div class="recom-info">Дата: ${r.date}</div>
+                            <div class="recom-info">Ранг: ${r.rang}</div>
+                            <div class="recom-reason">
+                                <strong>Причина:</strong><br>${r.reason}
+                            </div>
+                        </div>
+                    `).join('');
+            } catch (error) {
+                recomList.innerHTML = '<div class="no-results">Ошибка загрузки рекомендаций</div>';
+            }
+        }
+
+        document.getElementById('usernameInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') searchUsers();
+        });
+    </script>
+</body>
+</html>
