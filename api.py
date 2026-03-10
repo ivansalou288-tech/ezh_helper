@@ -834,6 +834,11 @@ class SubmitFormAction(BaseModel):
     gameId: str
     invite_code: str
 
+class GenerateLinksAction(BaseModel):
+    telegram_id: Optional[int] = None
+    username: Optional[str] = None
+    chat_id: int
+
 @app.post('/api/links/delete')
 def delete_link(action: LinkDeleteAction):
     """
@@ -992,6 +997,109 @@ def submit_form(action: SubmitFormAction):
         return {
             "status": "error",
             "message": f"Ошибка при отправке заявки: {str(e)}"
+        }
+
+@app.post('/generate_invite_links')
+async def generate_invite_links(action: GenerateLinksAction):
+    """
+    Генерирует ссылки-приглашения для чатов на основе chat_id с получением аватаров
+    """
+    try:
+        if not action.chat_id:
+            return {"status": "error", "message": "chat_id обязателен"}
+        
+        # Определяем основной чат клана
+
+        
+        # Получаем аватары чатов через Telegram Bot API
+        import requests
+        
+        def get_chat_info(chat_id):
+            try:
+                url = f"https://api.telegram.org/bot{bot_token}/getChat"
+                params = {"chat_id": chat_id}
+                
+                response = requests.get(url, params=params)
+                data = response.json()
+                
+                if data.get("ok"):
+                    chat_info = data.get("result", {})
+                    return {
+                        "name": chat_info.get("title", "Unknown"),
+                        "avatar": get_chat_avatar_from_info(chat_info)
+                    }
+                
+                return {"name": "Unknown", "avatar": None}
+                
+            except Exception as e:
+                print(f"Ошибка при получении информации о чате {chat_id}: {e}")
+                return {"name": "Unknown", "avatar": None}
+        
+        def get_chat_avatar_from_info(chat_info):
+            try:
+                photo = chat_info.get("photo")
+                
+                if photo:
+                    # Ищем фото в разных размерах
+                    avatar_file_id = None
+                    
+                    if "big_file_id" in photo:
+                        avatar_file_id = photo["big_file_id"]
+                    elif "small_file_id" in photo:
+                        avatar_file_id = photo["small_file_id"]
+                    elif "file_id" in photo:
+                        avatar_file_id = photo["file_id"]
+                    
+                    if avatar_file_id:
+                        # Получаем URL файла
+                        file_url = f"https://api.telegram.org/bot{bot_token}/getFile?file_id={avatar_file_id}"
+                        
+                        file_response = requests.get(file_url)
+                        file_data = file_response.json()
+                        
+                        if file_data.get("ok"):
+                            file_path = file_data["result"]["file_path"]
+                            avatar_url = f"https://api.telegram.org/file/bot{bot_token}/{file_path}"
+                            return avatar_url
+                
+                return None
+                
+            except Exception as e:
+                print(f"Ошибка при получении аватара чата: {e}")
+                return None
+        
+        # Получаем информацию о чатах
+        clan_info = get_chat_info(action.chat_id)
+
+        clan_link = await bot.export_chat_invite_link(action.chat_id)
+        # Формируем данные для ответа
+        links_data = {
+            "chat": {
+                "name": clan_info["name"],
+                "link": f"{clan_link}",
+                "avatar": clan_info["avatar"] or "/avatars/clan.png"
+            }
+        }
+        
+        print("="*50)
+        print("Сгенерированы ссылки для пользователя:")
+        print(f"Telegram ID: {action.telegram_id}")
+        print(f"Username: {action.username}")
+        print(f"Chat ID: {action.chat_id}")
+        print(f"Chat link: {links_data.chat.link}")
+        print(f"Chat name: {links_data.chat.name}")
+        print(f"Chat avatar: {links_data.chat.avatar}")
+        print("="*50)
+        
+        return {
+            "status": "success",
+            "data": links_data
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Ошибка при генерации ссылок: {str(e)}"
         }
 
 @app.post('/links-create')

@@ -991,7 +991,8 @@
                     },
                     body: JSON.stringify({
                         telegram_id: telegram_id,
-                        username: username
+                        username: username,
+                        chat_id: currentCodeData.chat_id
                     })
                 });
                 
@@ -1043,26 +1044,15 @@
             const linksContainer = document.createElement('div');
             linksContainer.className = 'form-container';
             linksContainer.innerHTML = `
-                <h2 class="neon-title">Вступление в чаты</h2>
+                <h2 class="neon-title">Вступление в чат</h2>
                 <div class="invite-links-content">
-                    <div class="chat-block" onclick="openLink('${linksData.clan.link}')">
+                    <div class="chat-block" onclick="openLink('${linksData.chat.link}')">
                         <div class="chat-avatar">
-                            <img src="https://ezh-dev.ru/chat_manager_aiogram3${linksData.clan.avatar}" alt="${linksData.clan.name}">
+                            <img src="${linksData.chat.avatar}" alt="${linksData.chat.name}">
                         </div>
                         <div class="chat-info">
-                            <h3>${linksData.clan.name}</h3>
-                            <p>Основной чат клана</p>
-                            <div class="link-hint">Нажмите для вступления</div>
-                        </div>
-                    </div>
-                    
-                    <div class="chat-block" onclick="openLink('${linksData.sostav.link}')">
-                        <div class="chat-avatar">
-                            <img src="https://ezh-dev.ru/chat_manager_aiogram3${linksData.sostav.avatar}" alt="${linksData.sostav.name}">
-                        </div>
-                        <div class="chat-info">
-                            <h3>${linksData.sostav.name}</h3>
-                            <p>Ваш состав</p>
+                            <h3>${linksData.chat.name}</h3>
+                            <p>Чат клана</p>
                             <div class="link-hint">Нажмите для вступления</div>
                         </div>
                     </div>
