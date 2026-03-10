@@ -199,8 +199,8 @@
               throw new Error('Ошибка при загрузке ссылок');
             }
             
-            const links = await response.json();
-            displayLinks(links);
+            const data = await response.json();
+            displayLinks(data.links);
             
           } catch (error) {
             console.error('Ошибка:', error);
