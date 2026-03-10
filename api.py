@@ -815,15 +815,18 @@ def get_all_links(chat_id: Optional[int] = None):
             "message": f"Ошибка при получении ссылок: {str(e)}"
         }
 
+class LinkDeleteAction(BaseModel):
+    link: str
+    chat_id: Optional[int] = None
+
 @app.post('/api/links/delete')
-def delete_link(request: Request):
+def delete_link(action: LinkDeleteAction):
     """
     Удаляет ссылку из таблицы links
     """
     try:
-        data = request.json()
-        link = data.get('link')
-        chat_id = data.get('chat_id')
+        link = action.link
+        chat_id = action.chat_id
         
         if not link:
             return {"status": "error", "message": "link is required"}

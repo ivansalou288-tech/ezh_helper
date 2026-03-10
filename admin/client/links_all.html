@@ -255,27 +255,28 @@
           try {
             // Получаем параметры из URL
             const urlParams = new URLSearchParams(window.location.search);
-            const chatId = urlParams.get('chat_id');
-            
+            const chatId = urlParams.get("chat_id");
+
             // Запрашиваем все ссылки с сервера
-            const response = await fetch(`https://ezh-dev.ru:3000/api/links/all${chatId ? `?chat_id=${chatId}` : ''}`);
-            
+            const response = await fetch(
+              `https://ezh-dev.ru:3000/api/links/all${chatId ? `?chat_id=${chatId}` : ""}`,
+            );
+
             if (!response.ok) {
-              throw new Error('Ошибка при загрузке ссылок');
+              throw new Error("Ошибка при загрузке ссылок");
             }
-            
+
             const data = await response.json();
             displayLinks(data.links);
-            
           } catch (error) {
-            console.error('Ошибка:', error);
-            showError('Не удалось загрузить ссылки');
+            console.error("Ошибка:", error);
+            showError("Не удалось загрузить ссылки");
           }
         }
 
         function displayLinks(links) {
-          const container = document.getElementById('links-container');
-          
+          const container = document.getElementById("links-container");
+
           if (!links || links.length === 0) {
             container.innerHTML = `
               <div class="no-links">
@@ -297,7 +298,9 @@
                 </tr>
               </thead>
               <tbody>
-                ${links.map(link => `
+                ${links
+                  .map(
+                    (link) => `
                   <tr id="link-row-${link.link}">
                     <td>
                       <span class="link-url" onclick="copyToClipboard('${link.link}', event)" style="cursor: pointer;">${link.link}</span>
@@ -307,63 +310,72 @@
                       <button class="delete-btn" onclick="deleteLink('${link.link}', '${link.chat_id}')">Удалить</button>
                     </td>
                   </tr>
-                `).join('')}
+                `,
+                  )
+                  .join("")}
               </tbody>
             </table>
           `;
-          
+
           container.innerHTML = tableHTML;
         }
 
         function deleteLink(link, chatId) {
           if (confirm(`Удалить ссылку ${link}?`)) {
             fetch(`https://ezh-dev.ru:3000/api/links/delete`, {
-              method: 'POST',
+              method: "POST",
               headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
               },
               body: JSON.stringify({
                 link: link,
-                chat_id: chatId
+                chat_id: parseInt(chatId),
+              }),
+            })
+              .then((response) => {
+                console.log("Response status:", response.status);
+                return response.json();
               })
-            })
-            .then(response => response.json())
-            .then(data => {
-              if (data.status === 'success') {
-                showNotification('Ссылка удалена!');
-                // Удаляем строку из таблицы
-                const row = document.getElementById(`link-row-${link}`);
-                if (row) {
-                  row.remove();
+              .then((data) => {
+                console.log("Response data:", data);
+                if (data.status === "success") {
+                  showNotification("Ссылка удалена!");
+                  // Удаляем строку из таблицы
+                  const row = document.getElementById(`link-row-${link}`);
+                  if (row) {
+                    row.remove();
+                  }
+                  // Если ссылок не осталось, показываем сообщение
+                  const tbody = document.querySelector(".links-table tbody");
+                  if (tbody && tbody.children.length === 0) {
+                    loadAllLinks(); // Перезагружаем данные
+                  }
+                } else {
+                  showNotification("Ошибка удаления: " + data.message);
                 }
-                // Если ссылок не осталось, показываем сообщение
-                const tbody = document.querySelector('.links-table tbody');
-                if (tbody && tbody.children.length === 0) {
-                  loadAllLinks(); // Перезагружаем данные
-                }
-              } else {
-                showNotification('Ошибка удаления: ' + data.message);
-              }
-            })
-            .catch(error => {
-              console.error('Ошибка:', error);
-              showNotification('Ошибка удаления ссылки');
-            });
+              })
+              .catch((error) => {
+                console.error("Ошибка:", error);
+                showNotification("Ошибка удаления ссылки");
+              });
           }
         }
 
         function copyToClipboard(text, event) {
           event.preventDefault();
-          navigator.clipboard.writeText(text).then(() => {
-            // Показываем уведомление об успешном копировании
-            showNotification('Ссылка скопирована!');
-          }).catch(err => {
-            console.error('Ошибка копирования:', err);
-          });
+          navigator.clipboard
+            .writeText(text)
+            .then(() => {
+              // Показываем уведомление об успешном копировании
+              showNotification("Ссылка скопирована!");
+            })
+            .catch((err) => {
+              console.error("Ошибка копирования:", err);
+            });
         }
 
         function showNotification(message) {
-          const notification = document.createElement('div');
+          const notification = document.createElement("div");
           notification.style.cssText = `
             position: fixed;
             top: 50%;
@@ -378,8 +390,8 @@
             animation: fadeInOut 2s ease-in-out;
           `;
           notification.textContent = message;
-          
-          const style = document.createElement('style');
+
+          const style = document.createElement("style");
           style.textContent = `
             @keyframes fadeInOut {
               0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
@@ -390,7 +402,7 @@
           `;
           document.head.appendChild(style);
           document.body.appendChild(notification);
-          
+
           setTimeout(() => {
             document.body.removeChild(notification);
             document.head.removeChild(style);
@@ -398,7 +410,7 @@
         }
 
         function showError(message) {
-          const container = document.getElementById('links-container');
+          const container = document.getElementById("links-container");
           container.innerHTML = `
             <div class="no-links">
               <div class="placeholder-icon">⚠️</div>
