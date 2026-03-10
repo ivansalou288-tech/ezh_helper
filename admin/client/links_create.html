@@ -16,15 +16,15 @@
         .glass-panel {
             position: relative;
             margin-top: 18px;
-            padding: 22px;
+            padding: 20px 18px 18px;
             border-radius: 18px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.05));
-            border: 1px solid rgba(0, 229, 255, 0.28);
+            background: linear-gradient(135deg, rgba(179, 136, 255, 0.18), rgba(35, 20, 60, 0.9));
+            border: 1px solid rgba(179, 136, 255, 0.65);
             box-shadow:
-                0 0 0 1px rgba(255, 45, 253, 0.10) inset,
+                0 0 0 1px rgba(255, 255, 255, 0.06) inset,
                 0 12px 28px rgba(0, 0, 0, 0.45),
-                0 0 26px rgba(0, 229, 255, 0.10),
-                0 0 34px rgba(255, 45, 253, 0.08);
+                0 0 24px rgba(179, 136, 255, 0.35),
+                0 0 36px rgba(124, 77, 255, 0.42);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
         }
@@ -35,34 +35,82 @@
             border-radius: 18px;
             pointer-events: none;
             background:
-                radial-gradient(1000px 260px at 15% 0%, rgba(0, 229, 255, 0.18), transparent 60%),
-                radial-gradient(900px 260px at 85% 100%, rgba(255, 45, 253, 0.14), transparent 55%);
-            opacity: 0.95;
+                radial-gradient(900px 260px at 15% 0%, rgba(179, 136, 255, 0.45), transparent 60%),
+                radial-gradient(900px 260px at 85% 100%, rgba(124, 77, 255, 0.32), transparent 55%);
+            opacity: 0.9;
         }
 
-        .placeholder {
+        .form-group {
             position: relative;
-            text-align: center;
-            padding: 48px 10px;
-            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 18px;
         }
-        .placeholder-icon { font-size: 3.2em; opacity: 0.55; margin-bottom: 12px; }
-        .placeholder-text { font-size: 1.1em; font-weight: 700; margin-bottom: 6px; color: #e9f9ff; text-shadow: 0 0 10px rgba(0, 229, 255, 0.18); }
-        .placeholder-subtext { font-size: 0.95em; opacity: 0.8; }
+        .label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.98em;
+            color: #f3e8ff;
+            text-shadow: 0 0 8px rgba(203, 167, 255, 0.7);
+        }
+        .helper {
+            font-size: 0.82em;
+            color: rgba(243, 232, 255, 0.75);
+            margin-bottom: 10px;
+        }
+        .number-input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(203, 167, 255, 0.9);
+            background: rgba(19, 10, 40, 0.95);
+            color: #f3e8ff;
+            font-size: 1em;
+            outline: none;
+            box-shadow: 0 0 16px rgba(124, 77, 255, 0.65);
+        }
+        .number-input::placeholder {
+            color: rgba(243, 232, 255, 0.45);
+        }
+        .number-input:focus {
+            border-color: rgba(255, 255, 255, 0.95);
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.15) inset,
+                0 0 20px rgba(203, 167, 255, 0.95);
+        }
+        .number-input.invalid {
+            border-color: rgba(255, 99, 132, 0.95);
+            box-shadow:
+                0 0 0 1px rgba(255, 99, 132, 0.45) inset,
+                0 0 18px rgba(255, 99, 132, 0.8);
+        }
+        .error-text {
+            margin-top: 6px;
+            font-size: 0.8em;
+            color: rgba(255, 144, 164, 0.95);
+            min-height: 1.1em;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1 class="title">Создать ссылку</h1>
-            <div class="subtitle">Окно пока пустое</div>
+            <div class="subtitle">Базовые параметры ссылки</div>
         </div>
 
         <div class="glass-panel">
-            <div class="placeholder">
-                <div class="placeholder-icon">🔗</div>
-                <div class="placeholder-text">Форма создания ссылки появится здесь</div>
-                <div class="placeholder-subtext">Пока что это заглушка (liquid glass / neon)</div>
+            <div class="form-group">
+                <label for="activationsInput" class="label">Количество активаций</label>
+                <div class="helper">Целое число от 1 до 50</div>
+                <input
+                    id="activationsInput"
+                    class="number-input"
+                    type="tel"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    placeholder="Например, 10"
+                    autocomplete="off"
+                >
+                <div id="activationsError" class="error-text"></div>
             </div>
         </div>
     </div>
@@ -90,6 +138,43 @@
                 // ignore
             }
         })();
+
+        function validateActivations() {
+            const input = document.getElementById('activationsInput');
+            const error = document.getElementById('activationsError');
+            if (!input || !error) return;
+
+            const raw = input.value.trim();
+
+            if (raw === '') {
+                error.textContent = 'Укажите количество активаций от 1 до 50';
+                input.classList.remove('invalid');
+                return;
+            }
+
+            if (!/^[0-9]+$/.test(raw)) {
+                error.textContent = 'Только целое число от 1 до 50';
+                input.classList.add('invalid');
+                return;
+            }
+
+            const value = parseInt(raw, 10);
+            if (!Number.isInteger(value) || value < 1 || value > 50) {
+                error.textContent = 'Допустимо значение от 1 до 50';
+                input.classList.add('invalid');
+                return;
+            }
+
+            input.classList.remove('invalid');
+            error.textContent = '';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const input = document.getElementById('activationsInput');
+            if (input) {
+                input.addEventListener('input', validateActivations);
+            }
+        });
     </script>
 </body>
 </html>
