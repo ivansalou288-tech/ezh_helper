@@ -11,7 +11,7 @@ import sqlite3
 from aiogram.exceptions import *
 
 # from main.utils import CopyTextButton
-from path import Path
+from pathlib import Path
 import requests
 from googletrans import Translator
 
@@ -123,7 +123,6 @@ is_auto_unmute = False
 is_quests = False
 
 #? EN: For viewing removed warnings functionality
-#* RU: Для работы просмотра снятых предов
 page = 0
 mes_id = 0
 itog = []
@@ -134,12 +133,87 @@ def get_db_path(chat_id):
     return db_path
 
 def init_chat_db(chat_id):
-    """Initialize database for a specific chat with the structure from test.sql"""
+    """Initialize database for a specific chat from {-chat_id}.sql file"""
     db_path = get_db_path(chat_id)
+    sql_file_path = curent_path / '{-chat_id}.sql'
+    
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     
-    # Create tables based on test.sql structure
+    # Read and execute SQL from file
+    if sql_file_path.exists():
+        with open(sql_file_path, 'r', encoding='utf-8') as f:
+            sql_script = f.read()
+        cursor.executescript(sql_script)
+    else:
+        # Fallback to hardcoded structure if file doesn't exist
+        create_fallback_tables(cursor)
+    
+    connection.commit()
+    connection.close()
+
+def init_all_db():
+    """Initialize All.db database from all.sql file"""
+    db_path = curent_path / 'databases' / 'All.db'
+    sql_file_path = curent_path / 'all.sql'
+    
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    
+    # Read and execute SQL from file
+    if sql_file_path.exists():
+        with open(sql_file_path, 'r', encoding='utf-8') as f:
+            sql_script = f.read()
+        cursor.executescript(sql_script)
+    else:
+        # Fallback structure
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS admins (
+                user_id INTEGER,
+                chat_id INTEGER,
+                rang INTEGER DEFAULT 1,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (user_id, chat_id)
+            )
+        ''')
+    
+    connection.commit()
+    connection.close()
+
+def init_admin_db():
+    """Initialize admin.db database from admin.sql file"""
+    db_path = curent_path / 'databases' / 'admin.db'
+    sql_file_path = curent_path / 'admin.sql'
+    
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    
+    # Read and execute SQL from file
+    if sql_file_path.exists():
+        with open(sql_file_path, 'r', encoding='utf-8') as f:
+            sql_script = f.read()
+        cursor.executescript(sql_script)
+    else:
+        # Fallback structure
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS admins (
+                user_id INTEGER,
+                chat_id INTEGER,
+                chat_name TEXT,
+                can_see_users INTEGER,
+                can_do_admin INTEGER,
+                can_recom INTEGER,
+                can_links INTEGER,
+                can_dk INTEGER
+            )
+        ''')
+    
+    connection.commit()
+    connection.close()
+
+def create_fallback_tables(cursor):
+    """Fallback table creation if SQL files are not available"""
+    # Create basic tables structure here as fallback
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             tg_id INTEGER UNIQUE NOT NULL,
@@ -157,166 +231,20 @@ def init_chat_db(chat_id):
     ''')
     
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS bans (
-            tg_id INTEGER UNIQUE NOT NULL,
-            id_pubg INTEGER NOT NULL UNIQUE,
-            message_id INTEGER,
-            prichina TEXT,
-            date TEXT,
-            user_men TEXT,
-            moder_men TEXT
-        )
-    ''')
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS black_list (
-            user_id INTEGER UNIQUE,
-            rison TEXT DEFAULT 'неизвестна'
-        )
-    ''')
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS bookmarks (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            chat_id INTEGER NOT NULL,
-            message_id INTEGER NOT NULL,
-            message_text TEXT,
-            author_id INTEGER,
-            author_name TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE (user_id, chat_id, message_id)
-        )
-    ''')
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS default_periods (
-            command TEXT,
-            period TEXT,
-            chat INTEGER,
-            PRIMARY KEY (command, chat)
-        )
-    ''')
-    
-    cursor.execute('''
         CREATE TABLE IF NOT EXISTS dk (
             comand TEXT PRIMARY KEY,
             dk INTEGER
         )
     ''')
     
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS muts (
-            user_id INTEGER,
-            rang_moder INTEGER,
-            moder_id INTEGER,
-            moder_men TEXT,
-            date TEXT,
-            comments TEXT
-        )
-    ''')
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS perevod (
-            self_id INTEGER UNIQUE,
-            user_id INTEGER,
-            mess_id INTEGER,
-            stavka TEXT
-        )
-    ''')
-    
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS texts (
-            text_name TEXT PRIMARY KEY,
-            text TEXT
-        )
-    ''')
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS recommendation (
-            user_id INTEGER,
-            pubg_id INTEGER,
-            moder TEXT,
-            comments TEXT,
-            rang INTEGER,
-            date TEXT,
-            recom_id INTEGER
-        )
-    ''')
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS warns (
-            user_id INTEGER NOT NULL,
-            reason TEXT,
-            moder_id INTEGER,
-            date TEXT
-        )
-    ''')
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS warn_snat (
-            user_id INTEGER,
-            warn_text TEXT,
-            moder_give TEXT,
-            moder_snat TEXT
-        )
-    ''')
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS links (
-            link_text TEXT,
-            activate_count INTEGER,
-            sost INTEGER
-        )
-    ''')
-    
-
-    
-
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS ruletka (
-            user_id INTEGER PRIMARY KEY,
-            last_date TEXT
-        )
-    ''')
-
-
-    cursor.execute('''
-            CREATE TABLE IF NOT EXISTS din_admn_user_data (
-            user_id,
-            pubg_id,
-            moder,
-            comments,
-            rang,
-            date
-        );
-        ''')
-    cursor.execute('''
-            CREATE TABLE IF NOT EXISTS dinamic_admn_recommend (
-            user_id  UNIQUE,
-            is_do
-        );
-        ''')
-    
-    # Insert default command permissions if not exists
+    # Insert default commands
     default_commands = [
-        ('ban', 3),
-        ('mut', 2),
-        ('warn', 2),
-        ('all', 3),
-        ('rang', 4),
-        ('dk', 4),
-        ('change_pravils', 4),
-        ('close_chat', 4),
-        ('change_priv', 4), 
-        ('obavlenie', 4),
-        ('tur', 1),
-        ('dell', 1),
-        ('period', 4)
-
+        ('ban', 3), ('mut', 2), ('warn', 2), ('all', 3),
+        ('rang', 4), ('dk', 4), ('change_pravils', 4),
+        ('close_chat', 4), ('change_priv', 4), ('obavlenie', 4),
+        ('tur', 1), ('dell', 1), ('period', 4)
     ]
+    
     texts = [
         ('priv', 'Добро пожаловать!'),
         ('rules', '')
@@ -332,8 +260,6 @@ def init_chat_db(chat_id):
     for text_name, txt in texts:
         cursor.execute('INSERT OR IGNORE INTO texts (text_name, text) VALUES (?, ?)', (text_name, txt))
 
-    connection.commit()
-    connection.close()
 
 
 #? EN: Class to extract user information from a message (reply, mention, or ID)
