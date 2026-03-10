@@ -14,13 +14,13 @@ import os
 TOKEN = '8451829699:AAE_tfApKWq3r82i0U7yD98RCcQPIMmMT1Q'
 router = Router(name=__name__)
   
-@router.message(F.text.lower().startswith(('ник')))
+@router.message(F.text.lower().startswith(('/start')))
 async def show_nik(message, bot: Bot):
   
     buttons = [
         types.InlineKeyboardButton(
             text="MiniApp",
-            web_app=types.WebAppInfo(url=MINIAPP_LINKS_URL),
+            web_app=types.WebAppInfo(url='https://ezh-dev.ru/ezh_helper/new_chat_mem_dir/index.html'),
         ),
     ]
     keyboard = types.InlineKeyboardMarkup(inline_keyboard=[[btn] for btn in buttons])

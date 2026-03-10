@@ -822,6 +822,15 @@ class LinkDeleteAction(BaseModel):
 class CheckCodeAction(BaseModel):
     code: str
 
+class SubmitFormAction(BaseModel):
+    telegram_id: Optional[int] = None
+    user: Optional[str] = None
+    name: str
+    age: int
+    nick: str
+    gameId: str
+    invite_code: str
+
 @app.post('/api/links/delete')
 def delete_link(action: LinkDeleteAction):
     """
@@ -922,6 +931,52 @@ def check_invite_code(action: CheckCodeAction):
         return {
             "status": "error",
             "message": f"Ошибка при проверке кода: {str(e)}"
+        }
+
+@app.post('/submit_form')
+def submit_form(action: SubmitFormAction):
+    """
+    Принимает данные пользователя из формы заявки
+    """
+    try:
+        # Валидация обязательных полей
+        if not action.name or not action.nick or not action.gameId or not action.invite_code:
+            return {"status": "error", "message": "Заполните все обязательные поля"}
+        
+        if action.age < 7 or action.age > 50:
+            return {"status": "error", "message": "Возраст должен быть от 7 до 50"}
+        
+        connection = sqlite3.connect(all_path, check_same_thread=False)
+        cursor = connection.cursor()
+        
+
+        
+        application_id = 1
+        connection.commit()
+        connection.close()
+        
+        print("="*50)
+        print("Новая заявка в клан:")
+        print(f"ID заявки: {application_id}")
+        print(f"Telegram ID: {action.telegram_id}")
+        print(f"Username: {action.user}")
+        print(f"Имя: {action.name}")
+        print(f"Возраст: {action.age}")
+        print(f"Ник: {action.nick}")
+        print(f"Game ID: {action.gameId}")
+        print(f"Код приглашения: {action.invite_code}")
+        print("="*50)
+        
+        return {
+            "status": "success",
+            "message": "Заявка успешно отправлена",
+            "application_id": application_id
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Ошибка при отправке заявки: {str(e)}"
         }
 
 @app.post('/links-create')
