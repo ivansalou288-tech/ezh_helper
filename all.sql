@@ -1,4 +1,4 @@
-CREATE TABLE admin_permissions (
+CREATE TABLE IF NOT EXISTS admin_permissions (
     id              INTEGER   PRIMARY KEY AUTOINCREMENT,
     admin_id        INTEGER,
     chat_id         INTEGER,
@@ -13,7 +13,7 @@ CREATE TABLE admin_permissions (
     chat_id) 
 );
 
-CREATE TABLE admins (
+CREATE TABLE IF NOT EXISTS admins (
     user_id    INTEGER,
     chat_id    INTEGER,
     rang       INTEGER   DEFAULT 1,
@@ -24,12 +24,12 @@ CREATE TABLE admins (
     )
 );
 
-CREATE TABLE all_users (
+CREATE TABLE IF NOT EXISTS all_users (
     user_id   UNIQUE,
     username
 );
 
-CREATE TABLE chat_info (
+CREATE TABLE IF NOT EXISTS chat_info (
     chat_id        INTEGER   PRIMARY KEY,
     chat_title     TEXT,
     chat_username  TEXT,
@@ -37,20 +37,20 @@ CREATE TABLE chat_info (
     updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE farma (
+CREATE TABLE IF NOT EXISTS farma (
     user_id   UNIQUE,
     meshok    INTEGER,
     last_date
 );
 
-CREATE TABLE perevod (
+CREATE TABLE IF NOT EXISTS perevod (
     self_id  UNIQUE,
     user_id,
     mess_id,
     stavka
 );
 
-CREATE TABLE stavki (
+CREATE TABLE IF NOT EXISTS stavki (
     user_id    UNIQUE,
     mess_id,
     stavka,

@@ -1,4 +1,4 @@
-CREATE TABLE bans (
+CREATE TABLE IF NOT EXISTS bans (
     tg_id      INTEGER UNIQUE
                        NOT NULL,
     id_pubg    INTEGER NOT NULL
@@ -10,12 +10,12 @@ CREATE TABLE bans (
     moder_men  TEXT
 );
 
-CREATE TABLE black_list (
+CREATE TABLE IF NOT EXISTS black_list (
     user_id INTEGER UNIQUE,
     rison   TEXT    DEFAULT 'неизвестна'
 );
 
-CREATE TABLE bookmarks (
+CREATE TABLE IF NOT EXISTS bookmarks (
     id           INTEGER   PRIMARY KEY AUTOINCREMENT,
     user_id      INTEGER   NOT NULL,
     chat_id      INTEGER   NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE bookmarks (
     )
 );
 
-CREATE TABLE default_periods (
+CREATE TABLE IF NOT EXISTS default_periods (
     command TEXT,
     period  TEXT,
     chat    INTEGER,
@@ -41,7 +41,7 @@ CREATE TABLE default_periods (
     )
 );
 
-CREATE TABLE din_admn_user_data (
+CREATE TABLE IF NOT EXISTS din_admn_user_data (
     user_id,
     pubg_id,
     moder,
@@ -50,17 +50,17 @@ CREATE TABLE din_admn_user_data (
     date
 );
 
-CREATE TABLE dinamic_admn_recommend (
+CREATE TABLE IF NOT EXISTS dinamic_admn_recommend (
     user_id  UNIQUE,
     is_do
 );
 
-CREATE TABLE dk (
+CREATE TABLE IF NOT EXISTS dk (
     comand TEXT    PRIMARY KEY,
     dk     INTEGER
 );
 
-CREATE TABLE muts (
+CREATE TABLE IF NOT EXISTS muts (
     user_id    INTEGER,
     rang_moder INTEGER,
     moder_id   INTEGER,
@@ -69,7 +69,7 @@ CREATE TABLE muts (
     comments   TEXT
 );
 
-CREATE TABLE recommendation (
+CREATE TABLE IF NOT EXISTS recommendation (
     user_id  INTEGER,
     pubg_id  INTEGER,
     moder    TEXT,
@@ -79,24 +79,24 @@ CREATE TABLE recommendation (
     recom_id INTEGER
 );
 
-CREATE TABLE ruletka (
+CREATE TABLE IF NOT EXISTS ruletka (
     user_id   INTEGER PRIMARY KEY,
     last_date TEXT
 );
 
-CREATE TABLE stavki (
+CREATE TABLE IF NOT EXISTS stavki (
     user_id   INTEGER UNIQUE,
     mess_id   INTEGER,
     stavka    TEXT,
     last_date TEXT
 );
 
-CREATE TABLE texts (
+CREATE TABLE IF NOT EXISTS texts (
     text_name TEXT PRIMARY KEY,
     text      TEXT
 );
 
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     tg_id      INTEGER UNIQUE
                        NOT NULL,
     username   TEXT,
@@ -113,14 +113,14 @@ CREATE TABLE users (
 );
 
 
-CREATE TABLE warn_snat (
+CREATE TABLE IF NOT EXISTS warn_snat (
     user_id    INTEGER,
     warn_text  TEXT,
     moder_give TEXT,
     moder_snat TEXT
 );
 
-CREATE TABLE warns (
+CREATE TABLE IF NOT EXISTS warns (
     user_id  INTEGER NOT NULL,
     reason   TEXT,
     moder_id INTEGER,

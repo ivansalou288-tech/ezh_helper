@@ -1,4 +1,4 @@
-CREATE TABLE admins (
+CREATE TABLE IF NOT EXISTS admins (
     user_id,
     chat_id,
     chat_name,
