@@ -3501,9 +3501,7 @@ async def bind_chat_to_admin(message: types.Message, bot: Bot):
         return
     
     # Проверяем, что чат в списке разрешенных
-    if message.chat.id not in chats:
-        await message.answer(f' {krest} Этот чат не поддерживается!', parse_mode='html')
-        return
+
     init_all_db()
     init_admin_db() 
     init_chat_db(message.chat.id)
