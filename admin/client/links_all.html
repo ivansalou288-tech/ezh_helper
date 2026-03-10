@@ -93,6 +93,24 @@
         font-weight: 600;
         font-size: 60px;
       }
+      .delete-btn {
+        background: rgba(244, 67, 54, 0.8);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 40px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+      .delete-btn:hover {
+        background: rgba(244, 67, 54, 1);
+        transform: scale(1.05);
+      }
+      .delete-btn:active {
+        transform: scale(0.95);
+      }
       .no-links {
         text-align: center;
         padding: 40px 20px;
@@ -123,6 +141,10 @@
         }
         .activate-count {
           font-size: 20px;
+        }
+        .delete-btn {
+          font-size: 16px;
+          padding: 6px 12px;
         }
       }
 
@@ -271,15 +293,19 @@
                 <tr>
                   <th>Ссылка</th>
                   <th>Активации</th>
+                  <th>Действия</th>
                 </tr>
               </thead>
               <tbody>
                 ${links.map(link => `
-                  <tr>
+                  <tr id="link-row-${link.link}">
                     <td>
                       <span class="link-url" onclick="copyToClipboard('${link.link}', event)" style="cursor: pointer;">${link.link}</span>
                     </td>
                     <td><span class="activate-count">${link.activate_cnt || 0}</span></td>
+                    <td>
+                      <button class="delete-btn" onclick="deleteLink('${link.link}', '${link.chat_id}')">Удалить</button>
+                    </td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -287,6 +313,43 @@
           `;
           
           container.innerHTML = tableHTML;
+        }
+
+        function deleteLink(link, chatId) {
+          if (confirm(`Удалить ссылку ${link}?`)) {
+            fetch(`https://ezh-dev.ru:3000/api/links/delete`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                link: link,
+                chat_id: chatId
+              })
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.status === 'success') {
+                showNotification('Ссылка удалена!');
+                // Удаляем строку из таблицы
+                const row = document.getElementById(`link-row-${link}`);
+                if (row) {
+                  row.remove();
+                }
+                // Если ссылок не осталось, показываем сообщение
+                const tbody = document.querySelector('.links-table tbody');
+                if (tbody && tbody.children.length === 0) {
+                  loadAllLinks(); // Перезагружаем данные
+                }
+              } else {
+                showNotification('Ошибка удаления: ' + data.message);
+              }
+            })
+            .catch(error => {
+              console.error('Ошибка:', error);
+              showNotification('Ошибка удаления ссылки');
+            });
+          }
         }
 
         function copyToClipboard(text, event) {

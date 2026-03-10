@@ -815,6 +815,55 @@ def get_all_links(chat_id: Optional[int] = None):
             "message": f"Ошибка при получении ссылок: {str(e)}"
         }
 
+@app.post('/api/links/delete')
+def delete_link(request: Request):
+    """
+    Удаляет ссылку из таблицы links
+    """
+    try:
+        data = request.json()
+        link = data.get('link')
+        chat_id = data.get('chat_id')
+        
+        if not link:
+            return {"status": "error", "message": "link is required"}
+        
+        connection = sqlite3.connect(all_path, check_same_thread=False)
+        cursor = connection.cursor()
+        
+        # Создаем таблицу если не существует
+        cursor.execute('''CREATE TABLE IF NOT EXISTS links (
+            chat_id INTEGER,
+            link TEXT,
+            activate_cnt INTEGER
+        )''')
+        connection.commit()
+        
+        # Удаляем ссылку
+        if chat_id:
+            cursor.execute('DELETE FROM links WHERE link = ? AND chat_id = ?', (link, chat_id))
+        else:
+            cursor.execute('DELETE FROM links WHERE link = ?', (link,))
+        
+        deleted = cursor.rowcount
+        connection.commit()
+        connection.close()
+        
+        if deleted == 0:
+            return {"status": "error", "message": "Ссылка не найдена"}
+        
+        return {
+            "status": "success",
+            "message": "Ссылка успешно удалена",
+            "deleted": deleted
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Ошибка при удалении ссылки: {str(e)}"
+        }
+
 @app.post('/links-create')
 def links_create(action: LinkCreateAction):
     connection = sqlite3.connect(all_path, check_same_thread=False)
