@@ -802,7 +802,7 @@ def get_all_links(chat_id: Optional[int] = None):
                 "link": link[1],
                 "activate_cnt": link[2] if link[2] is not None else 0
             })
-        
+        print(links_list)
         return {
             "status": "success",
             "links": links_list,
