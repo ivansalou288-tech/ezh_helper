@@ -105,26 +105,108 @@
             color: rgba(255, 255, 255, 0.7);
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: rgba(255, 255, 255, 0.6);
+        .links-grid {
+            width: 100%;
+            max-width: 640px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
         }
 
-        .empty-state-icon {
-            font-size: 4em;
-            margin-bottom: 20px;
-            opacity: 0.3;
+        .neon-card {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 18px 18px;
+            border-radius: 18px;
+            text-decoration: none;
+            cursor: pointer;
+            user-select: none;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.05));
+            border: 1px solid rgba(0, 229, 255, 0.28);
+            box-shadow:
+                0 0 0 1px rgba(255, 45, 253, 0.10) inset,
+                0 12px 28px rgba(0, 0, 0, 0.45),
+                0 0 26px rgba(0, 229, 255, 0.10),
+                0 0 34px rgba(255, 45, 253, 0.08);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
         }
 
-        .empty-state-text {
+        .neon-card::before {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            border-radius: 18px;
+            pointer-events: none;
+            background:
+                radial-gradient(1000px 220px at 20% 0%, rgba(0, 229, 255, 0.20), transparent 60%),
+                radial-gradient(800px 240px at 80% 100%, rgba(255, 45, 253, 0.16), transparent 55%);
+            opacity: 0.9;
+            filter: saturate(1.2);
+        }
+
+        .neon-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(0, 229, 255, 0.55);
+            box-shadow:
+                0 0 0 1px rgba(255, 45, 253, 0.14) inset,
+                0 16px 34px rgba(0, 0, 0, 0.55),
+                0 0 34px rgba(0, 229, 255, 0.16),
+                0 0 42px rgba(255, 45, 253, 0.12);
+        }
+
+        .neon-left {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 0;
+            z-index: 1;
+        }
+
+        .neon-title {
+            font-size: 1.12em;
+            font-weight: 800;
+            color: #e9f9ff;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.18);
+        }
+
+        .neon-subtitle {
+            font-size: 0.95em;
+            color: rgba(255, 255, 255, 0.70);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .neon-right {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1;
+        }
+
+        .neon-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            background: rgba(0, 229, 255, 0.08);
+            border: 1px solid rgba(0, 229, 255, 0.25);
+            box-shadow: 0 0 18px rgba(0, 229, 255, 0.10);
+            color: #00e5ff;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.55);
             font-size: 1.2em;
-            margin-bottom: 10px;
         }
 
-        .empty-state-subtext {
-            font-size: 0.9em;
-            opacity: 0.7;
+        .neon-arrow {
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.55);
         }
 
         @media (max-width: 768px) {
@@ -145,13 +227,31 @@
     <div class="main-content">
         <div class="page-header">
             <h1 class="page-title">Ссылки</h1>
-            <div class="page-subtitle">Функция в разработке</div>
+            <div class="page-subtitle">Управление ссылками</div>
         </div>
 
-        <div class="empty-state">
-            <div class="empty-state-icon">🔗</div>
-            <div class="empty-state-text">Функция ссылки</div>
-            <div class="empty-state-subtext">Эта функция находится в разработке и будет доступна в ближайшее время</div>
+        <div class="links-grid">
+            <a class="neon-card" href="links_create.html" onclick="return goWithQuery(event, 'links_create.html')">
+                <div class="neon-left">
+                    <div class="neon-title">Создать ссылку</div>
+                    <div class="neon-subtitle">Окно создания новой ссылки (пустое)</div>
+                </div>
+                <div class="neon-right">
+                    <div class="neon-icon">＋</div>
+                    <div class="neon-arrow">›</div>
+                </div>
+            </a>
+
+            <a class="neon-card" href="links_all.html" onclick="return goWithQuery(event, 'links_all.html')">
+                <div class="neon-left">
+                    <div class="neon-title">Все ссылки</div>
+                    <div class="neon-subtitle">Список всех ссылок (пустое)</div>
+                </div>
+                <div class="neon-right">
+                    <div class="neon-icon">≡</div>
+                    <div class="neon-arrow">›</div>
+                </div>
+            </a>
         </div>
     </div>
 
@@ -235,6 +335,16 @@
         document.addEventListener('DOMContentLoaded', () => {
             updateUserProfile();
         });
+
+        function goWithQuery(event, target) {
+            try {
+                event?.preventDefault?.();
+                window.location.href = target + window.location.search;
+                return false;
+            } catch (_) {
+                return true;
+            }
+        }
     </script>
 </body>
 </html>

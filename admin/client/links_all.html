@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Все ссылки</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0a0a; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; }
+        .container { max-width: 640px; margin: 0 auto; padding-top: 95px; }
+        .header { text-align: center; margin-bottom: 22px; }
+        .title { font-size: 2em; color: #b388ff; text-shadow: 0 0 20px #b388ff, 0 0 40px #7c4dff; margin-bottom: 10px; }
+        .subtitle { color: rgba(255, 255, 255, 0.7); }
+
+        .glass-panel {
+            position: relative;
+            margin-top: 18px;
+            padding: 22px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.05));
+            border: 1px solid rgba(0, 229, 255, 0.28);
+            box-shadow:
+                0 0 0 1px rgba(255, 45, 253, 0.10) inset,
+                0 12px 28px rgba(0, 0, 0, 0.45),
+                0 0 26px rgba(0, 229, 255, 0.10),
+                0 0 34px rgba(255, 45, 253, 0.08);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+        .glass-panel::before {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            border-radius: 18px;
+            pointer-events: none;
+            background:
+                radial-gradient(1000px 260px at 15% 0%, rgba(0, 229, 255, 0.18), transparent 60%),
+                radial-gradient(900px 260px at 85% 100%, rgba(255, 45, 253, 0.14), transparent 55%);
+            opacity: 0.95;
+        }
+
+        .placeholder {
+            position: relative;
+            text-align: center;
+            padding: 48px 10px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .placeholder-icon { font-size: 3.2em; opacity: 0.55; margin-bottom: 12px; }
+        .placeholder-text { font-size: 1.1em; font-weight: 700; margin-bottom: 6px; color: #e9f9ff; text-shadow: 0 0 10px rgba(0, 229, 255, 0.18); }
+        .placeholder-subtext { font-size: 0.95em; opacity: 0.8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">Все ссылки</h1>
+            <div class="subtitle">Окно пока пустое</div>
+        </div>
+
+        <div class="glass-panel">
+            <div class="placeholder">
+                <div class="placeholder-icon">🧾</div>
+                <div class="placeholder-text">Список ссылок появится здесь</div>
+                <div class="placeholder-subtext">Пока что это заглушка (liquid glass / neon)</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const tg = window.Telegram?.WebApp;
+            if (!tg) return;
+
+            try {
+                tg.ready();
+                tg.expand();
+                tg.requestFullscreen();
+                if (tg.setHeaderColor) tg.setHeaderColor('#0a0a0a');
+                if (tg.setBackgroundColor) tg.setBackgroundColor('#0a0a0a');
+                if (tg.BackButton) {
+                    tg.BackButton.show();
+                    tg.BackButton.onClick(() => {
+                        window.location.href = 'links.html' + window.location.search;
+                    });
+                }
+                if (tg.MainButton) tg.MainButton.hide();
+                if (tg.SettingsButton) tg.SettingsButton.hide();
+            } catch (_) {
+                // ignore
+            }
+        })();
+    </script>
+</body>
+</html>
