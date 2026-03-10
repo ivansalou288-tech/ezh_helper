@@ -36,11 +36,6 @@ async def kasik(message: types.Message):
         await message.answer(
             '📝Эта команда предназначена для использования в групповых чатах, а не в личных сообщениях!')
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
-    
-    if message.from_user.id in black_list:
         await message.answer('В доступе отказано, ты в черном списке')
         return
 

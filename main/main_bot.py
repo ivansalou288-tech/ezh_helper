@@ -42,9 +42,7 @@ page_c_b = 0
 async def show_nik(message, bot: Bot):
     if len(message.text.split()[0]) != 3:
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     try:
         if len(message.text.split()[1]) > 0:
             try:
@@ -87,9 +85,7 @@ async def show_nik(message, bot: Bot):
 async def plus_nik(message, bot: Bot):
     if len(message.text.split()[0]) != 4:
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     if message.chat.id == message.from_user.id:
         await message.answer(
             f'{write_em}Эта команда предназначена для использования в групповых чатах, а не в личных сообщениях!')
@@ -125,9 +121,7 @@ async def plus_nik(message, bot: Bot):
 async def plus_igr_nik(message, bot: Bot):
     if len(message.text.split()[1]) != 3:
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     if message.chat.id == message.from_user.id:
         await message.answer(
             f'{write_em}Эта команда предназначена для использования в групповых чатах, а не в личных сообщениях!')
@@ -163,9 +157,7 @@ async def plus_igr_nik(message, bot: Bot):
 async def plus_igr_id(message, bot: Bot):
     if len(message.text.split()[1]) != 4:
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     if message.chat.id == message.from_user.id:
         await message.answer(
             f'{write_em}Эта команда предназначена для использования в групповых чатах, а не в личных сообщениях!')
@@ -210,9 +202,7 @@ async def plus_igr_id(message, bot: Bot):
 #* RU: Показывает сгруппированный по рангам список админов чата (владелец, менеджер, замы и т.д.) с веселыми иконками.
 @router.message(F.text.lower().startswith(('кто админ')))
 async def kto_admin(message, bot: Bot): 
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     if message.chat.id == message.from_user.id:
         await message.answer(
             f'{write_em}Эта команда предназначена для использования в групповых чатах, а не в личных сообщениях!')
@@ -303,9 +293,7 @@ async def kto_admin(message, bot: Bot):
 async def kto_i(message, bot: Bot):
     if len(message.text) != 5:
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     if message.chat.id == message.from_user.id:
         await message.answer(
             f'{write_em}Эта команда предназначена для использования в групповых чатах, а не в личных сообщениях!')
@@ -447,9 +435,7 @@ async def kto_i(message, bot: Bot):
 async def kto_ti(message, bot: Bot):
     if len(message.text.split()[1]) != 2:
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     if message.chat.id == message.from_user.id:
         await message.answer(
             f'{write_em}Эта команда предназначена для использования в групповых чатах, а не в личных сообщениях!')
@@ -599,9 +585,7 @@ async def snatie_warns(message: types.Message, bot: Bot):
     global page, mes_id, itog, page_c
     # if len(message.text.split()[1:]) > 0 and '\n'.join(message.text.split('\n')[1:]) != ' '.join(message.text.split()[1:]):
     #     return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     if message.chat.id == message.from_user.id:
         await message.answer(
             f'{write_em}Эта команда предназначена для использования в групповых чатах, а не в личных сообщениях!')
@@ -796,9 +780,7 @@ async def ban_list(message: types.Message, bot: Bot):
     print('ban list ')
     if len(message.text.split()[0]) != 7:
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     if message.chat.id == message.from_user.id:
         await message.answer(f'{write_em}Эта команда предназначена для использования в групповых чатах, а не в личных сообщениях!', parse_mode='html')
         return
@@ -924,9 +906,7 @@ async def ban(message, bot: Bot):
         return
     
     # Проверка, что команда используется в групповом чате
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     
     if message.chat.id == message.from_user.id:
         await message.answer(
@@ -1016,9 +996,7 @@ async def ban(message, bot: Bot):
 async def unban(message, bot: Bot):
     if len(message.text.split()[0]) != 6:
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     try:
         if len(message.text.split()[1]) > 0:
             try:
@@ -1071,9 +1049,7 @@ async def unban(message, bot: Bot):
 async def returner(message, bot: Bot):
     if len(message.text.split()[0]) != 7:
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     try:
         if len(message.text.split()[1]) > 0:
             try:
@@ -1134,10 +1110,7 @@ async def mutes_check(message, bot: Bot):
     # if len(message.text.split()[0]) != 4:
     #     return
     # Убираем строгую проверку на аргументы, позволяем использовать команду без дополнительных параметров
-    if message.chat.id not in chats:
-        print(f"Чат {message.chat.id} не в списке разрешенных")
-        await message.answer('кыш')
-        return
+
 
     if message.chat.id == message.from_user.id:
         print("Команда использована в личном чате")
@@ -1222,7 +1195,7 @@ async def mutes_check(message, bot: Bot):
 async def mute(message, bot: Bot):
     global is_auto_unmute
     
-    if len(message.text.split()[0]) != 3 or message.chat.id not in chats:
+    if len(message.text.split()[0]) != 3:
         return
     
     if message.chat.id == message.from_user.id:
@@ -1300,8 +1273,8 @@ async def mute(message, bot: Bot):
     elif result != False:
         await message.reply(result, parse_mode='html')
     
-    if not is_auto_unmute:
-        await auto_unmute(message, bot)
+    # if not is_auto_unmute:
+    #     await auto_unmute(message, bot)
 
 
 #? EN: Unmutes a user in the chat, returning them the ability to write messages.
@@ -1314,9 +1287,7 @@ async def unmute(message, bot: Bot):
         return
     
     # Проверка, что команда используется в групповом чате
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     if len(message.text.split()[1:]) > 0 and '\n'.join(message.text.split('\n')[1:]) != ' '.join(message.text.split()[1:]):
         try:
             if message.text.split('@')[1] != "":
@@ -1432,9 +1403,7 @@ async def unmute(message, bot: Bot):
 async def warns_show(message, bot: Bot):
     if len(message.text.split()[0]) != 5:
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     if len(message.text.split()[1:]) > 0 and '\n'.join(message.text.split('\n')[1:]) != ' '.join(message.text.split()[1:]):
         try:
             message.text.split('@')[1]
@@ -1461,9 +1430,7 @@ async def warns_show(message, bot: Bot):
 async def warns_give(message, bot: Bot):
     if len(message.text.split()[0]) != 4:
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     if len(message.text) > 0:
         a = ' '.join(message.text.split()[1:])
         print('text1', a)
@@ -1546,9 +1513,7 @@ async def warns_give(message, bot: Bot):
 async def dell_warn(message, bot: Bot):
     if len(message.text.split()[1]) != 4:
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     a = 0
     if len(message.text.split()[2:]) > 0 and '\n'.join(message.text.split('\n')[2:]) != ' '.join(message.text.split()[2:]):
         try:
@@ -1641,9 +1606,7 @@ async def snatie_warns(message, bot: Bot):
     global page, mes_id, itog, page_c
     if len(message.text.split()[1]) != 5:
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     if message.chat.id == message.from_user.id:
         await message.answer(
             f'{write_em}Эта команда предназначена для использования в групповых чатах, а не в личных сообщениях!')
@@ -1991,73 +1954,73 @@ async def snat_list_next(call: types.CallbackQuery, bot: Bot):
 
 
 #? EN: Starts a background loop that automatically unmutes users when their mute time expires.
-#* RU: Запускает фоновый цикл, автоматически размутивший пользователей по истечении времени мута.
-@router.message(Command(commands='auto_unmute'))
-async def auto_unmute(message: types.Message, bot: Bot):
-    global is_auto_unmute
-    is_auto_unmute = True
-
-    while True:
-        try:
-            # Get all active chats
-            for chat_id in chats:
-                try:
-                    connection = sqlite3.connect(get_db_path(chat_id), check_same_thread=False)
-                    cursor = connection.cursor()
-
-                    # Check if muts table exists, create it if not
-                    cursor.execute('''SELECT name FROM sqlite_master WHERE type='table' AND name='muts' ''')
-                    if not cursor.fetchone():
-                        # Create muts table
-                        cursor.execute('''CREATE TABLE muts (
-                            user_id INTEGER,
-                            rang_moder INTEGER,
-                            moder_id INTEGER,
-                            moder_men TEXT,
-                            date TEXT,
-                            comments TEXT
-                        )''')
-                        connection.commit()
-                        continue  # Skip to next chat since this one has no muts yet
-
-                    dates = cursor.execute(f"SELECT date FROM muts").fetchall()
-                    dates_muts = []
-                    for date in dates:
-                        dates_muts.append(date[0])
-                    now_time = datetime.now().strftime('%H:%M:%S %d.%m.%Y')
-                    await asyncio.sleep(1)
-                    connection.commit()
-                    if now_time in dates_muts:
-
-                        now_time = (datetime.now() - timedelta(seconds=1)).strftime('%H:%M:%S %d.%m.%Y')
-
-                        user_id = cursor.execute(f"SELECT user_id FROM muts WHERE date = ?",
-                                                 (now_time,)).fetchall()[0][0]
-                        
-                        chat_member = await bot.get_chat_member(chat_id=chat_id, user_id=int(user_id))
-                        name_user = chat_member.user.first_name
-                        try:
-                            cursor.execute(f'DELETE FROM muts WHERE date = ?', (now_time,))
-                            connection.commit()
-                        except sqlite3.OperationalError:
-                            print('error')
-                            continue
-                        
-                        await bot.send_message(chat_id,
-                                               f'{unmut_em}<a href="tg://user?id={user_id}">{name_user}</a> твой срок молчания подошел к концу, можешь говорить, но будь аккуратнее впредь\n\n{voscl}Правила чата можно посмотреть по команде «<code>правила</code>»',
-                                               parse_mode='html')
-                    
-                    connection.close()
-                except Exception as e:
-                    print(f"Error in auto_unmute for chat {chat_id}: {e}")
-                    try:
-                        connection.close()
-                    except:
-                        pass
-        except Exception as e:
-            print(f"Global error in auto_unmute: {e}")
-        await asyncio.sleep(1)
-
+# #* RU: Запускает фоновый цикл, автоматически размутивший пользователей по истечении времени мута.
+# @router.message(Command(commands='auto_unmute'))
+# async def auto_unmute(message: types.Message, bot: Bot):
+#     global is_auto_unmute
+#     is_auto_unmute = True
+#
+#     while True:
+#         try:
+#             # Get all active chats
+#             for chat_id in chats:
+#                 try:
+#                     connection = sqlite3.connect(get_db_path(chat_id), check_same_thread=False)
+#                     cursor = connection.cursor()
+#
+#                     # Check if muts table exists, create it if not
+#                     cursor.execute('''SELECT name FROM sqlite_master WHERE type='table' AND name='muts' ''')
+#                     if not cursor.fetchone():
+#                         # Create muts table
+#                         cursor.execute('''CREATE TABLE muts (
+#                             user_id INTEGER,
+#                             rang_moder INTEGER,
+#                             moder_id INTEGER,
+#                             moder_men TEXT,
+#                             date TEXT,
+#                             comments TEXT
+#                         )''')
+#                         connection.commit()
+#                         continue  # Skip to next chat since this one has no muts yet
+#
+#                     dates = cursor.execute(f"SELECT date FROM muts").fetchall()
+#                     dates_muts = []
+#                     for date in dates:
+#                         dates_muts.append(date[0])
+#                     now_time = datetime.now().strftime('%H:%M:%S %d.%m.%Y')
+#                     await asyncio.sleep(1)
+#                     connection.commit()
+#                     if now_time in dates_muts:
+#
+#                         now_time = (datetime.now() - timedelta(seconds=1)).strftime('%H:%M:%S %d.%m.%Y')
+#
+#                         user_id = cursor.execute(f"SELECT user_id FROM muts WHERE date = ?",
+#                                                  (now_time,)).fetchall()[0][0]
+#
+#                         chat_member = await bot.get_chat_member(chat_id=chat_id, user_id=int(user_id))
+#                         name_user = chat_member.user.first_name
+#                         try:
+#                             cursor.execute(f'DELETE FROM muts WHERE date = ?', (now_time,))
+#                             connection.commit()
+#                         except sqlite3.OperationalError:
+#                             print('error')
+#                             continue
+#
+#                         await bot.send_message(chat_id,
+#                                                f'{unmut_em}<a href="tg://user?id={user_id}">{name_user}</a> твой срок молчания подошел к концу, можешь говорить, но будь аккуратнее впредь\n\n{voscl}Правила чата можно посмотреть по команде «<code>правила</code>»',
+#                                                parse_mode='html')
+#
+#                     connection.close()
+#                 except Exception as e:
+#                     print(f"Error in auto_unmute for chat {chat_id}: {e}")
+#                     try:
+#                         connection.close()
+#                     except:
+#                         pass
+#         except Exception as e:
+#             print(f"Global error in auto_unmute: {e}")
+#         await asyncio.sleep(1)
+#
 
 #? EN: Mentions all admins/overseers in the chat to gather them, optionally with an announcement text.
 #* RU: Созывает всех админов/ответственных в чате, отмечая их и при необходимости добавляя объявление.
@@ -2067,9 +2030,7 @@ async def admn_sbor(message, bot: Bot):
     
     connection = sqlite3.connect(get_db_path(message.chat.id))
     cursor = connection.cursor()
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     try:
         cursor.execute('SELECT tg_id FROM users WHERE rang > 0')
         users = cursor.fetchall()
@@ -2104,9 +2065,7 @@ async def admn_sbor(message, bot: Bot):
 #* RU: Организует общий сбор для всех участников чата, проверяя и красиво оформляя текст объявления.
 @router.message(F.text.lower().startswith(('созыв', 'созвать', 'общий сбор')))
 async def all_sbor(message):
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     #
     try:
         if len(message.text.split()[1]) > 4:
@@ -2254,9 +2213,7 @@ async def all_sbor(message):
 async def rang_up(message: types.Message, bot: Bot):
     if len(message.text.split()[0]) != 8:
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
 
     if message.chat.id == message.from_user.id:
         await message.answer(
@@ -2339,9 +2296,7 @@ async def rang_up(message: types.Message, bot: Bot):
 async def rang_down(message: types.Message, bot: Bot):
     if len(message.text.split()[0]) != 8:
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     if message.chat.id == message.from_user.id:
         await message.answer(
             f'{write_em}Эта команда предназначена для использования в групповых чатах, а не в личных сообщениях!')
@@ -2424,9 +2379,7 @@ async def rang_down(message: types.Message, bot: Bot):
 async def rang_snat(message: types.Message, bot: Bot):
     if len(message.text.split()[0]) > 11:
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
 
     if message.chat.id == message.from_user.id:
         await message.answer(
@@ -2490,9 +2443,7 @@ async def rang_snat(message: types.Message, bot: Bot):
 async def about_user(message):
     if len(message.text.split()[0]) != 8:
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     if message.chat.id == message.from_user.id:
         await message.answer(
             f'{write_em}Эта команда предназначена для использования в групповых чатах, а не в личных сообщениях!')
@@ -2562,9 +2513,7 @@ async def about_user(message):
 async def close_chat(message, bot: Bot):
     if len(message.text.split()[0]) != 4:
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     if message.chat.id == message.from_user.id:
         await message.answer(
             f'{write_em}Эта команда предназначена для использования в групповых чатах, а не в личных сообщениях!')
@@ -2596,9 +2545,7 @@ async def minus_sms(message, bot: Bot):
     if not message.reply_to_message:
         return
     
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     
     if message.chat.id == message.from_user.id:
         await message.answer(
@@ -2628,9 +2575,7 @@ async def open_chat(message, bot: Bot):
         await message.answer(
             f'{write_em}Эта команда предназначена для использования в групповых чатах, а не в личных сообщениях!')
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     if await is_successful_moder(moder_id, message.chat.id, 'close_chat') == False:
         await message.reply(f'{write_em}Ранг модератора не достаточен для использования этой команды')
         return
@@ -2687,9 +2632,7 @@ async def open_chat_button(call, bot: Bot):
 async def pravila(message, bot: Bot):
     if len(message.text) != 7:
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     if message.chat.id == message.from_user.id:
         await message.answer(
             f'{write_em}Эта команда предназначена для использования в групповых чатах, а не в личных сообщениях!')
@@ -2715,9 +2658,7 @@ async def pravila(message, bot: Bot):
 @router.message(F.text.lower().startswith(('+правила')))
 async def plus_pravila(message, bot: Bot):
 
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     if message.chat.id == message.from_user.id:
         await message.answer(
             f'{write_em}Эта команда предназначена для использования в групповых чатах, а не в личных сообщениях!')
@@ -2804,9 +2745,7 @@ async def show_pravil_vhod(message, bot: Bot):
 async def dk(message, bot: Bot):
     if len(message.text.split()[0]) != 2:
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     if message.chat.id == message.from_user.id:
         await message.answer(
             f'{write_em}Эта команда предназначена для использования в групповых чатах, а не в личных сообщениях!')
@@ -2926,9 +2865,7 @@ async def new_chat_mem(message, bot: Bot):
     user_id = new.id
     user = new.mention_html()
     print(user_id, username)
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     
     # Update username in main database clan tables
     connection = sqlite3.connect(get_db_path(message.chat.id), check_same_thread=False)
@@ -2965,9 +2902,7 @@ async def new_chat_mem(message, bot: Bot):
 @router.message(F.text.lower().startswith('+приветствие'))
 async def add_privetstvie(message, bot: Bot):
     moder_id = message.from_user.id
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     if message.chat.id == message.from_user.id:
         await message.answer(
             f'{write_em}Эта команда предназначена для использования в групповых чатах, а не в личных сообщениях!')
@@ -3006,9 +2941,7 @@ async def add_privetstvie(message, bot: Bot):
 async def privetstvie(message, bot: Bot):
     if len(message.text) != 11:
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     if message.chat.id == message.from_user.id:
         await message.answer(
             f'{write_em}Эта команда предназначена для использования в групповых чатах, а не в личных сообщениях!')
@@ -3036,9 +2969,7 @@ async def recom_check(message, bot: Bot):
     if len(message.text.split()[0]) != 12:
         return
 
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     
     # Initialize database for this chat if it doesn't exist
     init_chat_db(message.chat.id)
@@ -3113,9 +3044,7 @@ async def add_recom(message, bot: Bot):
     else:
         await message.reply(f'{write_em}Тебе не доступна эта функция')
         return
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     connection = sqlite3.connect(get_db_path(message.chat.id), check_same_thread=False)
     cursor = connection.cursor()
     text = message.text
@@ -3210,9 +3139,7 @@ async def add_recom(message, bot: Bot):
 async def dell_recom(message, bot: Bot):
     connection = sqlite3.connect(get_db_path(message.chat.id), check_same_thread=False)
     cursor = connection.cursor()
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     try:
         us = message.text.split()[1]
         print(us)
@@ -3296,9 +3223,7 @@ async def dell_recom(message, bot: Bot):
 #* RU: Показывает Telegram ID пользователя (по @, ответу или себе) в удобном для копирования виде.
 @router.message(Command(commands=['ид'], prefix='/!. '))
 async def id_user_check(message: types.Message, bot: Bot):
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     username = GetUserByMessage(message).username
     user_id = await get_user_id_self(message)
     if user_id == False:                                
@@ -3316,9 +3241,7 @@ async def id_user_check(message: types.Message, bot: Bot):
 #* RU: Отправляет оформленный список команд пользователю в ЛС при вызове из чата.
 @router.message(F.text.lower().startswith(('!команды', '! команды')))
 async def show_commands(message: types.Message, bot: Bot):
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        return
+    
     commands = types.InlineKeyboardButton(text='⚒️ Команды', url='https://ivansalou288-tech.github.io/chat_manager_bot/html/USER_GUIDE.html')
     keyboard = types.InlineKeyboardMarkup(inline_keyboard=[[commands]])
     await message.answer(f'{desk_em}Список команд ', parse_mode=ParseMode.HTML, disable_web_page_preview=True, reply_markup=keyboard)
@@ -3551,10 +3474,10 @@ async def get_username(message: types.Message, bot: Bot):
     username = message.from_user.username
     user_id = int(message.from_user.id)
     # print(user_id, username, message.text)
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        await bot.send_message(chat_id=1240656726,text= f'{message.from_user.username} | {message.text} | {message.chat.title}')
-        return
+    # if message.chat.id not in chats:
+    #     await message.answer('кыш')
+    #     await bot.send_message(chat_id=1240656726,text= f'{message.from_user.username} | {message.text} | {message.chat.title}')
+    #     return
     
     # Initialize database for this chat if it doesn't exist
     init_chat_db(message.chat.id)
@@ -3587,9 +3510,9 @@ async def get_username(message: types.Message, bot: Bot):
     # are not part of the new per-chat database structure. These would need to be handled differently
     # if they are still required for the application's functionality.
     
-    if is_auto_unmute == False:
-        print('auto_unmute')
-        await auto_unmute(message, bot)
+    # if is_auto_unmute == False:
+    #     print('auto_unmute')
+    #     await auto_unmute(message, bot)
     # if is_quests == False:
     #     print('quests')
         # await quests_funk(message, bot)

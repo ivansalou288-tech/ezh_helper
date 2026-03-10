@@ -144,12 +144,6 @@ async def perevod_start(message: Message):
     connection = sqlite3.connect(get_db_path(message.chat.id), check_same_thread=False)
     cursor = connection.cursor()
     
-    if message.chat.id not in chats:
-        await message.answer('кыш')
-        connection.close()
-        return
-
-    user_id = GetUserByMessage(message).user_id
     if user_id == False:
         await message.reply(
             '📝Невозможно найти информацию о пользователе\n\n💬Введите корректный юзернейм(<code>@</code><i>юзер</i>), тг айди (<code>@</code><i>айди</i>) или ответь на сообщение',

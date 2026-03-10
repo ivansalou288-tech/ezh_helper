@@ -54,11 +54,6 @@ async def show_messages_top_all_time(message: types.Message) -> None:
         return
 
     # Только в рабочих чатах
-    if message.chat.id not in chats:
-        await message.answer("кыш")
-        return
-
-    limit = _parse_limit(message.text)
     chat_id = message.chat.id
     
     # Initialize database for this chat if it doesn't exist

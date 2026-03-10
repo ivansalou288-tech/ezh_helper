@@ -56,12 +56,6 @@ async def golden_roulette(message: types.Message, bot:Bot):
         )
         return
 
-    if message.chat.id not in chats:
-        connection.close()
-        await message.answer("кыш")
-        return
-
-    user = message.from_user
     user_id = user.id
     user_mention = GetUserByID(user_id, message.chat.id).mention
 

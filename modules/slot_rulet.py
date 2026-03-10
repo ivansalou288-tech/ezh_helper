@@ -40,11 +40,6 @@ async def slot_roulette(message: types.Message):
         await message.answer("📝Эта команда предназначена для использования в групповых чатах, а не в личных сообщениях!")
         return
 
-    if message.chat.id not in chats:
-        await message.answer("кыш")
-        return
-
-    user = message.from_user
     user_id = user.id
     user_mention = f'<a href="tg://user?id={user_id}">{html.escape(user.full_name or user.username or "Пользователь")}</a>'
 
