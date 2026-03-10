@@ -770,6 +770,8 @@ def recom_give(action: RecomGiveAction):
 
 @app.post('/links-create')
 def links_create(action: LinkCreateAction):
+    connection = sqlite3.connect(all_path, check_same_thread=False)
+    cursor = connection.cursor()
     print("="*50)
     print("Получен запрос на создание ссылки:")
     print(f"Chat ID: {action.chat_id}")
@@ -794,10 +796,19 @@ def links_create(action: LinkCreateAction):
     # при переходе Telegram отправит боту: /start <payload>
     # payload компактный и легко парсится ботом
     bot_username = get_bot_username()
-    payload = f"lk_{action.chat_id}_{action.activations}"
-    link = f"https://t.me/{bot_username}?start={payload}"
+    # payload = f"lk_{action.chat_id}_{action.activations}"
+    # link = f"https://t.me/{bot_username}?start={payload}"
+    link = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+    cursor.execute('''CREATE TABLE IF NOT EXISTS links (
+        chat_id INTEGER,
+        link TEXT,
+        activate_cnt INTEGER
+    )''')
+    connection.commit()
+    cursor.execute('INSERT INTO links (chat_id, link, activate_cnt) VALUES (?, ?, ?)', (action.chat_id, link, action.activations))
+    connection.commit()
 
-    return {"status": "ok", "link": link, "payload": payload, "activations": action.activations}
+    return {"status": "ok", "link": link, "activations": action.activations}
 
 @app.post('/set_permissions')
 def set_permissions(action: SetPermissionsAction):

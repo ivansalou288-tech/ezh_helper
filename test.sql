@@ -146,3 +146,10 @@ CREATE TABLE farma (
     last_date TEXT
 );
 
+<--all.db-->
+
+CREATE TABLE IF NOT EXISTS links (
+        chat_id INTEGER,
+        link TEXT,
+        activate_cnt INTEGER
+)
