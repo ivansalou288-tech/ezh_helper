@@ -193,7 +193,7 @@
             const chatId = urlParams.get('chat_id');
             
             // Запрашиваем все ссылки с сервера
-            const response = await fetch(`/api/links/all${chatId ? `?chat_id=${chatId}` : ''}`);
+            const response = await fetch(`https://ezh-dev.ru:3000/api/links/all${chatId ? `?chat_id=${chatId}` : ''}`);
             
             if (!response.ok) {
               throw new Error('Ошибка при загрузке ссылок');
