@@ -1075,9 +1075,9 @@ async def generate_invite_links(action: GenerateLinksAction):
         # Формируем данные для ответа
         links_data = {
             "chat": {
-                "name": clan_info["name"],
+                "name": clan_info.get("name", "Unknown"),
                 "link": f"{clan_link}",
-                "avatar": clan_info["avatar"] or "/avatars/clan.png"
+                "avatar": clan_info.get("avatar") or "/avatars/clan.png"
             }
         }
         
@@ -1086,9 +1086,9 @@ async def generate_invite_links(action: GenerateLinksAction):
         print(f"Telegram ID: {action.telegram_id}")
         print(f"Username: {action.username}")
         print(f"Chat ID: {action.chat_id}")
-        print(f"Chat link: {links_data.chat.link}")
-        print(f"Chat name: {links_data.chat.name}")
-        print(f"Chat avatar: {links_data.chat.avatar}")
+        print(f"Chat link: {links_data['chat']['link']}")
+        print(f"Chat name: {links_data['chat']['name']}")
+        print(f"Chat avatar: {links_data['chat']['avatar']}")
         print("="*50)
         
         return {
