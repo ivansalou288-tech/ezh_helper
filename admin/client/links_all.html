@@ -308,7 +308,7 @@
                     </td>
                     <td><span class="activate-count">${link.activate_cnt || 0}</span></td>
                     <td>
-                      <button class="delete-btn" onclick="deleteLink('${link.link}', '${link.chat_id}')">Удалить</button>
+                      <button class="delete-btn" data-link="${link.link}" data-chat-id="${link.chat_id}">Удалить</button>
                     </td>
                   </tr>
                 `,
@@ -439,6 +439,15 @@
 
         // Загружаем ссылки при загрузке страницы
         loadAllLinks();
+
+        // Добавляем делегирование событий для динамически созданных кнопок
+        document.addEventListener('click', function(event) {
+          if (event.target.classList.contains('delete-btn')) {
+            const link = event.target.getAttribute('data-link');
+            const chatId = event.target.getAttribute('data-chat-id');
+            deleteLink(link, chatId);
+          }
+        });
       })();
     </script>
   </body>
