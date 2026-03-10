@@ -277,7 +277,7 @@
                 ${links.map(link => `
                   <tr>
                     <td>
-                      <a href="https://t.me/werty_clan_helper_bot?start=${link.link}" target="_blank" class="link-url" onclick="copyToClipboard('${link.link}', event)">${link.link}</a>
+                      <span class="link-url" onclick="copyToClipboard('${link.link}', event)" style="cursor: pointer;">${link.link}</span>
                     </td>
                     <td><span class="activate-count">${link.activate_cnt || 0}</span></td>
                   </tr>
