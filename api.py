@@ -815,13 +815,6 @@ def get_all_links(chat_id: Optional[int] = None):
             "message": f"Ошибка при получении ссылок: {str(e)}"
         }
 
-@app.get('/api/links/test')
-def test_endpoint():
-    """
-    Тестовый endpoint для проверки работы сервера
-    """
-    return {"status": "success", "message": "Server is working"}
-
 class LinkDeleteAction(BaseModel):
     link: str
     chat_id: Optional[int] = None

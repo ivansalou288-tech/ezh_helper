@@ -216,6 +216,7 @@
       <div class="header">
         <h1 class="title">Все ссылки</h1>
         <div class="subtitle">Список всех ссылок для чатов</div>
+        <button onclick="testButtonClick()" style="margin: 10px; padding: 10px; background: #4caf50; color: white; border: none; border-radius: 5px; cursor: pointer;">Тест кнопки</button>
       </div>
 
       <div id="links-container">
@@ -321,32 +322,27 @@
         }
 
         function deleteLink(link, chatId) {
+          console.log('deleteLink called with:', { link, chatId });
+          
           if (confirm(`Удалить ссылку ${link}?`)) {
-            // Сначала проверяем доступность сервера
-            fetch(`https://ezh-dev.ru:3000/api/links/test`)
-              .then(testResponse => {
-                console.log('Server test response:', testResponse.status);
-                if (!testResponse.ok) {
-                  throw new Error('Сервер недоступен');
-                }
-                return testResponse.json();
-              })
-              .then(testData => {
-                console.log('Server test data:', testData);
-                // Если сервер работает, отправляем запрос на удаление
-                return fetch(`https://ezh-dev.ru:3000/api/links/delete`, {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    link: link,
-                    chat_id: parseInt(chatId),
-                  }),
-                });
-              })
+            console.log('User confirmed deletion');
+            
+            const requestData = {
+              link: link,
+              chat_id: parseInt(chatId)
+            };
+            console.log('Request data:', requestData);
+            
+            fetch(`https://ezh-dev.ru:3000/api/links/delete`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(requestData),
+            })
               .then((response) => {
                 console.log("Delete response status:", response.status);
+                console.log("Delete response headers:", response.headers);
                 return response.json();
               })
               .then((data) => {
@@ -371,7 +367,15 @@
                 console.error('Ошибка:', error);
                 showNotification('Ошибка удаления ссылки: ' + error.message);
               });
+          } else {
+            console.log('User cancelled deletion');
           }
+        }
+
+        // Тестовая функция для проверки работы кнопок
+        function testButtonClick() {
+          console.log('Test button clicked!');
+          alert('Кнопка работает!');
         }
 
         function copyToClipboard(text, event) {
