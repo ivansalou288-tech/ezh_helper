@@ -107,10 +107,10 @@
 
         .links-grid {
             width: 100%;
-            max-width: 640px;
+            max-width: 520px;
             display: grid;
             grid-template-columns: 1fr;
-            gap: 14px;
+            gap: 12px;
         }
 
         .neon-card {
@@ -118,19 +118,19 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
-            padding: 18px 18px;
+            gap: 10px;
+            padding: 14px 14px;
             border-radius: 18px;
             text-decoration: none;
             cursor: pointer;
             user-select: none;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.05));
-            border: 1px solid rgba(0, 229, 255, 0.28);
+            background: linear-gradient(135deg, rgba(179, 136, 255, 0.18), rgba(35, 20, 60, 0.85));
+            border: 1px solid rgba(179, 136, 255, 0.65);
             box-shadow:
-                0 0 0 1px rgba(255, 45, 253, 0.10) inset,
+                0 0 0 1px rgba(255, 255, 255, 0.06) inset,
                 0 12px 28px rgba(0, 0, 0, 0.45),
-                0 0 26px rgba(0, 229, 255, 0.10),
-                0 0 34px rgba(255, 45, 253, 0.08);
+                0 0 24px rgba(179, 136, 255, 0.35),
+                0 0 36px rgba(124, 77, 255, 0.42);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
             transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
@@ -143,70 +143,67 @@
             border-radius: 18px;
             pointer-events: none;
             background:
-                radial-gradient(1000px 220px at 20% 0%, rgba(0, 229, 255, 0.20), transparent 60%),
-                radial-gradient(800px 240px at 80% 100%, rgba(255, 45, 253, 0.16), transparent 55%);
+                radial-gradient(900px 220px at 15% 0%, rgba(179, 136, 255, 0.45), transparent 60%),
+                radial-gradient(800px 240px at 80% 100%, rgba(124, 77, 255, 0.32), transparent 55%);
             opacity: 0.9;
-            filter: saturate(1.2);
+            filter: saturate(1.25);
         }
 
         .neon-card:hover {
             transform: translateY(-2px);
-            border-color: rgba(0, 229, 255, 0.55);
+            border-color: rgba(203, 167, 255, 0.95);
             box-shadow:
-                0 0 0 1px rgba(255, 45, 253, 0.14) inset,
-                0 16px 34px rgba(0, 0, 0, 0.55),
-                0 0 34px rgba(0, 229, 255, 0.16),
-                0 0 42px rgba(255, 45, 253, 0.12);
+                0 0 0 1px rgba(255, 255, 255, 0.12) inset,
+                0 16px 34px rgba(0, 0, 0, 0.6),
+                0 0 34px rgba(203, 167, 255, 0.62),
+                0 0 46px rgba(124, 77, 255, 0.8);
         }
 
         .neon-left {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 2px;
             min-width: 0;
             z-index: 1;
         }
 
         .neon-title {
-            font-size: 1.12em;
+            font-size: 1.08em;
             font-weight: 800;
-            color: #e9f9ff;
-            text-shadow: 0 0 10px rgba(0, 229, 255, 0.18);
+            color: #f3e8ff;
+            text-shadow: 0 0 12px rgba(203, 167, 255, 0.85), 0 0 22px rgba(124, 77, 255, 0.8);
         }
 
         .neon-subtitle {
-            font-size: 0.95em;
-            color: rgba(255, 255, 255, 0.70);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            display: none;
         }
 
         .neon-right {
             flex: 0 0 auto;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 6px;
             z-index: 1;
         }
 
         .neon-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: 14px;
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
             display: grid;
             place-items: center;
-            background: rgba(0, 229, 255, 0.08);
-            border: 1px solid rgba(0, 229, 255, 0.25);
-            box-shadow: 0 0 18px rgba(0, 229, 255, 0.10);
-            color: #00e5ff;
-            text-shadow: 0 0 10px rgba(0, 229, 255, 0.55);
+            background: rgba(179, 136, 255, 0.12);
+            border: 1px solid rgba(203, 167, 255, 0.9);
+            box-shadow: 0 0 18px rgba(179, 136, 255, 0.65);
+            color: #f3e8ff;
+            text-shadow: 0 0 14px rgba(203, 167, 255, 0.95);
             font-size: 1.2em;
         }
 
         .neon-arrow {
-            font-size: 1.1em;
-            color: rgba(255, 255, 255, 0.55);
+            font-size: 1.05em;
+            color: rgba(243, 232, 255, 0.75);
+            text-shadow: 0 0 10px rgba(203, 167, 255, 0.85);
         }
 
         @media (max-width: 768px) {
