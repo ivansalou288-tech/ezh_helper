@@ -15,12 +15,14 @@
         background: #0a0a0a;
         color: #fff;
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        padding: 20px;
+        margin: 0;
+        padding: 0;
       }
       .container {
-        max-width: 640px;
-        margin: 0 auto;
-        padding-top: 95px;
+        width: 100%;
+        margin: 0;
+        padding: 10px;
+        padding-top: 80px;
       }
       .header {
         text-align: center;
@@ -93,15 +95,11 @@
       /* Мобильная адаптация */
       @media (max-width: 480px) {
         .container {
-          padding: 10px;
-          padding-top: 80px;
+          padding: 5px;
+          padding-top: 60px;
         }
         .title {
           font-size: 1.5em;
-        }
-        .glass-panel {
-          padding: 15px;
-          margin-top: 10px;
         }
         .links-table {
           font-size: 11px;
@@ -192,13 +190,11 @@
         <div class="subtitle">Список всех ссылок для чатов</div>
       </div>
 
-      <div class="glass-panel">
-        <div id="links-container">
-          <div class="placeholder">
-            <div class="placeholder-icon">🧾</div>
-            <div class="placeholder-text">Загрузка ссылок...</div>
-            <div class="placeholder-subtext">Получение данных с сервера</div>
-          </div>
+      <div id="links-container">
+        <div class="placeholder">
+          <div class="placeholder-icon">🧾</div>
+          <div class="placeholder-text">Загрузка ссылок...</div>
+          <div class="placeholder-subtext">Получение данных с сервера</div>
         </div>
       </div>
     </div>
