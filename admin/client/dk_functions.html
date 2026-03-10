@@ -127,6 +127,130 @@
             opacity: 0.7;
         }
 
+        .commands-table {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: rgba(179, 136, 255, 0.1);
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .table-title {
+            font-size: 1.2em;
+            color: #b388ff;
+            font-weight: 600;
+        }
+
+        .table-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .command-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+
+        .command-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .command-item:last-child {
+            border-bottom: none;
+        }
+
+        .command-info {
+            flex: 1;
+        }
+
+        .command-name {
+            font-size: 1.1em;
+            color: #fff;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .command-code {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.6);
+            font-family: 'Courier New', monospace;
+        }
+
+        .rank-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .rank-0 {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .rank-1 {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+            border: 1px solid rgba(33, 150, 243, 0.3);
+        }
+
+        .rank-2 {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .rank-3 {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+            border: 1px solid rgba(255, 152, 0, 0.3);
+        }
+
+        .rank-4 {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+
+        .rank-5 {
+            background: rgba(156, 39, 176, 0.2);
+            color: #9c27b0;
+            border: 1px solid rgba(156, 39, 176, 0.3);
+        }
+
+        .rank-6 {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: #f44336;
+        }
+
         @media (max-width: 768px) {
             .main-content {
                 margin-top: 115px;
@@ -145,13 +269,13 @@
     <div class="main-content">
         <div class="page-header">
             <h1 class="page-title">DK функции</h1>
-            <div class="page-subtitle">Функция в разработке</div>
+            <div class="page-subtitle">Список команд и их рангов доступа</div>
         </div>
 
-        <div class="empty-state">
-            <div class="empty-state-icon">🎯</div>
-            <div class="empty-state-text">Функция DK функции</div>
-            <div class="empty-state-subtext">Эта функция находится в разработке и будет доступна в ближайшее время</div>
+        <div id="contentContainer">
+            <div class="loading">
+                <div>Загрузка списка команд...</div>
+            </div>
         </div>
     </div>
 
@@ -231,9 +355,79 @@
             profile.style.display = 'flex';
         }
 
+        function getChatId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('chat_id');
+        }
+
+        async function loadDkCommands() {
+            const chatId = getChatId();
+            if (!chatId) {
+                document.getElementById('contentContainer').innerHTML = `
+                    <div class="error">
+                        <div>Ошибка: не указан ID чата</div>
+                    </div>
+                `;
+                return;
+            }
+
+            try {
+                const response = await fetch(`/dk-commands/${chatId}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data.commands || data.commands.length === 0) {
+                    document.getElementById('contentContainer').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📋</div>
+                            <div class="empty-state-text">Нет команд</div>
+                            <div class="empty-state-subtext">В этом чате не настроены команды DK</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const commandsHtml = data.commands.map(cmd => `
+                    <div class="command-item">
+                        <div class="command-info">
+                            <div class="command-name">${cmd.command_name}</div>
+                            <div class="command-code">/${cmd.command}</div>
+                        </div>
+                        <div class="rank-badge rank-${cmd.required_rank}">
+                            ${cmd.rank_name}
+                        </div>
+                    </div>
+                `).join('');
+
+                document.getElementById('contentContainer').innerHTML = `
+                    <div class="commands-table">
+                        <div class="table-header">
+                            <div class="table-title">Команды чата</div>
+                        </div>
+                        <div class="table-content">
+                            ${commandsHtml}
+                        </div>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error loading DK commands:', error);
+                document.getElementById('contentContainer').innerHTML = `
+                    <div class="error">
+                        <div>Ошибка загрузки данных</div>
+                        <div style="font-size: 0.9em; margin-top: 10px;">${error.message}</div>
+                    </div>
+                `;
+            }
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             updateUserProfile();
+            loadDkCommands();
         });
     </script>
 </body>

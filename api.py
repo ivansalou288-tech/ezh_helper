@@ -1179,6 +1179,78 @@ async def snat_warn(action: SnatWarnAction):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) 
 
+@app.get("/dk-commands/{chat_id}")
+def get_dk_commands(chat_id: int):
+    """
+    Получает список команд и их рангов доступа из таблицы dk в базе данных чата
+    """
+    try:
+        # Получаем путь к базе данных конкретного чата
+        chat_db_path = curent_path / 'databases' / f'{chat_id}.db'
+        
+        if not chat_db_path.exists():
+            raise HTTPException(status_code=404, detail="База данных чата не найдена")
+        
+        connection = sqlite3.connect(chat_db_path)
+        cursor = connection.cursor()
+        
+        # Проверяем существование таблицы dk
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='dk'")
+        if not cursor.fetchone():
+            connection.close()
+            return {"commands": []}
+        
+        # Получаем все команды и их ранги
+        cursor.execute("SELECT comand, dk FROM dk ORDER BY dk ASC, comand ASC")
+        dk_commands = cursor.fetchall()
+        
+        connection.close()
+        
+        # Словарь с названиями команд на русском
+        command_names = {
+            'ban': 'Блокировка пользователей',
+            'mut': 'Ограничение пользователей',
+            'warn': 'Предупреждение пользователей',
+            'all': 'Созыв пользователей',
+            'rang': 'Изменение ранга пользователей',
+            'dk': 'Изменение доступа вызова команд',
+            'change_pravils': 'Изменение правил чата',
+            'close_chat': 'Изменение ограничений чата',
+            'change_priv': 'Изменение приветствия чата',
+            'obavlenie': 'Создание объявления',
+            'tur': 'Создание турниров',
+            'dell': 'Удаление сообщений',
+            'period': 'Изменение периодов'
+        }
+        
+        # Словарь с названиями рангов
+        rank_names = {
+            0: 'Доступно всем',
+            1: 'Младший Модератор',
+            2: 'Модератор',
+            3: 'Старший Модератор',
+            4: 'Заместитель',
+            5: 'Менеджер',
+            6: 'Владелец'
+        }
+        
+        # Формируем результат
+        commands = []
+        for comand, dk in dk_commands:
+            commands.append({
+                'command': comand,
+                'command_name': command_names.get(comand, comand),
+                'required_rank': dk,
+                'rank_name': rank_names.get(dk, f'Ранг {dk}')
+            })
+        
+        return {"commands": commands}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
     
 
 if  __name__ == '__main__':
