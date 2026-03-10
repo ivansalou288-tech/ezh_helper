@@ -819,6 +819,9 @@ class LinkDeleteAction(BaseModel):
     link: str
     chat_id: Optional[int] = None
 
+class CheckCodeAction(BaseModel):
+    code: str
+
 @app.post('/api/links/delete')
 def delete_link(action: LinkDeleteAction):
     """
@@ -865,6 +868,60 @@ def delete_link(action: LinkDeleteAction):
         return {
             "status": "error",
             "message": f"Ошибка при удалении ссылки: {str(e)}"
+        }
+
+@app.post('/check_invite_code')
+def check_invite_code(action: CheckCodeAction):
+    """
+    Проверяет действительность кода приглашения
+    """
+    try:
+        code = action.code
+        
+        if not code:
+            return {"status": "error", "message": "Код не указан"}
+        
+        connection = sqlite3.connect(all_path, check_same_thread=False)
+        cursor = connection.cursor()
+        
+        # Создаем таблицу если не существует
+        cursor.execute('''CREATE TABLE IF NOT EXISTS links (
+            chat_id INTEGER,
+            link TEXT,
+            activate_cnt INTEGER
+        )''')
+        connection.commit()
+        
+        # Ищем код в таблице
+        cursor.execute('SELECT chat_id, activate_cnt FROM links WHERE link = ?', (code,))
+        result = cursor.fetchone()
+        connection.close()
+        
+        if not result:
+            return {"status": "error", "message": "Неверный код приглашения"}
+        
+        chat_id, activate_cnt = result
+        
+        if activate_cnt <= 0:
+            return {"status": "error", "message": "Код больше не действителен"}
+        
+        # Определяем состав на основе chat_id
+        sost = "sost-1" if chat_id == chats_names['sost-1'] else "sost-2" if chat_id == chats_names['sost-2'] else "unknown"
+        
+        return {
+            "status": "success",
+            "data": {
+                "link": code,
+                "chat_id": chat_id,
+                "activate_count": activate_cnt,
+                "sost": sost
+            }
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Ошибка при проверке кода: {str(e)}"
         }
 
 @app.post('/links-create')
