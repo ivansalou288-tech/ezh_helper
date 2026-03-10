@@ -105,6 +105,26 @@ class LinkCreateAction(BaseModel):
     admin_name: Optional[str] = None
     admin_username: Optional[str] = None
 
+_cached_bot_username: Optional[str] = None
+
+def get_bot_username() -> str:
+    global _cached_bot_username
+    if _cached_bot_username:
+        return _cached_bot_username
+    try:
+        import requests
+        r = requests.get(f"https://api.telegram.org/bot{bot_token}/getMe", timeout=5)
+        data = r.json() if r.ok else {}
+        username = (data.get("result") or {}).get("username")
+        if username:
+            _cached_bot_username = username
+            return username
+    except Exception:
+        pass
+    # Fallback: project default bot username (used in main_bot.py links)
+    _cached_bot_username = "werty_clan_helper_bot"
+    return _cached_bot_username
+
 @app.get('/user-admin-chats/{user_id}')
 def get_user_admin_chats(user_id: int):
     """
@@ -765,11 +785,19 @@ def links_create(action: LinkCreateAction):
     if action.activations < 1 or action.activations > 50:
         raise HTTPException(status_code=400, detail="activations must be in range 1..50")
 
-    # Генерируем токен ссылки (пока без сохранения в БД)
-    token = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
-    link = f"https://ezh-dev.ru/link/{token}"
+    if action.chat_id is None:
+        raise HTTPException(status_code=400, detail="chat_id is required")
+    if not isinstance(action.chat_id, int):
+        raise HTTPException(status_code=400, detail="chat_id must be int")
 
-    return {"status": "ok", "link": link, "token": token, "activations": action.activations}
+    # Генерируем telegram deep-link (рефералку) для бота:
+    # при переходе Telegram отправит боту: /start <payload>
+    # payload компактный и легко парсится ботом
+    bot_username = get_bot_username()
+    payload = f"lk_{action.chat_id}_{action.activations}"
+    link = f"https://t.me/{bot_username}?start={payload}"
+
+    return {"status": "ok", "link": link, "payload": payload, "activations": action.activations}
 
 @app.post('/set_permissions')
 def set_permissions(action: SetPermissionsAction):

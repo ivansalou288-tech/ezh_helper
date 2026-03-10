@@ -28,6 +28,49 @@ itog_b = []
 itog = 0
 page_c_b = 0
 
+@router.message(Command('start'))
+async def start_deeplink(message: types.Message, bot: Bot):
+    # реагируем только в личке
+    if message.chat.id != message.from_user.id:
+        return
+
+    payload = ""
+    try:
+        payload = message.text.split(maxsplit=1)[1].strip()
+    except Exception:
+        payload = ""
+
+    # Deep-link для "ссылок": lk_<chat_id>_<activations>
+    if payload.startswith("lk_"):
+        try:
+            parts = payload.split("_")
+            chat_id = int(parts[1])
+            activations = int(parts[2])
+            if activations < 1 or activations > 50:
+                raise ValueError("bad activations")
+        except Exception:
+            await message.answer("Ссылка повреждена или устарела.")
+            return
+
+        user = message.from_user
+        user_line = f"👤 Пользователь: <a href=\"tg://user?id={user.id}\">{html.escape(user.full_name or 'Пользователь')}</a> (ID: <code>{user.id}</code>)"
+        username_line = f"@{html.escape(user.username)}" if user.username else "нет"
+
+        try:
+            await bot.send_message(
+                chat_id,
+                f"🔗 Запрос по ссылке\n{user_line}\n👤 Username: <code>{username_line}</code>\n🔁 Лимит активаций: <b>{activations}</b>",
+                parse_mode="html"
+            )
+        except Exception:
+            await message.answer("Не получилось отправить запрос в чат (бот не в чате или нет прав).")
+            return
+
+        await message.answer("Запрос отправлен в чат.")
+        return
+
+    await message.answer("Привет. Открой ссылку из админки, чтобы отправить запрос в чат.")
+
 
 
 
