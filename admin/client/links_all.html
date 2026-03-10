@@ -276,7 +276,9 @@
               <tbody>
                 ${links.map(link => `
                   <tr>
-                    <td><a href="${link.link}" target="_blank" class="link-url">${link.link}</a></td>
+                    <td>
+                      <a href="https://t.me/werty_clan_helper_bot?start=${link.link}" target="_blank" class="link-url" onclick="copyToClipboard('${link.link}', event)">${link.link}</a>
+                    </td>
                     <td><span class="activate-count">${link.activate_cnt || 0}</span></td>
                   </tr>
                 `).join('')}
@@ -285,6 +287,51 @@
           `;
           
           container.innerHTML = tableHTML;
+        }
+
+        function copyToClipboard(text, event) {
+          event.preventDefault();
+          navigator.clipboard.writeText(text).then(() => {
+            // Показываем уведомление об успешном копировании
+            showNotification('Ссылка скопирована!');
+          }).catch(err => {
+            console.error('Ошибка копирования:', err);
+          });
+        }
+
+        function showNotification(message) {
+          const notification = document.createElement('div');
+          notification.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 18px;
+            z-index: 1000;
+            animation: fadeInOut 2s ease-in-out;
+          `;
+          notification.textContent = message;
+          
+          const style = document.createElement('style');
+          style.textContent = `
+            @keyframes fadeInOut {
+              0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+              20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+              80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+              100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            }
+          `;
+          document.head.appendChild(style);
+          document.body.appendChild(notification);
+          
+          setTimeout(() => {
+            document.body.removeChild(notification);
+            document.head.removeChild(style);
+          }, 2000);
         }
 
         function showError(message) {
