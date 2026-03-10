@@ -48,9 +48,12 @@ chats_names = {
     'sost-2': 1002439682589
 }
 
-def get_db_path(chat_id):
+def get_db_path(chat_id: int):
     """Получает путь к базе данных чата"""
-    chat_id_str = str(-chat_id)
+    if chat_id < 0 :
+        chat_id_str = str(-chat_id)
+    else:
+        chat_id_str = str(chat_id)
     return curent_path / 'databases' / f'{chat_id_str}.db'
 
 app.add_middleware(
@@ -945,19 +948,31 @@ def submit_form(action: SubmitFormAction):
         
         if action.age < 7 or action.age > 50:
             return {"status": "error", "message": "Возраст должен быть от 7 до 50"}
-        
+
         connection = sqlite3.connect(all_path, check_same_thread=False)
         cursor = connection.cursor()
+        cursor.execute('SELECT chat_id FROM links WHERE link = ?', (action.invite_code,))
+        chat_id = cursor.fetchone()
         
-
+        if not chat_id:
+            return {"status": "error", "message": "Код приглашения не найден"}
         
-        application_id = 1
+        chat_id = chat_id[0]
+    
         connection.commit()
         connection.close()
+        connection = sqlite3.connect(get_db_path(chat_id), check_same_thread=False)
+        cursor = connection.cursor()
         
+        try:
+            cursor.execute('INSERT INTO users (tg_id, username, name, age, nik_pubg, id_pubg, nik, rang, last_date, date_vhod, mess_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                           (action.telegram_id, action.user, action.name, action.age, action.nick, action.gameId, action.nick, 0, '', datetime.now().strftime('%H:%M:%S %d.%m.%Y'), 0))
+            connection.commit()
+        except Exception as e:
+            return {"status": "error", "message": f"Ошибка при добавлении пользователя: {str(e)}"}
+
         print("="*50)
         print("Новая заявка в клан:")
-        print(f"ID заявки: {application_id}")
         print(f"Telegram ID: {action.telegram_id}")
         print(f"Username: {action.user}")
         print(f"Имя: {action.name}")
@@ -970,7 +985,7 @@ def submit_form(action: SubmitFormAction):
         return {
             "status": "success",
             "message": "Заявка успешно отправлена",
-            "application_id": application_id
+            "application_id": action.telegram_id
         }
         
     except Exception as e:
