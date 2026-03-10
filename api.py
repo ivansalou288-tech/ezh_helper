@@ -768,6 +768,53 @@ def recom_give(action: RecomGiveAction):
     connection.close()
     return {"status": "ok", "message": "Данные получены"}
 
+@app.get('/api/links/all')
+def get_all_links(chat_id: Optional[int] = None):
+    """
+    Получает все ссылки из таблицы links
+    """
+    try:
+        connection = sqlite3.connect(all_path, check_same_thread=False)
+        cursor = connection.cursor()
+        
+        # Создаем таблицу если не существует
+        cursor.execute('''CREATE TABLE IF NOT EXISTS links (
+            chat_id INTEGER,
+            link TEXT,
+            activate_cnt INTEGER
+        )''')
+        connection.commit()
+        
+        if chat_id:
+            # Получаем ссылки для конкретного чата
+            cursor.execute('SELECT chat_id, link, activate_cnt FROM links WHERE chat_id = ? ORDER BY chat_id', (chat_id,))
+        else:
+            # Получаем все ссылки
+            cursor.execute('SELECT chat_id, link, activate_cnt FROM links ORDER BY chat_id')
+        
+        links = cursor.fetchall()
+        connection.close()
+        
+        links_list = []
+        for link in links:
+            links_list.append({
+                "chat_id": link[0],
+                "link": link[1],
+                "activate_cnt": link[2] if link[2] is not None else 0
+            })
+        
+        return {
+            "status": "success",
+            "links": links_list,
+            "count": len(links_list)
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Ошибка при получении ссылок: {str(e)}"
+        }
+
 @app.post('/links-create')
 def links_create(action: LinkCreateAction):
     connection = sqlite3.connect(all_path, check_same_thread=False)
