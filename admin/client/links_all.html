@@ -93,6 +93,11 @@
         font-weight: 600;
         font-size: 60px;
       }
+      .chat-level {
+        color: #ffc107;
+        font-weight: 600;
+        font-size: 60px;
+      }
       .delete-btn {
         background: rgba(244, 67, 54, 0.8);
         color: white;
@@ -140,6 +145,9 @@
           font-size: 20px;
         }
         .activate-count {
+          font-size: 20px;
+        }
+        .chat-level {
           font-size: 20px;
         }
         .delete-btn {
@@ -294,6 +302,7 @@
                 <tr>
                   <th>Ссылка</th>
                   <th>Активации</th>
+                  <th>Уровень</th>
                   <th>Действия</th>
                 </tr>
               </thead>
@@ -306,6 +315,7 @@
                       <span class="link-url" onclick="copyToClipboard('${link.link}', event)" style="cursor: pointer;">${link.link}</span>
                     </td>
                     <td><span class="activate-count">${link.activate_cnt || 0}</span></td>
+                    <td><span class="chat-level">${link.chat_id || 'N/A'}</span></td>
                     <td>
                       <button class="delete-btn" data-link="${link.link}" data-chat-id="${link.chat_id}">Удалить</button>
                     </td>
@@ -369,12 +379,6 @@
           } else {
             console.log('User cancelled deletion');
           }
-        }
-
-        // Тестовая функция для проверки работы кнопок
-        function testButtonClick() {
-          console.log('Test button clicked!');
-          alert('Кнопка работает!');
         }
 
         function copyToClipboard(text, event) {
