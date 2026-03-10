@@ -6,7 +6,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from typing import Optional
 
 from aiogram import Router, types, F, Bot
-from main.config3 import get_db_path, init_chat_db, chats
+from main.config3 import get_db_path, init_chat_db
 
 router = Router()
 
@@ -52,7 +52,7 @@ async def show_messages_top_all_time(message: types.Message) -> None:
     if message.chat.id == message.from_user.id:
         await message.answer("📝Эта команда предназначена для использования в групповых чатах, а не в личных сообщениях!")
         return
-
+    limit = _parse_limit(message.text)
     # Только в рабочих чатах
     chat_id = message.chat.id
     

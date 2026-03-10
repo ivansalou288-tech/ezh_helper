@@ -9,7 +9,7 @@ from aiogram import types, F, Router, Bot
 
 from aiogram.types import ContentType
 
-from main.config3 import get_db_path, init_chat_db, chats, mute_user, GetUserByID, all_path
+from main.config3 import get_db_path, init_chat_db, mute_user, GetUserByID, all_path
 router = Router()
 
 #? EN: Chat command for playing Golden roulette: bets your farm coins, with a chance to lose the bet or double it.
@@ -55,7 +55,7 @@ async def golden_roulette(message: types.Message, bot:Bot):
             "📝Эта команда предназначена для использования в групповых чатах, а не в личных сообщениях!"
         )
         return
-
+    user = message.from_user
     user_id = user.id
     user_mention = GetUserByID(user_id, message.chat.id).mention
 
