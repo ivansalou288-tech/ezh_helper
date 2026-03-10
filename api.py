@@ -1186,7 +1186,9 @@ def get_dk_commands(chat_id: int):
     """
     try:
         # Получаем путь к базе данных конкретного чата
-        chat_db_path = curent_path / 'databases' / f'{chat_id}.db'
+        # Убираем знак минус из ID чата для имени файла
+        chat_id_str = str(abs(chat_id))
+        chat_db_path = curent_path / 'databases' / f'{chat_id_str}.db'
         
         if not chat_db_path.exists():
             raise HTTPException(status_code=404, detail="База данных чата не найдена")
