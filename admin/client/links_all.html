@@ -322,22 +322,35 @@
 
         function deleteLink(link, chatId) {
           if (confirm(`Удалить ссылку ${link}?`)) {
-            fetch(`https://ezh-dev.ru:3000/api/links/delete`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                link: link,
-                chat_id: parseInt(chatId),
-              }),
-            })
+            // Сначала проверяем доступность сервера
+            fetch(`https://ezh-dev.ru:3000/api/links/test`)
+              .then(testResponse => {
+                console.log('Server test response:', testResponse.status);
+                if (!testResponse.ok) {
+                  throw new Error('Сервер недоступен');
+                }
+                return testResponse.json();
+              })
+              .then(testData => {
+                console.log('Server test data:', testData);
+                // Если сервер работает, отправляем запрос на удаление
+                return fetch(`https://ezh-dev.ru:3000/api/links/delete`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    link: link,
+                    chat_id: parseInt(chatId),
+                  }),
+                });
+              })
               .then((response) => {
-                console.log("Response status:", response.status);
+                console.log("Delete response status:", response.status);
                 return response.json();
               })
               .then((data) => {
-                console.log("Response data:", data);
+                console.log("Delete response data:", data);
                 if (data.status === "success") {
                   showNotification("Ссылка удалена!");
                   // Удаляем строку из таблицы
@@ -346,17 +359,17 @@
                     row.remove();
                   }
                   // Если ссылок не осталось, показываем сообщение
-                  const tbody = document.querySelector(".links-table tbody");
+                  const tbody = document.querySelector('.links-table tbody');
                   if (tbody && tbody.children.length === 0) {
                     loadAllLinks(); // Перезагружаем данные
                   }
                 } else {
-                  showNotification("Ошибка удаления: " + data.message);
+                  showNotification('Ошибка удаления: ' + data.message);
                 }
               })
-              .catch((error) => {
-                console.error("Ошибка:", error);
-                showNotification("Ошибка удаления ссылки");
+              .catch(error => {
+                console.error('Ошибка:', error);
+                showNotification('Ошибка удаления ссылки: ' + error.message);
               });
           }
         }
