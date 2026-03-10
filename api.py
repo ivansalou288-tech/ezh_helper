@@ -97,6 +97,14 @@ class SetPermissionsAction(BaseModel):
 class DeletePermissionsAction(BaseModel):
     chat_id: str
     user_id: str
+
+class LinkCreateAction(BaseModel):
+    activations: int
+    chat_id: Optional[int] = None
+    admin_id: Optional[int] = None
+    admin_name: Optional[str] = None
+    admin_username: Optional[str] = None
+
 @app.get('/user-admin-chats/{user_id}')
 def get_user_admin_chats(user_id: int):
     """
@@ -739,6 +747,29 @@ def recom_give(action: RecomGiveAction):
     connection.commit()
     connection.close()
     return {"status": "ok", "message": "Данные получены"}
+
+@app.post('/links-create')
+def links_create(action: LinkCreateAction):
+    print("="*50)
+    print("Получен запрос на создание ссылки:")
+    print(f"Chat ID: {action.chat_id}")
+    print(f"Activations: {action.activations}")
+    print(f"Admin ID: {action.admin_id}")
+    print(f"Admin Name: {action.admin_name}")
+    print(f"Admin Username: {action.admin_username}")
+    print("="*50)
+
+    # Базовая серверная валидация
+    if not isinstance(action.activations, int):
+        raise HTTPException(status_code=400, detail="activations must be int")
+    if action.activations < 1 or action.activations > 50:
+        raise HTTPException(status_code=400, detail="activations must be in range 1..50")
+
+    # Генерируем токен ссылки (пока без сохранения в БД)
+    token = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+    link = f"https://ezh-dev.ru/link/{token}"
+
+    return {"status": "ok", "link": link, "token": token, "activations": action.activations}
 
 @app.post('/set_permissions')
 def set_permissions(action: SetPermissionsAction):
