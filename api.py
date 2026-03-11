@@ -174,7 +174,7 @@ async def snat_warn_admn(user_id, chat_id,moder_id, number_warn, warn_count_new)
     finally:
         connection.close()
 
-async def ban_user(chat_id: int, user_id: int, admin_id: int, reason: str):
+async def ban_user_admn(chat_id: int, user_id: int, admin_id: int, reason: str):
     """Банит пользователя в чате"""
     try:
         # Кикаем пользователя из чата
@@ -1424,7 +1424,7 @@ async def ban_user(action: BanUserAction):
         # Например, добавление в специальную таблицу забаненных пользователей
         # или вызов Telegram Bot API для бана
         
-        await ban_user(action.chat_id, action.user_id, action.admin_id, action.reason)
+        await ban_user_admn(action.chat_id, action.user_id, action.admin_id, action.reason)
 
 
         return {
