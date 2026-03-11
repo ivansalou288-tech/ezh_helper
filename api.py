@@ -1213,7 +1213,54 @@ async def submit_form(action: SubmitFormAction):
                 if failed_chats:
                     message += f"\nНе удалось добавить в чаты: {', '.join([f'Chat {cid}' for cid in failed_chats])}"
                 
+                
                 await bot.send_message(chat_id, message)
+                
+                # Отправляем уведомление всем админам чата в личные сообщения
+                try:
+                    admin_conn = sqlite3.connect(admin_path, check_same_thread=False)
+                    admin_cursor = admin_conn.cursor()
+                    
+                    # Получаем всех админов для этого чата с правом can_see_users
+                    admin_cursor.execute('SELECT user_id FROM admins WHERE chat_id = ? AND can_see_users = 1', (chat_id,))
+                    admin_users = admin_cursor.fetchall()
+                    
+                    admin_conn.close()
+                    
+                    if admin_users:
+                        print(f"Отправка уведомлений {len(admin_users)} админам чата {chat_id}")
+                        
+                        for admin_user in admin_users:
+                            admin_user_id = admin_user[0]
+                            try:
+                                admin_message = f"📋 Новая заявка в клан:\n\n"
+                                admin_message += f"👤 Telegram ID: {action.telegram_id}\n"
+                                admin_message += f"🔹 Username: {action.user}\n"
+                                admin_message += f"🔹 Имя: {action.name}\n"
+                                admin_message += f"🔹 Возраст: {action.age}\n"
+                                admin_message += f"🔹 Ник: {action.nick}\n"
+                                admin_message += f"🔹 Game ID: {action.gameId}\n"
+                                admin_message += f"🔹 Код приглашения: {action.invite_code}\n"
+                                admin_message += f"📁 Добавлен в чаты: {', '.join(chat_names)}\n"
+                                 
+                                if failed_chats:
+                                    admin_message += f"❌ Не удалось добавить в чаты: {', '.join([f'Chat {cid}' for cid in failed_chats])}\n"
+                                 
+                                admin_message += f"\n📊 Заявка ID: {action.telegram_id}"
+                                 
+                                await bot.send_message(admin_user_id, admin_message)
+                                print(f"Уведомление отправлено админу {admin_user_id}")
+                                 
+                            except Exception as admin_error:
+                                print(f"Не удалось отправить уведомление админу {admin_user_id}: {admin_error}")
+                        
+                        print(f"Завершена отправка уведомлений админам")
+                    else:
+                        print(f"Админы с правом can_see_users для чата {chat_id} не найдены")
+                        
+                except Exception as admin_error:
+                    print(f"Ошибка при получении админов: {admin_error}")
+                    
             except Exception as e:
                 print(f"Ошибка при отправке уведомления: {e}")
         
