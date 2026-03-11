@@ -983,8 +983,8 @@
             const username = userData?.username || null;
             
             try {
-                // Запрашиваем ссылки-приглашения
-                const response = await fetch('https://ezh-dev.ru:3000/generate_invite_links', {
+                // Запрашиваем ссылки-приглашения по коду приглашения
+                const response = await fetch('https://ezh-dev.ru:3000/generate_invite_links_by_code', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -992,7 +992,7 @@
                     body: JSON.stringify({
                         telegram_id: telegram_id,
                         username: username,
-                        chat_id: currentCodeData.chat_id
+                        code: currentCode
                     })
                 });
                 
@@ -1043,19 +1043,34 @@
         function showInviteLinks(linksData) {
             const linksContainer = document.createElement('div');
             linksContainer.className = 'form-container';
-            linksContainer.innerHTML = `
-                <h2 class="neon-title">Вступление в чат</h2>
-                <div class="invite-links-content">
-                    <div class="chat-block" onclick="openLink('${linksData.chat.link}')">
+            
+            // Генерируем HTML для всех чатов
+            let chatsHTML = '';
+            linksData.chats.forEach((chat, index) => {
+                const chatNumber = index + 1;
+                const chatDescription = chat.chat_id === linksData.main_chat_id ? 'Основной чат клана' : `Дополнительный чат #${chatNumber}`;
+                
+                chatsHTML += `
+                    <div class="chat-block" onclick="openLink('${chat.link}')">
                         <div class="chat-avatar">
-                            <img src="${linksData.chat.avatar}" alt="${linksData.chat.name}">
+                            <img src="${chat.avatar}" alt="${chat.name}">
                         </div>
                         <div class="chat-info">
-                            <h3>${linksData.chat.name}</h3>
-                            <p>Чат клана</p>
+                            <h3>${chat.name}</h3>
+                            <p>${chatDescription}</p>
                             <div class="link-hint">Нажмите для вступления</div>
                         </div>
                     </div>
+                `;
+            });
+            
+            linksContainer.innerHTML = `
+                <h2 class="neon-title">Вступление в чаты</h2>
+                <div class="invite-links-content">
+                    <p style="text-align: center; margin-bottom: 20px; color: #b388ff;">
+                        🎉 Поздравляем! Ваш код действителен. Вступите в чаты ниже:
+                    </p>
+                    ${chatsHTML}
                 </div>
                 
                 <div class="guide-buttons">

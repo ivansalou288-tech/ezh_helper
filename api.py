@@ -1196,6 +1196,153 @@ async def submit_form(action: SubmitFormAction):
             "message": f"Ошибка при отправке заявки: {str(e)}"
         }
 
+class GenerateLinksByCodeAction(BaseModel):
+    code: str
+    telegram_id: Optional[int] = None
+    username: Optional[str] = None
+
+@app.post('/generate_invite_links_by_code')
+async def generate_invite_links_by_code(action: GenerateLinksByCodeAction):
+    """
+    Генерирует ссылки-приглашения для всех чатов указанных в коде приглашения
+    """
+    try:
+        if not action.code:
+            return {"status": "error", "message": "код приглашения обязателен"}
+        
+        # Сначала проверяем код и получаем информацию о нем
+        connection = sqlite3.connect(all_path, check_same_thread=False)
+        cursor = connection.cursor()
+        
+        cursor.execute('SELECT chat_id, activate_cnt, target_chats FROM links WHERE link = ?', (action.code,))
+        result = cursor.fetchone()
+        connection.close()
+        
+        if not result:
+            return {"status": "error", "message": "Неверный код приглашения"}
+        
+        chat_id, activate_cnt, target_chats_json = result
+        
+        if activate_cnt <= 0:
+            return {"status": "error", "message": "Код больше не действителен"}
+        
+        # Парсим список целевых чатов
+        import json
+        target_chats = []
+        try:
+            target_chats = json.loads(target_chats_json) if target_chats_json else []
+        except:
+            target_chats = []
+        
+        # Если target_chats пустой, используем основной chat_id
+        if not target_chats:
+            target_chats = [chat_id]
+        
+        # Получаем аватары чатов через Telegram Bot API
+        import requests
+        
+        def get_chat_info(chat_id):
+            try:
+                url = f"https://api.telegram.org/bot{bot_token}/getChat"
+                params = {"chat_id": chat_id}
+                
+                response = requests.get(url, params=params)
+                data = response.json()
+                
+                if data.get("ok"):
+                    chat_info = data.get("result", {})
+                    return {
+                        "name": chat_info.get("title", "Unknown"),
+                        "avatar": get_chat_avatar_from_info(chat_info)
+                    }
+                
+                return {"name": "Unknown", "avatar": None}
+                
+            except Exception as e:
+                print(f"Ошибка при получении информации о чате {chat_id}: {e}")
+                return {"name": "Unknown", "avatar": None}
+        
+        def get_chat_avatar_from_info(chat_info):
+            try:
+                photo = chat_info.get("photo")
+                
+                if photo:
+                    # Ищем фото в разных размерах
+                    avatar_file_id = None
+                    
+                    if "big_file_id" in photo:
+                        avatar_file_id = photo["big_file_id"]
+                    elif "small_file_id" in photo:
+                        avatar_file_id = photo["small_file_id"]
+                    elif "file_id" in photo:
+                        avatar_file_id = photo["file_id"]
+                    
+                    if avatar_file_id:
+                        # Получаем URL файла
+                        file_url = f"https://api.telegram.org/bot{bot_token}/getFile?file_id={avatar_file_id}"
+                        
+                        file_response = requests.get(file_url)
+                        file_data = file_response.json()
+                        
+                        if file_data.get("ok"):
+                            file_path = file_data["result"]["file_path"]
+                            avatar_url = f"https://api.telegram.org/file/bot{bot_token}/{file_path}"
+                            return avatar_url
+                
+                return None
+                
+            except Exception as e:
+                print(f"Ошибка при получении аватара чата: {e}")
+                return None
+        
+        # Получаем информацию о всех чатах
+        chats_data = []
+        for chat_id in target_chats:
+            try:
+                chat_info = get_chat_info(chat_id)
+                chat_link = await bot.export_chat_invite_link(chat_id)
+                
+                chats_data.append({
+                    "chat_id": chat_id,
+                    "name": chat_info.get("name", "Unknown"),
+                    "link": chat_link,
+                    "avatar": chat_info.get("avatar") or "/avatars/clan.png"
+                })
+            except Exception as e:
+                print(f"Ошибка при генерации ссылки для чата {chat_id}: {e}")
+                continue
+        
+        # Формируем данные для ответа
+        links_data = {
+            "chats": chats_data,
+            "count": len(chats_data),
+            "code": action.code,
+            "main_chat_id": chat_id
+        }
+        
+        print("="*50)
+        print("Сгенерированы ссылки по коду приглашения:")
+        print(f"Код: {action.code}")
+        print(f"Telegram ID: {action.telegram_id}")
+        print(f"Username: {action.username}")
+        print(f"Основной Chat ID: {chat_id}")
+        print(f"Целевые чаты: {target_chats}")
+        print(f"Сгенерировано ссылок: {len(chats_data)}")
+        for chat in chats_data:
+            print(f"  - {chat['name']} ({chat['chat_id']}): {chat['link']}")
+        print("="*50)
+ 
+        return {
+            "status": "success",
+            "data": links_data
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Ошибка при генерации ссылок: {str(e)}"
+        }
+
 @app.post('/generate_invite_links')
 async def generate_invite_links(action: GenerateLinksAction):
     """
