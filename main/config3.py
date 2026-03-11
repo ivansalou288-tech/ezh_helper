@@ -150,7 +150,7 @@ def init_chat_db(chat_id):
         create_fallback_tables(cursor)
     
     connection.commit()
-    connection.close()
+
 
         # Insert default commands
     default_commands = [
@@ -177,7 +177,7 @@ def init_chat_db(chat_id):
 
     for dk, rng in default_commands:
         cursor.execute('INSERT OR IGNORE INTO dk (comand, dk) VALUES (?, ?)', (dk, rng))
-        
+    connection.commit()
 
 def init_all_db():
     """Initialize All.db database from all.sql file"""
@@ -1165,5 +1165,5 @@ async def kick_user(user_id, chat_id, bot: Bot):
         await bot.send_message(chat_id,
             f'👨🏻‍🔧 <a href="tg://user?id={user_id}">Пользователь</a> является Телеграм-админом этого чата',
             parse_mode='html')
-            
+
 
