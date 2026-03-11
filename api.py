@@ -178,22 +178,13 @@ async def ban_user_admn(chat_id: int, user_id: int, admin_id: int, reason: str):
     """Банит пользователя в чате"""
     try:
         # Проверяем, состоит ли пользователь в чате
-        try:
-            chat_member = await bot.get_chat_member(chat_id, user_id)
-            print(f"Статус пользователя {user_id} в чате {chat_id}: {chat_member.status}")
-        except Exception as e:
-            if "PARTICIPANT_ID_INVALID" in str(e):
-                return {
-                    "status": "error",
-                    "message": f"Пользователь {user_id} не найден в чате. Возможно, он уже вышел или был удален."
-                }
-            else:
-                print(f"Ошибка при проверке участника: {e}")
-                # Продолжаем попытку бана даже если не удалось проверить статус
+        
         
         # Кикаем пользователя из чата
-        await bot.ban_chat_member(chat_id, user_id)
-        
+        try:
+            await bot.ban_chat_member(chat_id, user_id)
+        except Exception:
+            print('Всем похуй')
         user = GetUserByID(user_id, chat_id)
         moder = GetUserByID(admin_id, chat_id)
         
