@@ -1301,7 +1301,7 @@ class DeleteUserAction(BaseModel):
     admin_username: Optional[str] = None
 
 @app.post('/ban_user')
-def ban_user(action: BanUserAction):
+async def ban_user(action: BanUserAction):
     """
     Банит пользователя в чате
     """
@@ -1315,6 +1315,18 @@ def ban_user(action: BanUserAction):
         print(f"Admin Name: {action.admin_name}")
         print(f"Admin Username: {action.admin_username}")
         print("="*50)
+
+        # Проверяем, не является ли пользователь владельцем чата
+        try:
+            if bot:
+                chat_member = await bot.get_chat_member(action.chat_id, action.user_id)
+                if chat_member.status == 'creator':
+                    return {
+                        "status": "error", 
+                        "message": "Нельзя забанить владельца чата"
+                    }
+        except Exception as e:
+            print(f"Ошибка при проверке статуса пользователя: {e}")
 
         # Здесь можно добавить логику бана пользователя
         # Например, добавление в специальную таблицу забаненных пользователей
