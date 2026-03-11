@@ -1744,6 +1744,52 @@ def set_permissions(action: SetPermissionsAction):
         }
     }
 
+@app.get('/user_permissions/{chat_id}/{user_id}')
+def get_user_permissions(chat_id: int, user_id: int):
+    """
+    Проверяет имеет ли пользователь какие-либо права в чате
+    """
+    try:
+        connection = sqlite3.connect(admin_path, check_same_thread=False)
+        cursor = connection.cursor()
+        
+        # Проверяем есть ли у пользователя права в этом чате
+        cursor.execute('SELECT * FROM admins WHERE user_id = ? AND chat_id = ?', (user_id, chat_id))
+        admin_record = cursor.fetchone()
+        
+        connection.close()
+        
+        if admin_record:
+            # Структура: user_id, chat_id, chat_name, can_see_users, can_do_admin, can_recom, can_links, can_dk
+            permissions = {
+                "has_permissions": True,
+                "can_see_users": bool(admin_record[3]) if len(admin_record) > 3 else False,
+                "can_do_admin": bool(admin_record[4]) if len(admin_record) > 4 else False,
+                "can_recom": bool(admin_record[5]) if len(admin_record) > 5 else False,
+                "can_links": bool(admin_record[6]) if len(admin_record) > 6 else False,
+                "can_dk": bool(admin_record[7]) if len(admin_record) > 7 else False
+            }
+        else:
+            permissions = {
+                "has_permissions": False,
+                "can_see_users": False,
+                "can_do_admin": False,
+                "can_recom": False,
+                "can_links": False,
+                "can_dk": False
+            }
+        
+        return {
+            "status": "success",
+            "data": permissions
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Ошибка при проверке прав: {str(e)}"
+        }
+
 @app.post('/delete_permissions')
 def delete_permissions(action: DeletePermissionsAction):
     """

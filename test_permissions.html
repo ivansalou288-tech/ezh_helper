@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Permissions</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .test-section { margin: 20px 0; padding: 15px; background: white; border-radius: 8px; }
+        .result { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Test User Permissions</h1>
+    
+    <div class="test-section">
+        <h3>Test API Endpoint</h3>
+        <button onclick="testPermissions()">Test User 123456789 in Chat 1002143434937</button>
+        <button onclick="testNoPermissions()">Test User 999999999 in Chat 1002143434937</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function testPermissions() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<div class="result">Testing...</div>';
+            
+            try {
+                const response = await fetch('https://ezh-dev.ru:3000/user_permissions/1002143434937/123456789');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const perms = data.data;
+                    const activeRights = Object.values(perms).filter(p => p === true).length;
+                    
+                    resultDiv.innerHTML = `
+                        <div class="result success">
+                            <h4>✅ User 123456789 Permissions:</h4>
+                            <p>Has permissions: ${perms.has_permissions}</p>
+                            <p>Active rights: ${activeRights}</p>
+                            <ul>
+                                <li>Can see users: ${perms.can_see_users}</li>
+                                <li>Can do admin: ${perms.can_do_admin}</li>
+                                <li>Can recommend: ${perms.can_recom}</li>
+                                <li>Can manage links: ${perms.can_links}</li>
+                                <li>Can manage DK: ${perms.can_dk}</li>
+                            </ul>
+                            <p><strong>Expected: "Права: 3" (has_permissions=1, can_see_users=1, can_do_admin=1, can_links=1)</strong></p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="result error">❌ Error: ${data.message}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">❌ Network Error: ${error.message}</div>`;
+            }
+        }
+
+        async function testNoPermissions() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<div class="result">Testing...</div>';
+            
+            try {
+                const response = await fetch('https://ezh-dev.ru:3000/user_permissions/1002143434937/999999999');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const perms = data.data;
+                    
+                    resultDiv.innerHTML = `
+                        <div class="result success">
+                            <h4>✅ User 999999999 Permissions:</h4>
+                            <p>Has permissions: ${perms.has_permissions}</p>
+                            <p><strong>Expected: "Нет прав" (all permissions = false)</strong></p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="result error">❌ Error: ${data.message}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">❌ Network Error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
