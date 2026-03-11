@@ -25,7 +25,7 @@ sys.path.insert(0, ROOT_DIR)
 
 from main.config3 import *
 from main.secret import main_token as bot_token
-
+prinatie_bot = Bot(token=bot_token)
 # Импортируем бота для проверки статуса пользователей
 try:
     from aiogram import Bot
@@ -1334,7 +1334,7 @@ async def generate_invite_links_by_code(action: GenerateLinksByCodeAction):
         for chat_id in target_chats:
             try:
                 chat_info = get_chat_info(chat_id)
-                chat_link = await bot.export_chat_invite_link(chat_id)
+                chat_link = await prinatie_bot.export_chat_invite_link(chat_id)
                 
                 chats_data.append({
                     "chat_id": chat_id,
@@ -1451,7 +1451,7 @@ async def generate_invite_links(action: GenerateLinksAction):
         for chat_id in target_chats:
             try:
                 chat_info = get_chat_info(chat_id)
-                chat_link = await bot.export_chat_invite_link(chat_id)
+                chat_link = await prinatie_bot.export_chat_invite_link(chat_id)
                 
                 chats_data.append({
                     "chat_id": chat_id,
