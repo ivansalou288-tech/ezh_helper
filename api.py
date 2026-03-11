@@ -788,6 +788,14 @@ def get_all_links(chat_id: Optional[int] = None):
             activate_cnt INTEGER,
             target_chats TEXT
         )''')
+        
+        # Добавляем колонку target_chats если она не существует
+        try:
+            cursor.execute('ALTER TABLE links ADD COLUMN target_chats TEXT')
+        except sqlite3.OperationalError:
+            # Колонка уже существует
+            pass
+        
         connection.commit()
         
         if chat_id:
@@ -864,6 +872,14 @@ def delete_link(action: LinkDeleteAction):
             activate_cnt INTEGER,
             target_chats TEXT
         )''')
+        
+        # Добавляем колонку target_chats если она не существует
+        try:
+            cursor.execute('ALTER TABLE links ADD COLUMN target_chats TEXT')
+        except sqlite3.OperationalError:
+            # Колонка уже существует
+            pass
+        
         connection.commit()
         
         # Удаляем ссылку
@@ -912,6 +928,14 @@ def check_invite_code(action: CheckCodeAction):
             activate_cnt INTEGER,
             target_chats TEXT
         )''')
+        
+        # Добавляем колонку target_chats если она не существует
+        try:
+            cursor.execute('ALTER TABLE links ADD COLUMN target_chats TEXT')
+        except sqlite3.OperationalError:
+            # Колонка уже существует
+            pass
+        
         connection.commit()
         
         # Ищем код в таблице
@@ -1242,12 +1266,21 @@ def links_create(action: LinkCreateAction):
     import json
     target_chats_json = json.dumps(action.target_chats) if action.target_chats else "[]"
     
+    # Создаем таблицу если не существует
     cursor.execute('''CREATE TABLE IF NOT EXISTS links (
         chat_id INTEGER,
         link TEXT,
         activate_cnt INTEGER,
         target_chats TEXT
     )''')
+    
+    # Добавляем колонку target_chats если она не существует
+    try:
+        cursor.execute('ALTER TABLE links ADD COLUMN target_chats TEXT')
+    except sqlite3.OperationalError:
+        # Колонка уже существует
+        pass
+    
     connection.commit()
     cursor.execute('INSERT INTO links (chat_id, link, activate_cnt, target_chats) VALUES (?, ?, ?, ?)', 
                    (action.chat_id, link, action.activations, target_chats_json))
