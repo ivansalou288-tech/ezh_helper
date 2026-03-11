@@ -363,38 +363,21 @@ async def get_users_sdk(chat: int):
         # Пытаемся получить статус участника в чате; если его больше нет в чате,
         # Telegram может вернуть ошибку "member not found" — тогда используем ранг
         chat_status = '� Состоит в чате'  # по умолчанию считаем, что состоит
-        
-        if bot:
-            try:
-                chat_member = await bot.get_chat_member(chat, tg_ids)
-                status = chat_member.status
+
+
+        chat_member = await bot.get_chat_member(chat, tg_ids)
+        status = chat_member.status
                 
-                if status == 'administrator':
+        if status == 'administrator':
                     chat_status = '👨🏻‍🔧 Телеграм-админ этого чата'
-                elif status == 'creator':
+        elif status == 'creator':
                     chat_status = '👨🏻‍🔧 Создатель этого чата'
-                elif status == 'member' or status == 'restricted':
-                    chat_status = '💚 Состоит в чате'
-                else:
-                    chat_status = '💔 Не состоит в чате'
-                    
-            except Exception as e:
-                # При любой ошибке используем ранг из базы данных
-                # Это исправляет проблему, когда у многих статус "не состоит"
-                if rang and rang >= 5:
-                    chat_status = '👨🏻‍🔧 Телеграм-админ этого чата'
-                elif rang and rang >= 3:
-                    chat_status = '💚 Состоит в чате'
-                else:
+        elif status == 'member' or status == 'restricted':
                     chat_status = '💚 Состоит в чате'
         else:
-            # Бот недоступен, используем ранг для определения статуса
-            if rang and rang >= 5:
-                chat_status = '👨🏻‍🔧 Телеграм-админ этого чата'
-            elif rang and rang >= 3:
-                chat_status = '💚 Состоит в чате'
-            else:
-                chat_status = '💚 Состоит в чате'
+                    chat_status = '💔 Не состоит в чате'
+                    
+            
 
         users[index] = {
             'tg_ids': tg_ids,
@@ -849,6 +832,7 @@ class GenerateLinksAction(BaseModel):
     telegram_id: Optional[int] = None
     username: Optional[str] = None
     chat_id: int
+    target_chats: Optional[list] = []
 
 @app.post('/api/links/delete')
 def delete_link(action: LinkDeleteAction):
@@ -980,7 +964,7 @@ def check_invite_code(action: CheckCodeAction):
         }
 
 @app.post('/submit_form')
-def submit_form(action: SubmitFormAction):
+async def submit_form(action: SubmitFormAction):
     """
     Принимает данные пользователя из формы заявки
     """
@@ -1074,7 +1058,7 @@ def submit_form(action: SubmitFormAction):
                 if failed_chats:
                     message += f"\nНе удалось добавить в чаты: {', '.join([f'Chat {cid}' for cid in failed_chats])}"
                 
-                bot.send_message(chat_id, message)
+                await bot.send_message(chat_id, message)
             except Exception as e:
                 print(f"Ошибка при отправке уведомления: {e}")
         
@@ -1100,9 +1084,6 @@ async def generate_invite_links(action: GenerateLinksAction):
     try:
         if not action.chat_id:
             return {"status": "error", "message": "chat_id обязателен"}
-        
-        # Определяем основной чат клана
-
         
         # Получаем аватары чатов через Telegram Bot API
         import requests
@@ -1161,27 +1142,41 @@ async def generate_invite_links(action: GenerateLinksAction):
                 print(f"Ошибка при получении аватара чата: {e}")
                 return None
         
-        # Получаем информацию о чатах
-        clan_info = get_chat_info(action.chat_id)
-
-        clan_link = await bot.export_chat_invite_link(action.chat_id)
+        # Определяем список чатов для генерации ссылок
+        target_chats = action.target_chats if action.target_chats else [action.chat_id]
+        
+        # Получаем информацию о всех чатах
+        chats_data = []
+        for chat_id in target_chats:
+            try:
+                chat_info = get_chat_info(chat_id)
+                chat_link = await bot.export_chat_invite_link(chat_id)
+                
+                chats_data.append({
+                    "chat_id": chat_id,
+                    "name": chat_info.get("name", "Unknown"),
+                    "link": chat_link,
+                    "avatar": chat_info.get("avatar") or "/avatars/clan.png"
+                })
+            except Exception as e:
+                print(f"Ошибка при генерации ссылки для чата {chat_id}: {e}")
+                continue
+        
         # Формируем данные для ответа
         links_data = {
-            "chat": {
-                "name": clan_info.get("name", "Unknown"),
-                "link": f"{clan_link}",
-                "avatar": clan_info.get("avatar") or "/avatars/clan.png"
-            }
+            "chats": chats_data,
+            "count": len(chats_data)
         }
         
         print("="*50)
         print("Сгенерированы ссылки для пользователя:")
         print(f"Telegram ID: {action.telegram_id}")
         print(f"Username: {action.username}")
-        print(f"Chat ID: {action.chat_id}")
-        print(f"Chat link: {links_data['chat']['link']}")
-        print(f"Chat name: {links_data['chat']['name']}")
-        print(f"Chat avatar: {links_data['chat']['avatar']}")
+        print(f"Основной Chat ID: {action.chat_id}")
+        print(f"Целевые чаты: {target_chats}")
+        print(f"Сгенерировано ссылок: {len(chats_data)}")
+        for chat in chats_data:
+            print(f"  - {chat['name']} ({chat['chat_id']}): {chat['link']}")
         print("="*50)
  
         return {
