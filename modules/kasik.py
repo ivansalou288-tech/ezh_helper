@@ -41,7 +41,7 @@ async def kasik(message: types.Message):
 
     period_str = '5 минут'  # Default value
     try:
-        period_str = cursor.execute('SELECT period FROM default_periods WHERE command = ?', ('kasik')).fetchall()[0][0]
+        period_str = cursor.execute('SELECT period FROM default_periods WHERE command = ?', ('kasik', )).fetchall()[0][0]
         time_value, time_unit = period_str.split()
         time_value = int(time_value)
         if time_unit in ['ч', 'час', 'часа', 'часов']:
