@@ -359,15 +359,15 @@ async def get_users_sdk(chat: int):
         last_date = user[8]
         date_vhod = user[9]
         mess_count = user[10]
-
+        try:
         # Пытаемся получить статус участника в чате; если его больше нет в чате,
         # Telegram может вернуть ошибку "member not found" — тогда используем ранг
-        chat_status = '� Состоит в чате'  # по умолчанию считаем, что состоит
+            chat_status = '� Состоит в чате'  # по умолчанию считаем, что состоит
 
 
-        chat_member = await bot.get_chat_member(chat, tg_ids)
-        status = chat_member.status
-        try:   
+            chat_member = await bot.get_chat_member(chat, tg_ids)
+            status = chat_member.status
+   
             if status == 'administrator':
                         chat_status = '👨🏻‍🔧 Телеграм-админ этого чата'
             elif status == 'creator':
