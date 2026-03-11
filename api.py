@@ -177,10 +177,26 @@ async def snat_warn_admn(user_id, chat_id,moder_id, number_warn, warn_count_new)
 async def ban_user_admn(chat_id: int, user_id: int, admin_id: int, reason: str):
     """Банит пользователя в чате"""
     try:
+        # Проверяем, состоит ли пользователь в чате
+        try:
+            chat_member = await bot.get_chat_member(chat_id, user_id)
+            print(f"Статус пользователя {user_id} в чате {chat_id}: {chat_member.status}")
+        except Exception as e:
+            if "PARTICIPANT_ID_INVALID" in str(e):
+                return {
+                    "status": "error",
+                    "message": f"Пользователь {user_id} не найден в чате. Возможно, он уже вышел или был удален."
+                }
+            else:
+                print(f"Ошибка при проверке участника: {e}")
+                # Продолжаем попытку бана даже если не удалось проверить статус
+        
         # Кикаем пользователя из чата
         await bot.ban_chat_member(chat_id, user_id)
+        
         user = GetUserByID(user_id, chat_id)
         moder = GetUserByID(admin_id, chat_id)
+        
         # Записываем в историю банов (если есть таблица)
         chat_db_path = get_db_path(chat_id)
         connection = sqlite3.connect(chat_db_path, check_same_thread=False)
@@ -197,7 +213,7 @@ async def ban_user_admn(chat_id: int, user_id: int, admin_id: int, reason: str):
         message_idd = (await bot.send_message(chat_id, f'<b>{voscl}Внимание{voscl}</b>\n{circle_em}Злостный нарушитель {user_men} получает бан и покидает нас\n👮‍♂️Выгнал его: {moder_men}\n{mes_em}Выгнали его за: {reason}', parse_mode='html')).message_id
         
         try:
-            cursor.execute(f'INSERT INTO bans (tg_id, id_pubg, message_id, prichina, date, user_men, moder_men) VALUES (?, ?, ?, ?, ?, ?, ?)', (user_id, pubg_id, message_id, comments, date, user_men, moder_men))
+            cursor.execute(f'INSERT INTO bans (tg_id, id_pubg, message_id, prichina, date, user_men, moder_men) VALUES (?, ?, ?, ?, ?, ?, ?)', (user_id, pubg_id, message_idd, reason, date, user_men, moder_men))
         except sqlite3.IntegrityError:
             cursor.execute(f'UPDATE bans SET id_pubg = ? WHERE tg_id = ?', (pubg_id, user_id))
             cursor.execute(f'UPDATE bans SET message_id = ? WHERE tg_id = ?', (message_idd, user_id))
@@ -212,9 +228,28 @@ async def ban_user_admn(chat_id: int, user_id: int, admin_id: int, reason: str):
         except sqlite3.OperationalError:
             pass
         
+        print(f"Пользователь {user_id} успешно забанен в чате {chat_id}")
+        return {"status": "success", "message": "Пользователь успешно забанен"}
+        
     except Exception as e:
-        print(f"Ошибка при выполнении бана пользователя {user_id}: {e}")
-        raise e
+        error_msg = str(e)
+        print(f"Ошибка при выполнении бана пользователя {user_id}: {error_msg}")
+        
+        if "PARTICIPANT_ID_INVALID" in error_msg:
+            return {
+                "status": "error",
+                "message": f"Пользователь {user_id} не найден в чате. Возможно, он уже вышел или был удален."
+            }
+        elif "CHAT_ADMIN_REQUIRED" in error_msg:
+            return {
+                "status": "error", 
+                "message": "У бота недостаточно прав для бана пользователей. Убедитесь, что бот является администратором."
+            }
+        else:
+            return {
+                "status": "error",
+                "message": f"Ошибка при бане пользователя: {error_msg}"
+            }
 
 
 
@@ -1424,8 +1459,10 @@ async def ban_user(action: BanUserAction):
         # Например, добавление в специальную таблицу забаненных пользователей
         # или вызов Telegram Bot API для бана
         
-        await ban_user_admn(action.chat_id, action.user_id, action.admin_id, action.reason)
-
+        ban_result = await ban_user_admn(action.chat_id, action.user_id, action.admin_id, action.reason)
+        
+        if ban_result and ban_result.get("status") == "error":
+            return ban_result
 
         return {
             "status": "success",
