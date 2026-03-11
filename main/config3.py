@@ -152,6 +152,33 @@ def init_chat_db(chat_id):
     connection.commit()
     connection.close()
 
+        # Insert default commands
+    default_commands = [
+        ('ban', 4), ('mut', 4), ('warn', 4), ('all', 4),
+        ('rang', 4), ('dk', 4), ('change_pravils', 4),
+        ('close_chat', 4), ('change_priv', 4), ('obavlenie', 4),
+        ('tur', 4), ('dell', 4), ('period', 4)
+    ]
+    
+    texts = [
+        ('priv', 'Добро пожаловать!'),
+        ('rules', '')
+    ]
+    default_periods = [
+        ('mut', "1 час"),
+        ('all', "3 минуты"),
+        ('kasik', "5 минут")
+    ]
+    for command, dk_value in default_commands:
+        cursor.execute('INSERT OR IGNORE INTO dk (comand, dk) VALUES (?, ?)', (command, dk_value))
+    
+    for text_name, txt in texts:
+        cursor.execute('INSERT OR IGNORE INTO texts (text_name, text) VALUES (?, ?)', (text_name, txt))
+
+    for dk, rng in default_commands:
+        cursor.execute('INSERT OR IGNORE INTO dk (comand, dk) VALUES (?, ?)', (dk, rng))
+        
+
 def init_all_db():
     """Initialize All.db database from all.sql file"""
     db_path = curent_path / 'databases' / 'All.db'
