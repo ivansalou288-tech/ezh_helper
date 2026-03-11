@@ -70,14 +70,14 @@ tur_path = curent_path / 'databases' / 'tournaments.db'
 dinamik_path = curent_path / 'databases' / 'din_data.db'
 
 
-#? EN: Import working chat IDs from database
-#* RU: Импорт ID рабочих чатов из базы данных
-connection = sqlite3.connect(main_path, check_same_thread=False)
-cursor = connection.cursor()
-logs_gr = -int(cursor.execute(f"SELECT chat_id FROM chat_ids WHERE chat_name = ?", ('logs_gr',)).fetchall()[0][0])
-sost_1 = -int(cursor.execute(f"SELECT chat_id FROM chat_ids WHERE chat_name = ?", ('sost_1',)).fetchall()[0][0])
-sost_2 = -int(cursor.execute(f"SELECT chat_id FROM chat_ids WHERE chat_name = ?", ('sost_2',)).fetchall()[0][0])
-klan = -int(cursor.execute(f"SELECT chat_id FROM chat_ids WHERE chat_name = ?", ('klan',)).fetchall()[0][0])
+# #? EN: Import working chat IDs from database
+# #* RU: Импорт ID рабочих чатов из базы данных
+# connection = sqlite3.connect(main_path, check_same_thread=False)
+# cursor = connection.cursor()
+# logs_gr = -int(cursor.execute(f"SELECT chat_id FROM chat_ids WHERE chat_name = ?", ('logs_gr',)).fetchall()[0][0])
+# sost_1 = -int(cursor.execute(f"SELECT chat_id FROM chat_ids WHERE chat_name = ?", ('sost_1',)).fetchall()[0][0])
+# sost_2 = -int(cursor.execute(f"SELECT chat_id FROM chat_ids WHERE chat_name = ?", ('sost_2',)).fetchall()[0][0])
+# klan = -int(cursor.execute(f"SELECT chat_id FROM chat_ids WHERE chat_name = ?", ('klan',)).fetchall()[0][0])
 
 
 

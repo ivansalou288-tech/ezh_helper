@@ -1,5 +1,6 @@
 from aiogram import types, F, Router, Dispatcher, Bot
-from aiogram.filters import Command
+from aiogram.types import ChatPermissions, InlineKeyboardButton, InlineKeyboardMarkup, FSInputFile
+from aiogram.filters import Command, CommandStart
 from aiogram.enums import ParseMode
 import asyncio
 import random
@@ -19,8 +20,9 @@ from modules.cubes import router as cubes_router
 from modules.farm import router as farm_router
 from modules.kasik import router as kasik_router
 from aiogram.enums.chat_member_status import ChatMemberStatus
+import main.secret 
 # Add router to dispatcher
-TOKEN = '8451829699:AAE_tfApKWq3r82i0U7yD98RCcQPIMmMT1Q'
+TOKEN = main.secret.main_token
 router = Router(name=__name__)
 
 page_b = 0
@@ -70,6 +72,24 @@ async def bind_chat_to_admin(message: types.Message, bot: Bot):
         await message.answer('❌ Произошла ошибка при выдачи прав. Попробуйте позже.')
 
 
+#? EN: Handles /start command and shows main menu with options to join clan or indicate existing membership
+#* RU: Обрабатывает команду /start и показывает главное меню с опциями вступления в клан или указания существующего членства
+@router.message(CommandStart())
+async def start(message: types.Message, bot: Bot):
+    if message.chat.id != message.from_user.id:
+        return
+    try:
+        await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+    except Exception:
+        pass
+    buttons = [
+        types.InlineKeyboardButton(text="Вступить в клан", web_app=types.WebAppInfo(url='https://ezh-dev.ru/ezh_helper/new_chat_mem_dir/index.html')),
+
+    ]
+
+    keyboard = types.InlineKeyboardMarkup(inline_keyboard=[buttons])
+
+    await message.answer_photo(photo=FSInputFile(f'{curent_path}/photos/klan_ava.jpg'), reply_markup=keyboard, caption='Приветствуем тебя в нашем боте!\nЧто ты хочешь сделать?')
 
 
 
@@ -669,6 +689,12 @@ async def snatie_warns(message: types.Message, bot: Bot):
     warns_count = len(all_warns)
     ar = []
     
+    # Создаем кнопки навигации один раз перед циклом
+    buttons = [
+        types.InlineKeyboardButton(text="◀️", callback_data="snat_list_back"),
+        types.InlineKeyboardButton(text="▶️", callback_data="snat_list_next")
+    ]
+    
     for i, warn in enumerate(all_warns):
         warn_text = warn[1] if warn[1] else 'Без причины'
         moder_give_id = (warn[2]).split('ID: ')[1] if warn[2] else None
@@ -693,10 +719,6 @@ async def snatie_warns(message: types.Message, bot: Bot):
             itog.append('\n\n'.join(ar))
             ar.clear()
 
-    buttons = [
-        types.InlineKeyboardButton(text="◀️", callback_data="snat_list_back"),
-        types.InlineKeyboardButton(text="▶️", callback_data="snat_list_next")
-    ]
     keyboard = types.InlineKeyboardMarkup(inline_keyboard=[buttons])
 
     page_c = len(itog)
