@@ -32,6 +32,42 @@ page_c_b = 0
 
 
 
+#? EN: Command for chat owners to bind their chat to admin panel
+#* RU: Команда для владельцев чатов для привязки чата к админ-панели
+@router.message(F.text.lower().startswith('!владелец'))
+async def bind_chat_to_admin(message: types.Message, bot: Bot):
+    """Привязывает чат к админ-панели для владельца чата"""
+    
+    # Проверяем, что команда используется в групповом чате
+    if message.chat.id == message.from_user.id:
+        await message.answer(f' {krest} Эта команда работает только в групповых чатах!', parse_mode='html')
+        return
+    
+    # Проверяем, что чат в списке разрешенных
+
+    init_all_db()
+    init_admin_db() 
+    init_chat_db(message.chat.id)
+
+
+    try:
+        # Получаем информацию о пользователе в чате
+        chat_member = await bot.get_chat_member(message.chat.id, message.from_user.id)
+        
+        # Проверяем, что пользователь является владельцем
+        if chat_member.status != ChatMemberStatus.CREATOR:
+            await message.answer(f' {krest} Только владелец чата может использовать эту команду!', parse_mode='html')
+            return
+        cursor.execute(f'UPDATE users SET rang = ? WHERE tg_id = ?',
+                   (6, message.from_user.id))
+        connection.commit()
+       
+        
+    except Exception as e:
+        print(f"Error in bind_chat_to_admin: {e}")
+        await message.answer('❌ Произошла ошибка при выдачи прав. Попробуйте позже.')
+
+
 
 
 
