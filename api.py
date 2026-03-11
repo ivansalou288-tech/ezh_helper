@@ -129,6 +129,98 @@ def get_bot_username() -> str:
     _cached_bot_username = "werty_clan_helper_bot"
     return _cached_bot_username
 
+
+
+
+
+
+#? EN: Removes specific warning from user and reorganizes warning list
+#* RU: Снимает конкретное предупреждение с пользователя и реорганизует список предупреждений
+async def snat_warn_admn(user_id, chat_id,moder_id, number_warn, warn_count_new):
+    chat_db_path = get_db_path(chat_id)
+    connection = sqlite3.connect(chat_db_path, check_same_thread=False)
+    cursor = connection.cursor()
+    
+    try:
+        # Получаем все предупреждения пользователя, отсортированные по дате
+        cursor.execute("SELECT * FROM warns WHERE user_id = ? ORDER BY date", (user_id,))
+        all_warns = cursor.fetchall()
+        
+        if not all_warns or number_warn > len(all_warns):
+            return
+            
+        # Удаляем указанное предупреждение (1 = самое старое, 2 = второе, 3 = самое новое)
+        warn_index = number_warn - 1
+        if warn_index < len(all_warns):
+            warn_to_delete = all_warns[warn_index]
+            # Delete by user_id and reason to identify the specific warning
+            cursor.execute("DELETE FROM warns WHERE user_id = ? AND reason = ? AND moder_id = ? AND date = ?", 
+                        (user_id, warn_to_delete[1], warn_to_delete[2], warn_to_delete[3]))
+            connection.commit()
+            
+        # Записываем в историю снятых предупреждений
+        moder_name = GetUserByID(moder_id, chat_id).nik
+        moder_mention = f'<a href="tg://user?id={moder_id}">{moder_name}</a>'
+        
+        try:
+            cursor.execute('INSERT INTO warn_snat (user_id, warn_text, moder_give, moder_snat) VALUES (?, ?, ?, ?)', 
+                        (user_id, warn_to_delete[1] if warn_index < len(all_warns) else 'Предупреждение', f'ID: {warn_to_delete[2]}' if warn_index < len(all_warns) else 'Неизвестен', moder_mention))
+            connection.commit()
+        except:
+            pass
+            
+    except Exception as e:
+        print(f"Error in snat_warn: {e}")
+    finally:
+        connection.close()
+
+async def ban_user(chat_id: int, user_id: int, admin_id: int, reason: str):
+    """Банит пользователя в чате"""
+    try:
+        # Кикаем пользователя из чата
+        await bot.ban_chat_member(chat_id, user_id)
+        user = GetUserByID(user_id, chat_id)
+        moder = GetUserByID(admin_id, chat_id)
+        # Записываем в историю банов (если есть таблица)
+        chat_db_path = get_db_path(chat_id)
+        connection = sqlite3.connect(chat_db_path, check_same_thread=False)
+        cursor = connection.cursor()
+
+        await snat_warn_admn(user_id, chat_id, admin_id, 3, 2)
+        await snat_warn_admn(user_id, chat_id, admin_id, 2, 1)
+        await snat_warn_admn(user_id, chat_id, admin_id, 1, 0)
+
+        pubg_id = user.id_pubg
+        date = datetime.now().strftime('%H:%M:%S %d.%m.%Y')
+        user_men = user.mention
+        moder_men = moder.mention
+        message_idd = (await bot.send_message(chat_id, f'<b>{voscl}Внимание{voscl}</b>\n{circle_em}Злостный нарушитель {user_men} получает бан и покидает нас\n👮‍♂️Выгнал его: {moder_men}\n{mes_em}Выгнали его за: {reason}', parse_mode='html')).message_id
+        
+        try:
+            cursor.execute(f'INSERT INTO bans (tg_id, id_pubg, message_id, prichina, date, user_men, moder_men) VALUES (?, ?, ?, ?, ?, ?, ?)', (user_id, pubg_id, message_id, comments, date, user_men, moder_men))
+        except sqlite3.IntegrityError:
+            cursor.execute(f'UPDATE bans SET id_pubg = ? WHERE tg_id = ?', (pubg_id, user_id))
+            cursor.execute(f'UPDATE bans SET message_id = ? WHERE tg_id = ?', (message_idd, user_id))
+            cursor.execute(f'UPDATE bans SET prichina = ? WHERE tg_id = ?', (reason, user_id))
+            cursor.execute(f'UPDATE bans SET date = ? WHERE tg_id = ?', (date, user_id))
+            cursor.execute(f'UPDATE bans SET user_men = ? WHERE tg_id = ?', (user_men, user_id))
+            cursor.execute(f'UPDATE bans SET moder_men = ? WHERE tg_id = ?', (moder_men, user_id))
+        connection.commit()
+        try:
+            cursor.execute(f'DELETE FROM users WHERE tg_id = ?', (user_id, ))
+            connection.commit()
+        except sqlite3.OperationalError:
+            pass
+        
+    except Exception as e:
+        print(f"Ошибка при выполнении бана пользователя {user_id}: {e}")
+        raise e
+
+
+
+
+
+
 @app.get('/user-admin-chats/{user_id}')
 def get_user_admin_chats(user_id: int):
     """
@@ -1332,6 +1424,9 @@ async def ban_user(action: BanUserAction):
         # Например, добавление в специальную таблицу забаненных пользователей
         # или вызов Telegram Bot API для бана
         
+        await ban_user(action.chat_id, action.user_id, action.admin_id, action.reason)
+
+
         return {
             "status": "success",
             "message": f"Пользователь {action.user_id} забанен в чате {action.chat_id}",
