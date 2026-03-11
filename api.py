@@ -1681,6 +1681,47 @@ def set_permissions(action: SetPermissionsAction):
     print(f"Изменение рангов команд: {action.change_team_ranks}")
     print("="*50)
     
+    # Получаем имя чата - сначала из базы, потом через API
+    chat_name = None
+    try:
+        # Сначала проверяем есть ли уже имя в базе
+        connection_check = sqlite3.connect(admin_path, check_same_thread=False)
+        cursor_check = connection_check.cursor()
+        cursor_check.execute('SELECT DISTINCT chat_name FROM admins WHERE chat_id = ?', (int(action.chat_id),))
+        existing_name = cursor_check.fetchone()
+        connection_check.close()
+        
+        if existing_name and existing_name[0]:
+            chat_name = existing_name[0]
+            print(f"Используем существующее имя чата из базы: {chat_name}")
+        else:
+            # Пытаемся получить через Telegram API
+            try:
+                import requests
+                url = f"https://api.telegram.org/bot{bot_token}/getChat"
+                params = {"chat_id": action.chat_id}
+                
+                response = requests.get(url, params=params, timeout=5)
+                if response.status_code == 200:
+                    data = response.json()
+                    if data.get("ok"):
+                        chat_info = data.get("result", {})
+                        chat_name = chat_info.get("title", f"Chat {action.chat_id}")
+                        print(f"Получено имя чата через API: {chat_name}")
+                    else:
+                        chat_name = f"Chat {action.chat_id}"
+                        print(f"Не удалось получить имя чата через API, используем заглушку: {chat_name}")
+                else:
+                    chat_name = f"Chat {action.chat_id}"
+                    print(f"Ошибка API Telegram (статус: {response.status_code}), используем заглушку: {chat_name}")
+            except Exception as e:
+                chat_name = f"Chat {action.chat_id}"
+                print(f"Ошибка при получении имени чата через API: {e}, используем заглушку: {chat_name}")
+    
+    except Exception as e:
+        print(f"Ошибка при получении имени чата: {e}")
+        chat_name = f"Chat {action.chat_id}"
+    
     try: 
         connection = sqlite3.connect(admin_path, check_same_thread=False)
         cursor = connection.cursor()
@@ -1694,9 +1735,10 @@ def set_permissions(action: SetPermissionsAction):
             print("Обновляем существующую запись для пользователя в этом чате")
             cursor.execute('''
                 UPDATE admins 
-                SET can_see_users = ?, can_do_admin = ?, can_recom = ?, can_links = ?, can_dk = ?
+                SET chat_name = ?, can_see_users = ?, can_do_admin = ?, can_recom = ?, can_links = ?, can_dk = ?
                 WHERE user_id = ? AND chat_id = ?
             ''', (
+                chat_name,
                 int(action.view_users),
                 int(action.grant_admin),
                 int(action.manage_recommendations),
@@ -1709,11 +1751,12 @@ def set_permissions(action: SetPermissionsAction):
             # Вставляем новую запись
             print("Вставляем новую запись для пользователя в этом чате")
             cursor.execute('''
-                INSERT INTO admins (user_id, chat_id, can_see_users, can_do_admin, can_recom, can_links, can_dk)
+                INSERT INTO admins (user_id, chat_id, chat_name, can_see_users, can_do_admin, can_recom, can_links, can_dk)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
             ''', (
                 int(action.user_id),
                 int(action.chat_id),
+                chat_name,
                 int(action.view_users),
                 int(action.grant_admin),
                 int(action.manage_recommendations),
