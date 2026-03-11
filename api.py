@@ -2057,5 +2057,39 @@ def get_dk_commands(chat_id: int):
 
     
 
+@app.get('/check_owner/{chat_id}/{user_id}')
+def check_owner(chat_id: int, user_id: int):
+    """
+    Проверяет является ли пользователь владельцем чата
+    """
+    try:
+        connection = sqlite3.connect(admin_path, check_same_thread=False)
+        cursor = connection.cursor()
+        
+        # Проверяем есть ли пользователь в таблице creators (владельцы)
+        cursor.execute('SELECT * FROM creators WHERE user_id = ? AND chat_id = ?', (user_id, chat_id))
+        creator_record = cursor.fetchone()
+        
+        connection.close()
+        
+        if creator_record:
+            return {
+                "status": "success",
+                "is_owner": True,
+                "message": "Пользователь является владельцем чата"
+            }
+        else:
+            return {
+                "status": "success", 
+                "is_owner": False,
+                "message": "Пользователь не является владельцем чата"
+            }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Ошибка при проверке владельца: {str(e)}"
+        }
+
 if  __name__ == '__main__':
     uvicorn.run('api:app', reload=True, port=3000, host="0.0.0.0", ssl_keyfile='/etc/letsencrypt/live/ezh-dev.ru/privkey.pem', ssl_certfile='/etc/letsencrypt/live/ezh-dev.ru/cert.pem')

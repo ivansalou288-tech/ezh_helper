@@ -358,15 +358,45 @@
             profile.style.display = 'flex';
         }
 
-        function loadTargetUserInfo() {
+        async function loadTargetUserInfo() {
             const urlParams = new URLSearchParams(window.location.search);
             const username = urlParams.get('username');
             const nik = urlParams.get('nik');
             const userId = urlParams.get('user_id');
+            const chatId = urlParams.get('chat_id');
 
             document.getElementById('targetUsername').textContent = username ? `@${username}` : '-';
             document.getElementById('targetNik').textContent = nik || '-';
             document.getElementById('targetUserId').textContent = userId || '-';
+
+            // Проверяем, является ли пользователь владельцем
+            if (userId && chatId) {
+                try {
+                    const ownerResponse = await fetch(`https://ezh-dev.ru:3000/check_owner/${chatId}/${userId}`);
+                    const ownerData = await ownerResponse.json();
+
+                    if (ownerData.status === 'success' && ownerData.is_owner) {
+                        // Добавляем индикатор владельца
+                        const userIdElement = document.getElementById('targetUserId');
+                        userIdElement.innerHTML = `${userId} <span style="color: #ff6b6b; font-weight: bold;">👑 ВЛАДЕЛЕЦ</span>`;
+                        
+                        // Блокируем все тумблеры
+                        document.querySelectorAll('.toggle').forEach(toggle => {
+                            toggle.style.opacity = '0.5';
+                            toggle.style.pointerEvents = 'none';
+                        });
+                        
+                        // Блокируем кнопки
+                        document.querySelectorAll('.submit-btn').forEach(btn => {
+                            btn.style.opacity = '0.5';
+                            btn.style.pointerEvents = 'none';
+                            btn.title = 'Нельзя изменять права владельца';
+                        });
+                    }
+                } catch (error) {
+                    console.error('Ошибка при проверке владельца:', error);
+                }
+            }
         }
 
         function togglePermission(element) {
@@ -378,17 +408,26 @@
             const chatId = urlParams.get('chat_id');
             const userId = urlParams.get('user_id');
 
-            const permissions = {
-                chat_id: chatId,
-                user_id: userId,
-                view_users: document.getElementById('toggle1').classList.contains('active'),
-                grant_admin: document.getElementById('toggle2').classList.contains('active'),
-                manage_recommendations: document.getElementById('toggle3').classList.contains('active'),
-                manage_links: document.getElementById('toggle4').classList.contains('active'),
-                change_team_ranks: document.getElementById('toggle5').classList.contains('active')
-            };
-
             try {
+                // Сначала проверяем, не является ли пользователь владельцем
+                const ownerResponse = await fetch(`https://ezh-dev.ru:3000/check_owner/${chatId}/${userId}`);
+                const ownerData = await ownerResponse.json();
+
+                if (ownerData.status === 'success' && ownerData.is_owner) {
+                    alert('❌ Нельзя изменять права владельца чата!');
+                    return;
+                }
+
+                const permissions = {
+                    chat_id: chatId,
+                    user_id: userId,
+                    view_users: document.getElementById('toggle1').classList.contains('active'),
+                    grant_admin: document.getElementById('toggle2').classList.contains('active'),
+                    manage_recommendations: document.getElementById('toggle3').classList.contains('active'),
+                    manage_links: document.getElementById('toggle4').classList.contains('active'),
+                    change_team_ranks: document.getElementById('toggle5').classList.contains('active')
+                };
+
                 const response = await fetch('https://ezh-dev.ru:3000/set_permissions', {
                     method: 'POST',
                     headers: {
@@ -416,6 +455,16 @@
             }
 
             try {
+                // Сначала проверяем, не является ли пользователь владельцем
+                const ownerResponse = await fetch(`https://ezh-dev.ru:3000/check_owner/${chatId}/${userId}`);
+                const ownerData = await ownerResponse.json();
+
+                if (ownerData.status === 'success' && ownerData.is_owner) {
+                    alert('❌ Нельзя удалить права у владельца чата!');
+                    return;
+                }
+
+                // Если владелец - продолжаем удаление прав
                 const response = await fetch('https://ezh-dev.ru:3000/delete_permissions', {
                     method: 'POST',
                     headers: {

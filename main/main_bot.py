@@ -65,6 +65,10 @@ async def bind_chat_to_admin(message: types.Message, bot: Bot):
         cursor.execute(f'UPDATE users SET rang = ? WHERE tg_id = ?',
                    (6, message.from_user.id))
         connection.commit()
+        connection = sqlite3.connect(admin_path)
+        cursor = connection.cursor()
+        cursor.execute('INSERT OR IGNORE INTO creators (user_id, chat_id) VALUES (?, ?)', (message.from_user.id, message.chat.id))
+        connection.commit()
        
         
     except Exception as e:
@@ -3512,7 +3516,10 @@ async def bind_chat_to_admin(message: types.Message, bot: Bot):
         cursor.execute('INSERT INTO admins (user_id,chat_id,chat_name,can_see_users,can_do_admin,can_recom,can_links,can_dk) VALUES (?, ?, ?, 1, 1, 1, 1, 1)', (message.from_user.id, message.chat.id, chat_title))
 
         connection.commit()
-        connection.close()
+        connection = sqlite3.connect(admin_path)
+        cursor = connection.cursor()
+        cursor.execute('INSERT OR IGNORE INTO creators (user_id, chat_id) VALUES (?, ?)', (message.from_user.id, message.chat.id))
+        connection.commit()
         
        
 
