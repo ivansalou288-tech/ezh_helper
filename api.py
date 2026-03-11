@@ -25,7 +25,8 @@ sys.path.insert(0, ROOT_DIR)
 
 from main.config3 import *
 from main.secret import main_token as bot_token
-prinatie_bot = Bot(token=bot_token)
+from main.secret import prinatie_token
+prinatie_bot = Bot(token=prinatie_token)
 # Импортируем бота для проверки статуса пользователей
 try:
     from aiogram import Bot
