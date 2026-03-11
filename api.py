@@ -367,16 +367,18 @@ async def get_users_sdk(chat: int):
 
         chat_member = await bot.get_chat_member(chat, tg_ids)
         status = chat_member.status
-                
-        if status == 'administrator':
-                    chat_status = '👨🏻‍🔧 Телеграм-админ этого чата'
-        elif status == 'creator':
-                    chat_status = '👨🏻‍🔧 Создатель этого чата'
-        elif status == 'member' or status == 'restricted':
-                    chat_status = '💚 Состоит в чате'
-        else:
-                    chat_status = '💔 Не состоит в чате'
-                    
+        try:   
+            if status == 'administrator':
+                        chat_status = '👨🏻‍🔧 Телеграм-админ этого чата'
+            elif status == 'creator':
+                        chat_status = '👨🏻‍🔧 Создатель этого чата'
+            elif status == 'member' or status == 'restricted':
+                        chat_status = '💚 Состоит в чате'
+            else:
+                        chat_status = '💔 Не состоит в чате'
+        except Exception:
+            chat_status = '💔 Не состоит в чате'
+
             
 
         users[index] = {
