@@ -58,6 +58,8 @@ async def bind_chat_to_admin(message: types.Message, bot: Bot):
         if chat_member.status != ChatMemberStatus.CREATOR:
             await message.answer(f' {krest} Только владелец чата может использовать эту команду!', parse_mode='html')
             return
+        connection = sqlite3.connect(get_db_path(message.chat.id), check_same_thread=False)
+        cursor = connection.cursor()
         cursor.execute(f'UPDATE users SET rang = ? WHERE tg_id = ?',
                    (6, message.from_user.id))
         connection.commit()
