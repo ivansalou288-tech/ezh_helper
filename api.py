@@ -190,7 +190,7 @@ async def ban_user_admn(chat_id: int, user_id: int, admin_id: int, reason: str):
         await snat_warn_admn(user_id, chat_id, admin_id, 2, 1)
         await snat_warn_admn(user_id, chat_id, admin_id, 1, 0)
 
-        pubg_id = user.id_pubg
+        pubg_id = user.pubg_id
         date = datetime.now().strftime('%H:%M:%S %d.%m.%Y')
         user_men = user.mention
         moder_men = moder.mention
