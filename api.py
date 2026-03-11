@@ -1285,6 +1285,92 @@ def links_create(action: LinkCreateAction):
 
     return {"status": "ok", "link": link, "activations": action.activations, "target_chats": action.target_chats}
 
+class BanUserAction(BaseModel):
+    chat_id: int
+    user_id: int
+    reason: str
+    admin_id: Optional[int] = None
+    admin_name: Optional[str] = None
+    admin_username: Optional[str] = None
+
+class DeleteUserAction(BaseModel):
+    chat_id: int
+    user_id: int
+    admin_id: Optional[int] = None
+    admin_name: Optional[str] = None
+    admin_username: Optional[str] = None
+
+@app.post('/ban_user')
+def ban_user(action: BanUserAction):
+    """
+    Банит пользователя в чате
+    """
+    try:
+        print("="*50)
+        print("Получен запрос на бан пользователя:")
+        print(f"Chat ID: {action.chat_id}")
+        print(f"User ID: {action.user_id}")
+        print(f"Reason: {action.reason}")
+        print(f"Admin ID: {action.admin_id}")
+        print(f"Admin Name: {action.admin_name}")
+        print(f"Admin Username: {action.admin_username}")
+        print("="*50)
+
+        # Здесь можно добавить логику бана пользователя
+        # Например, добавление в специальную таблицу забаненных пользователей
+        # или вызов Telegram Bot API для бана
+        
+        return {
+            "status": "success",
+            "message": f"Пользователь {action.user_id} забанен в чате {action.chat_id}",
+            "reason": action.reason
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Ошибка при бане пользователя: {str(e)}"
+        }
+
+@app.post('/delete_user')
+def delete_user(action: DeleteUserAction):
+    """
+    Удаляет пользователя из базы данных чата
+    """
+    try:
+        print("="*50)
+        print("Получен запрос на удаление пользователя:")
+        print(f"Chat ID: {action.chat_id}")
+        print(f"User ID: {action.user_id}")
+        print(f"Admin ID: {action.admin_id}")
+        print(f"Admin Name: {action.admin_name}")
+        print(f"Admin Username: {action.admin_username}")
+        print("="*50)
+
+        # Удаляем пользователя из базы данных чата
+        connection = sqlite3.connect(get_db_path(action.chat_id), check_same_thread=False)
+        cursor = connection.cursor()
+        
+        cursor.execute('DELETE FROM users WHERE tg_id = ?', (action.user_id,))
+        deleted = cursor.rowcount
+        
+        connection.commit()
+        connection.close()
+        
+        if deleted == 0:
+            return {"status": "error", "message": "Пользователь не найден в базе данных"}
+        
+        return {
+            "status": "success",
+            "message": f"Пользователь {action.user_id} удален из базы данных чата {action.chat_id}"
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Ошибка при удалении пользователя: {str(e)}"
+        }
+
 @app.post('/set_permissions')
 def set_permissions(action: SetPermissionsAction):
     """

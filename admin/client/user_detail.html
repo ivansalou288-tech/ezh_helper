@@ -460,6 +460,170 @@
                 box-shadow: 0 0 8px rgba(124, 77, 255, 0.7);
             }
         }
+        
+        /* Стили для кнопок действий */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+        
+        .action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .ban-btn {
+            background: linear-gradient(145deg, #ff6b6b, #ee5a52);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        .ban-btn:hover {
+            background: linear-gradient(145deg, #ff5252, #e53935);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .delete-btn {
+            background: linear-gradient(145deg, #757575, #616161);
+            color: white;
+            box-shadow: 0 4px 15px rgba(117, 117, 117, 0.3);
+        }
+        
+        .delete-btn:hover {
+            background: linear-gradient(145deg, #616161, #424242);
+            box-shadow: 0 6px 20px rgba(117, 117, 117, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        /* Модальное окно */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+        }
+        
+        .modal {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border: 2px solid #ff6b6b;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.3);
+            animation: modalAppear 0.3s ease-out;
+        }
+        
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        .modal-title {
+            font-size: 1.5em;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+        }
+        
+        .modal-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #e0e0e0;
+            font-size: 1em;
+        }
+        
+        .modal-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px;
+            border: 2px solid #ff6b6b;
+            border-radius: 10px;
+            background: rgba(26, 26, 46, 0.8);
+            color: white;
+            font-size: 1em;
+            resize: vertical;
+            outline: none;
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.2);
+        }
+        
+        .modal-textarea:focus {
+            border-color: #ff5252;
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .modal-textarea::placeholder {
+            color: #999;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        
+        .modal-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-confirm {
+            background: linear-gradient(145deg, #ff6b6b, #ee5a52);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        .modal-confirm:hover {
+            background: linear-gradient(145deg, #ff5252, #e53935);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .modal-cancel {
+            background: linear-gradient(145deg, #7c4dff, #b388ff);
+            color: white;
+            box-shadow: 0 4px 15px rgba(124, 77, 255, 0.3);
+        }
+        
+        .modal-cancel:hover {
+            background: linear-gradient(145deg, #6a1bff, #9c27b0);
+            box-shadow: 0 6px 20px rgba(124, 77, 255, 0.5);
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -479,6 +643,29 @@
         <h1>Карточка пользователя</h1>
         <div class="container">
             <div class="user-card" id="userCard"></div>
+            
+            <!-- Кнопки действий -->
+            <div class="action-buttons">
+                <button class="action-btn ban-btn" onclick="showBanModal()">Забанить</button>
+                <button class="action-btn delete-btn" onclick="deleteUser()">Удалить из БД</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для бана -->
+    <div class="modal-overlay" id="banModal">
+        <div class="modal">
+            <h2 class="modal-title">Забанить пользователя</h2>
+            <label class="modal-label" for="banReason">Причина бана:</label>
+            <textarea 
+                id="banReason" 
+                class="modal-textarea" 
+                placeholder="Укажите причину бана пользователя..."
+            ></textarea>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-cancel" onclick="hideBanModal()">Отмена</button>
+                <button class="modal-btn modal-confirm" onclick="confirmBan()">Забанить</button>
+            </div>
         </div>
     </div>
 
@@ -1021,6 +1208,115 @@
                     userCard.appendChild(recommendationsSection);
                 });
         }
+
+        // Функции для работы с модальным окном и API
+        function showBanModal() {
+            const modal = document.getElementById('banModal');
+            const reasonTextarea = document.getElementById('banReason');
+            reasonTextarea.value = ''; // Очищаем предыдущую причину
+            modal.classList.add('show');
+        }
+
+        function hideBanModal() {
+            const modal = document.getElementById('banModal');
+            modal.classList.remove('show');
+        }
+
+        async function confirmBan() {
+            const reasonTextarea = document.getElementById('banReason');
+            const reason = reasonTextarea.value.trim();
+            
+            if (!reason) {
+                alert('Пожалуйста, укажите причину бана');
+                return;
+            }
+
+            const admin = getCurrentUser();
+            if (!admin) {
+                alert('Не удалось получить данные профиля Telegram');
+                return;
+            }
+
+            try {
+                const response = await fetch('https://ezh-dev.ru:3000/ban_user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: parseInt(currentChatId),
+                        user_id: parseInt(currentUserId),
+                        reason: reason,
+                        admin_id: admin.id,
+                        admin_name: `${admin.first_name} ${admin.last_name}`.trim() || admin.username,
+                        admin_username: admin.username
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    alert('Пользователь успешно забанен');
+                    hideBanModal();
+                    // Можно добавить обновление данных или возврат к списку
+                } else {
+                    alert(`Ошибка: ${data.message}`);
+                }
+            } catch (error) {
+                console.error('Ошибка при бане пользователя:', error);
+                alert('Произошла ошибка при бане пользователя');
+            }
+        }
+
+        async function deleteUser() {
+            if (!confirm('Вы уверены, что хотите удалить этого пользователя из базы данных? Это действие нельзя отменить.')) {
+                return;
+            }
+
+            const admin = getCurrentUser();
+            if (!admin) {
+                alert('Не удалось получить данные профиля Telegram');
+                return;
+            }
+
+            try {
+                const response = await fetch('https://ezh-dev.ru:3000/delete_user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: parseInt(currentChatId),
+                        user_id: parseInt(currentUserId),
+                        admin_id: admin.id,
+                        admin_name: `${admin.first_name} ${admin.last_name}`.trim() || admin.username,
+                        admin_username: admin.username
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    alert('Пользователь успешно удален из базы данных');
+                    // Возвращаемся к списку пользователей
+                    const chatId = new URLSearchParams(window.location.search).get('chat_id');
+                    if (chatId) {
+                        window.location.href = `see_users.html?chat_id=${chatId}`;
+                    } else {
+                        window.history.back();
+                    }
+                } else {
+                    alert(`Ошибка: ${data.message}`);
+                }
+            } catch (error) {
+                console.error('Ошибка при удалении пользователя:', error);
+                alert('Произошла ошибка при удалении пользователя');
+            }
+        }
+
+        // Закрытие модального окна при клике на оверлей
+        document.addEventListener('click', (e) => {
+            const modal = document.getElementById('banModal');
+            if (e.target === modal) {
+                hideBanModal();
+            }
+        });
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
