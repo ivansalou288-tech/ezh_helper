@@ -19,7 +19,7 @@ curent_path = (Path(__file__)).parent.parent
 
 #? EN: Opens the casino (slot/dice) interface, letting user choose a bet from their farm bag with cooldown.
 #* RU: Открывает интерфейс казика (слоты/кости), позволяя выбрать ставку из мешка фармы с кулдауном.
-@router.message(F.text.in_(['!казик', '! казик']))
+@router.message(F.text.lower().in_(['!казик', '! казик']))
 async def kasik(message: types.Message):
     # Initialize database for this chat if it doesn't exist (for default_periods and black_list)
     init_chat_db(message.chat.id)
