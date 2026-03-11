@@ -270,10 +270,44 @@ def get_user_admin_chats(user_id: int):
         admin_chats = []
         for row in rows:
             # Структура таблицы: user_id, chat_id, chat_name, can_see_users, can_do_admin, can_recom, can_links, can_dk
+            chat_id = row[1]
+            chat_name = row[2] if row[2] else None
+            
+            # Если имя чата пустое, пытаемся получить через Telegram API
+            if not chat_name:
+                try:
+                    import requests
+                    url = f"https://api.telegram.org/bot{bot_token}/getChat"
+                    params = {"chat_id": chat_id}
+                    
+                    response = requests.get(url, params=params, timeout=5)
+                    if response.status_code == 200:
+                        data = response.json()
+                        if data.get("ok"):
+                            chat_info = data.get("result", {})
+                            chat_name = chat_info.get("title", f"Chat {chat_id}")
+                            print(f"Получено имя чата {chat_id} через API: {chat_name}")
+                            
+                            # Обновляем имя в базе данных
+                            cursor.execute('UPDATE admins SET chat_name = ? WHERE user_id = ? AND chat_id = ?', 
+                                          (chat_name, user_id, chat_id))
+                            connection.commit()
+                        else:
+                            chat_name = f"Chat {chat_id}"
+                            print(f"Не удалось получить имя чата {chat_id} через API")
+                    else:
+                        chat_name = f"Chat {chat_id}"
+                        print(f"Ошибка API Telegram для чата {chat_id}: {response.status_code}")
+                except Exception as e:
+                    chat_name = f"Chat {chat_id}"
+                    print(f"Ошибка при получении имени чата {chat_id}: {e}")
+            else:
+                print(f"Используем существующее имя чата из базы: {chat_name}")
+            
             chat_data = {
                 "user_id": row[0],
-                "chat_id": row[1], 
-                "chat_name": row[2] if row[2] else f"Chat {row[1]}",
+                "chat_id": chat_id, 
+                "chat_name": chat_name,
                 "permissions": {
                     "can_see_users": bool(row[3]) if len(row) > 3 else False,
                     "can_do_admin": bool(row[4]) if len(row) > 4 else False,
