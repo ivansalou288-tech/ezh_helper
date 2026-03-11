@@ -464,45 +464,76 @@
         /* Стили для кнопок действий */
         .action-buttons {
             display: flex;
-            gap: 15px;
+            gap: 20px;
             margin-top: 30px;
+            margin-bottom: 30px;
             justify-content: center;
         }
         
         .action-btn {
-            padding: 12px 24px;
+            padding: 15px 30px;
             border: none;
-            border-radius: 10px;
-            font-size: 1em;
-            font-weight: 600;
+            border-radius: 15px;
+            font-size: 1.1em;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            min-width: 150px;
+        }
+        
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .action-btn:hover::before {
+            left: 100%;
         }
         
         .ban-btn {
-            background: linear-gradient(145deg, #ff6b6b, #ee5a52);
+            background: linear-gradient(145deg, #ff1744, #d50000);
             color: white;
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            box-shadow: 
+                0 0 20px rgba(255, 23, 68, 0.5),
+                inset 0 0 20px rgba(255, 23, 68, 0.1);
+            border: 2px solid #ff1744;
         }
         
         .ban-btn:hover {
-            background: linear-gradient(145deg, #ff5252, #e53935);
-            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
-            transform: translateY(-2px);
+            background: linear-gradient(145deg, #d50000, #b71c1c);
+            box-shadow: 
+                0 0 30px rgba(255, 23, 68, 0.8),
+                inset 0 0 30px rgba(255, 23, 68, 0.2);
+            transform: translateY(-3px);
+            border-color: #ff5252;
         }
         
         .delete-btn {
-            background: linear-gradient(145deg, #757575, #616161);
+            background: linear-gradient(145deg, #9c27b0, #7b1fa2);
             color: white;
-            box-shadow: 0 4px 15px rgba(117, 117, 117, 0.3);
+            box-shadow: 
+                0 0 20px rgba(156, 39, 176, 0.5),
+                inset 0 0 20px rgba(156, 39, 176, 0.1);
+            border: 2px solid #9c27b0;
         }
         
         .delete-btn:hover {
-            background: linear-gradient(145deg, #616161, #424242);
-            box-shadow: 0 6px 20px rgba(117, 117, 117, 0.5);
-            transform: translateY(-2px);
+            background: linear-gradient(145deg, #7b1fa2, #6a1b9a);
+            box-shadow: 
+                0 0 30px rgba(156, 39, 176, 0.8),
+                inset 0 0 30px rgba(156, 39, 176, 0.2);
+            transform: translateY(-3px);
+            border-color: #ba68c8;
         }
         
         /* Модальное окно */
@@ -646,8 +677,8 @@
             
             <!-- Кнопки действий -->
             <div class="action-buttons">
-                <button class="action-btn ban-btn" onclick="showBanModal()">Забанить</button>
-                <button class="action-btn delete-btn" onclick="deleteUser()">Удалить из БД</button>
+                <button class="action-btn ban-btn" onclick="showBanModal()">🚫 Забанить</button>
+                <button class="action-btn delete-btn" onclick="deleteUser()">🗑️ Удалить из БД</button>
             </div>
         </div>
     </div>
