@@ -3416,7 +3416,7 @@ async def set_period(message):
             'общий-сбор': 'all',
             'созыв': 'all',
             'созвать': 'all',
-            'казик': 'kasik',
+            'казик': 'kas ik',
             'рулетка': 'slot_roulette'
         }
 
@@ -3598,7 +3598,7 @@ async def main() -> None:
         dp.include_router(message_top_router)
         dp.include_router(farm_router)
         dp.include_router(cubes_router)
-        dp.include_router(kasik_router)
+        # dp.include_router(kasik_router)
         dp.include_router(golden_rulet_router)
         dp.include_router(router)
         
