@@ -3436,7 +3436,7 @@ async def set_period(message):
         
         # The default_periods table is already created by init_chat_db() from test.sql schema
         period = f"{time_value} {time_unit}"
-        cursor.execute('INSERT OR REPLACE INTO default_periods (command, period, chat) VALUES (?, ?, ?)', (command, period, message.chat.id))
+        cursor.execute('INSERT OR REPLACE INTO default_periods (command, period) VALUES (?, ?)', (command, period))
         connection.commit()
         connection.close()
         

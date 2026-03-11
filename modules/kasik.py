@@ -41,7 +41,7 @@ async def kasik(message: types.Message):
 
     period_str = '5 минут'  # Default value
     try:
-        period_str = cursor.execute('SELECT period FROM default_periods WHERE command = ? AND chat = ?', ('kasik', message.chat.id)).fetchall()[0][0]
+        period_str = cursor.execute('SELECT period FROM default_periods WHERE command = ?', ('kasik')).fetchall()[0][0]
         time_value, time_unit = period_str.split()
         time_value = int(time_value)
         if time_unit in ['ч', 'час', 'часа', 'часов']:
@@ -51,9 +51,9 @@ async def kasik(message: types.Message):
         elif time_unit in ['д', 'день', 'дня', 'дней', 'сутки']:
             cd_delta = timedelta(days=time_value)
         else:
-            cd_delta = timedelta(minutes=15)
+            cd_delta = timedelta(minutes=5)
     except (IndexError, ValueError):
-        cd_delta = timedelta(minutes=15)
+        cd_delta = timedelta(minutes=5)
     finally:
         connection.close()
 
