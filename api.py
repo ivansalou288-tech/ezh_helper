@@ -104,6 +104,7 @@ class DeletePermissionsAction(BaseModel):
 class LinkCreateAction(BaseModel):
     activations: int
     chat_id: Optional[int] = None
+    target_chats: Optional[list] = []
     admin_id: Optional[int] = None
     admin_name: Optional[str] = None
     admin_username: Optional[str] = None
@@ -784,7 +785,8 @@ def get_all_links(chat_id: Optional[int] = None):
         cursor.execute('''CREATE TABLE IF NOT EXISTS links (
             chat_id INTEGER,
             link TEXT,
-            activate_cnt INTEGER
+            activate_cnt INTEGER,
+            target_chats TEXT
         )''')
         connection.commit()
         
@@ -833,6 +835,7 @@ class SubmitFormAction(BaseModel):
     nick: str
     gameId: str
     invite_code: str
+    target_chats: Optional[list] = []
 
 class GenerateLinksAction(BaseModel):
     telegram_id: Optional[int] = None
@@ -858,7 +861,8 @@ def delete_link(action: LinkDeleteAction):
         cursor.execute('''CREATE TABLE IF NOT EXISTS links (
             chat_id INTEGER,
             link TEXT,
-            activate_cnt INTEGER
+            activate_cnt INTEGER,
+            target_chats TEXT
         )''')
         connection.commit()
         
@@ -905,22 +909,31 @@ def check_invite_code(action: CheckCodeAction):
         cursor.execute('''CREATE TABLE IF NOT EXISTS links (
             chat_id INTEGER,
             link TEXT,
-            activate_cnt INTEGER
+            activate_cnt INTEGER,
+            target_chats TEXT
         )''')
         connection.commit()
         
         # Ищем код в таблице
-        cursor.execute('SELECT chat_id, activate_cnt FROM links WHERE link = ?', (code,))
+        cursor.execute('SELECT chat_id, activate_cnt, target_chats FROM links WHERE link = ?', (code,))
         result = cursor.fetchone()
         connection.close()
         
         if not result:
             return {"status": "error", "message": "Неверный код приглашения"}
         
-        chat_id, activate_cnt = result
+        chat_id, activate_cnt, target_chats_json = result
         
         if activate_cnt <= 0:
             return {"status": "error", "message": "Код больше не действителен"}
+        
+        # Парсим список целевых чатов
+        import json
+        target_chats = []
+        try:
+            target_chats = json.loads(target_chats_json) if target_chats_json else []
+        except:
+            target_chats = []
         
         # Определяем состав на основе chat_id
         sost = "sost-1" if chat_id == chats_names['sost-1'] else "sost-2" if chat_id == chats_names['sost-2'] else "unknown"
@@ -931,6 +944,7 @@ def check_invite_code(action: CheckCodeAction):
                 "link": code,
                 "chat_id": chat_id,
                 "activate_count": activate_cnt,
+                "target_chats": target_chats,
                 "sost": sost
             }
         }
@@ -956,26 +970,48 @@ def submit_form(action: SubmitFormAction):
 
         connection = sqlite3.connect(all_path, check_same_thread=False)
         cursor = connection.cursor()
-        cursor.execute('SELECT chat_id FROM links WHERE link = ?', (action.invite_code,))
-        chat_id = cursor.fetchone()
+        cursor.execute('SELECT chat_id, target_chats FROM links WHERE link = ?', (action.invite_code,))
+        link_data = cursor.fetchone()
         
-        if not chat_id:
+        if not link_data:
             return {"status": "error", "message": "Код приглашения не найден"}
         
-        chat_id = chat_id[0]
-    
+        chat_id, target_chats_json = link_data
+        
+        # Парсим список целевых чатов
+        import json
+        target_chats = []
+        try:
+            target_chats = json.loads(target_chats_json) if target_chats_json else []
+        except:
+            target_chats = []
+        
+        # Если список целевых чатов пуст, используем основной chat_id
+        if not target_chats:
+            target_chats = [chat_id]
+        
         connection.commit()
         connection.close()
-        connection = sqlite3.connect(get_db_path(chat_id), check_same_thread=False)
-        cursor = connection.cursor()
         
-        try:
-            cursor.execute('INSERT INTO users (tg_id, username, name, age, nik_pubg, id_pubg, nik, rang, last_date, date_vhod, mess_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                           (action.telegram_id, action.user, action.name, action.age, action.nick, action.gameId, action.nick, 0, '', datetime.now().strftime('%H:%M:%S %d.%m.%Y'), 0))
-            connection.commit()
-        except Exception as e:
-            return {"status": "error", "message": f"Ошибка при добавлении пользователя: {str(e)}"}
-
+        # Добавляем пользователя во все целевые чаты
+        added_chats = []
+        failed_chats = []
+        
+        for target_chat_id in target_chats:
+            try:
+                connection = sqlite3.connect(get_db_path(target_chat_id), check_same_thread=False)
+                cursor = connection.cursor()
+                
+                cursor.execute('INSERT INTO users (tg_id, username, name, age, nik_pubg, id_pubg, nik, rang, last_date, date_vhod, mess_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                               (action.telegram_id, action.user, action.name, action.age, action.nick, action.gameId, action.nick, 0, '', datetime.now().strftime('%H:%M:%S %d.%m.%Y'), 0))
+                connection.commit()
+                connection.close()
+                added_chats.append(target_chat_id)
+                
+            except Exception as e:
+                print(f"Ошибка при добавлении пользователя в чат {target_chat_id}: {e}")
+                failed_chats.append(target_chat_id)
+        
         print("="*50)
         print("Новая заявка в клан:")
         print(f"Telegram ID: {action.telegram_id}")
@@ -985,12 +1021,45 @@ def submit_form(action: SubmitFormAction):
         print(f"Ник: {action.nick}")
         print(f"Game ID: {action.gameId}")
         print(f"Код приглашения: {action.invite_code}")
+        print(f"Целевые чаты: {target_chats}")
+        print(f"Успешно добавлено в чаты: {added_chats}")
+        print(f"Не удалось добавить в чаты: {failed_chats}")
         print("="*50)
+        
+        # Отправляем уведомление в основной чат
+        if added_chats:
+            try:
+                chat_names = []
+                for chat_id in added_chats:
+                    chat_name = f"Chat {chat_id}"
+                    # Пытаемся получить имя чата из admin базы
+                    try:
+                        admin_conn = sqlite3.connect(admin_path, check_same_thread=False)
+                        admin_cursor = admin_conn.cursor()
+                        admin_cursor.execute('SELECT chat_name FROM admins WHERE chat_id = ? LIMIT 1', (chat_id,))
+                        chat_name_result = admin_cursor.fetchone()
+                        if chat_name_result and chat_name_result[0]:
+                            chat_name = chat_name_result[0]
+                        admin_conn.close()
+                    except:
+                        pass
+                    chat_names.append(chat_name)
+                
+                message = f"Новая заявка в клан:\nTelegram ID: {action.telegram_id}\nUsername: {action.user}\nИмя: {action.name}\nВозраст: {action.age}\nНик: {action.nick}\nGame ID: {action.gameId}\nКод приглашения: {action.invite_code}\nДобавлен в чаты: {', '.join(chat_names)}"
+                
+                if failed_chats:
+                    message += f"\nНе удалось добавить в чаты: {', '.join([f'Chat {cid}' for cid in failed_chats])}"
+                
+                bot.send_message(chat_id, message)
+            except Exception as e:
+                print(f"Ошибка при отправке уведомления: {e}")
         
         return {
             "status": "success",
-            "message": "Заявка успешно отправлена",
-            "application_id": action.telegram_id
+            "message": f"Заявка успешно отправлена. Добавлен в {len(added_chats)} чатов.",
+            "application_id": action.telegram_id,
+            "added_chats": added_chats,
+            "failed_chats": failed_chats
         }
         
     except Exception as e:
@@ -1090,7 +1159,7 @@ async def generate_invite_links(action: GenerateLinksAction):
         print(f"Chat name: {links_data['chat']['name']}")
         print(f"Chat avatar: {links_data['chat']['avatar']}")
         print("="*50)
-        
+ 
         return {
             "status": "success",
             "data": links_data
@@ -1102,6 +1171,40 @@ async def generate_invite_links(action: GenerateLinksAction):
             "message": f"Ошибка при генерации ссылок: {str(e)}"
         }
 
+@app.get('/admin-chats/{user_id}')
+def get_admin_chats(user_id: int):
+    """
+    Получает список чатов, где пользователь является администратором
+    """
+    try:
+        connection = sqlite3.connect(admin_path, check_same_thread=False)
+        cursor = connection.cursor()
+        
+        # Получаем все чаты, где пользователь является админом
+        cursor.execute('SELECT DISTINCT chat_id, chat_name FROM admins WHERE user_id = ? AND can_links = 1', (user_id,))
+        admin_chats = cursor.fetchall()
+        
+        connection.close()
+        
+        chats_list = []
+        for chat in admin_chats:
+            chats_list.append({
+                "chat_id": chat[0],
+                "chat_name": chat[1] or f"Chat {chat[0]}"
+            })
+        
+        return {
+            "status": "success",
+            "chats": chats_list,
+            "count": len(chats_list)
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Ошибка при получении чатов админа: {str(e)}"
+        }
+
 @app.post('/links-create')
 def links_create(action: LinkCreateAction):
     connection = sqlite3.connect(all_path, check_same_thread=False)
@@ -1109,6 +1212,7 @@ def links_create(action: LinkCreateAction):
     print("="*50)
     print("Получен запрос на создание ссылки:")
     print(f"Chat ID: {action.chat_id}")
+    print(f"Target Chats: {action.target_chats}")
     print(f"Activations: {action.activations}")
     print(f"Admin ID: {action.admin_id}")
     print(f"Admin Name: {action.admin_name}")
@@ -1133,16 +1237,23 @@ def links_create(action: LinkCreateAction):
     # payload = f"lk_{action.chat_id}_{action.activations}"
     # link = f"https://t.me/{bot_username}?start={payload}"
     link = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+    
+    # Конвертируем список чатов в JSON строку для хранения
+    import json
+    target_chats_json = json.dumps(action.target_chats) if action.target_chats else "[]"
+    
     cursor.execute('''CREATE TABLE IF NOT EXISTS links (
         chat_id INTEGER,
         link TEXT,
-        activate_cnt INTEGER
+        activate_cnt INTEGER,
+        target_chats TEXT
     )''')
     connection.commit()
-    cursor.execute('INSERT INTO links (chat_id, link, activate_cnt) VALUES (?, ?, ?)', (action.chat_id, link, action.activations))
+    cursor.execute('INSERT INTO links (chat_id, link, activate_cnt, target_chats) VALUES (?, ?, ?, ?)', 
+                   (action.chat_id, link, action.activations, target_chats_json))
     connection.commit()
 
-    return {"status": "ok", "link": link, "activations": action.activations}
+    return {"status": "ok", "link": link, "activations": action.activations, "target_chats": action.target_chats}
 
 @app.post('/set_permissions')
 def set_permissions(action: SetPermissionsAction):

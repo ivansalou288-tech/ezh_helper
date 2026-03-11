@@ -8,3 +8,8 @@ CREATE TABLE IF NOT EXISTS admins (
     can_links,
     can_dk
 );
+
+CREATE TABLE IF NOT EXISTS creators (
+    user_id,
+    chat_id
+);
