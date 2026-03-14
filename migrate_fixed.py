@@ -103,24 +103,58 @@ def migrate_warnings():
                         print(f"Неожиданная структура данных: {warning}")
                         continue
                     
+                    # Функция для извлечения ID и имени из гиперссылки
+                    def extract_moder_info(moder_data):
+                        if not moder_data:
+                            return None, None
+                        
+                        moder_str = str(moder_data)
+                        print(f"  🔍 Анализ данных модератора: {repr(moder_str)}")
+                        
+                        # Если это гиперссылка формата <a href="tg://user?id=ID">ИМЯ</a>
+                        if '<a href="tg://user?id=' in moder_str:
+                            import re
+                            # Извлекаем ID
+                            id_match = re.search(r'<a href="tg://user?id=(\d+)">', moder_str)
+                            # Извлекаем имя
+                            name_match = re.search(r'<a href="tg://user?id=\d+">([^<]+)</a>', moder_str)
+                            
+                            moder_id = int(id_match.group(1)) if id_match else 0
+                            moder_name = name_match.group(1).strip() if name_match else None
+                            print(f"  📋 Найдена гиперссылка: ID={moder_id}, Имя={moder_name}")
+                            return moder_id, moder_name
+                        
+                        # Если это просто число
+                        if moder_str.isdigit():
+                            print(f"  🔢 Найдено число: {moder_str}")
+                            return int(moder_str), None
+                        
+                        # Если это просто текст
+                        print(f"  📝 Найден текст: {moder_str}")
+                        return None, moder_str
+                    
                     # Переносим каждое предупреждение
                     warn_data = [
-                        (first_warn, first_moder, 1),
-                        (second_warn, second_moder, 2),
-                        (therd_warn, therd_moder, 3)
+                        (first_warn, extract_moder_info(first_moder), 1),
+                        (second_warn, extract_moder_info(second_moder), 2),
+                        (therd_warn, extract_moder_info(therd_moder), 3)
                     ]
                     
-                    for warn_text, moder_id, warn_num in warn_data:
+                    for warn_text, moder_info, warn_num in warn_data:
                         if warn_text and str(warn_text).strip():  # Пропускаем пустые предупреждения
                             try:
                                 # Вставляем в новую таблицу
                                 current_date = datetime.now().strftime('%d.%m.%Y')
+                                
+                                moder_id = moder_info[0] if moder_info and moder_info[0] else 0
+                                moder_name = moder_info[1] if moder_info and moder_info[1] else None
+                                
                                 new_cursor.execute(
                                     "INSERT INTO warns (user_id, reason, moder_id, date) VALUES (?, ?, ?, ?)",
-                                    (tg_id, str(warn_text), int(moder_id) if moder_id and str(moder_id).isdigit() else 0, current_date)
+                                    (tg_id, str(warn_text), moder_id, current_date)
                                 )
                                 migrated_count += 1
-                                print(f"  ✓ Перенесено предупреждение #{warn_num} для пользователя {tg_id}")
+                                print(f"  ✓ Перенесено предупреждение #{warn_num} для пользователя {tg_id}, модер ID: {moder_id}, имя: {moder_name}")
                             except Exception as e:
                                 print(f"  ✗ Ошибка при переносе предупреждения #{warn_num} для пользователя {tg_id}: {e}")
                                 total_errors += 1
