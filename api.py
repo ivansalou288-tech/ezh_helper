@@ -2217,4 +2217,4 @@ def check_owner(chat_id: int, user_id: int):
         }
 
 if  __name__ == '__main__':
-    uvicorn.run('api:app', reload=True, port=53640, host="0.0.0.0", ssl_keyfile='/etc/letsencrypt/live/panel.ezh-dev.ru/privkey.pem', ssl_certfile='/etc/letsencrypt/live/panel.ezh-dev.ru/cert.pem')
+    uvicorn.run('api:app', reload=True, port=3000, host="0.0.0.0", ssl_keyfile='/etc/letsencrypt/live/ezhqpy.ru/privkey.pem', ssl_certfile='/etc/letsencrypt/live/ezhqpy.ru/cert.pem')
