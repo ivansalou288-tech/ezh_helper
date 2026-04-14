@@ -87,7 +87,7 @@ async def start(message: types.Message, bot: Bot):
     except Exception:
         pass
     buttons = [
-        types.InlineKeyboardButton(text="Вступить в клан", web_app=types.WebAppInfo(url='https://ezh-dev.ru/ezh_helper/new_chat_mem_dir/index.html')),
+        types.InlineKeyboardButton(text="Вступить в клан", web_app=types.WebAppInfo(url='https://ezhqpy.ru/ezh_helper/new_chat_mem_dir/index.html')),
 
     ]
 
