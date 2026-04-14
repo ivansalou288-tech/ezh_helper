@@ -72,7 +72,7 @@
 
         async function loadAllUsers() {
             try {
-                const response = await fetch(`https://ezh-dev.ru:3000/users/${chatId}`);
+                const response = await fetch(`https://panel.ezh-dev.ru:53640/users/${chatId}`);
                 const data = await response.json();
                 if (data && typeof data === 'object') {
                     allUsers = Object.keys(data).map(key => data[key]).filter(u => u && u.nik);
@@ -116,7 +116,7 @@
             const recomList = document.getElementById('recomList');
             try {
                 recomList.innerHTML = '<div class="no-results">Загрузка рекомендаций...</div>';
-                const response = await fetch(`https://ezh-dev.ru:3000/recom/${chatId}/${userId}`);
+                const response = await fetch(`https://panel.ezh-dev.ru:53640/recom/${chatId}/${userId}`);
                 const data = await response.json();
 
                 if (!data || data.length === 0) {

@@ -147,7 +147,7 @@
 
             try {
                 const user = tg?.initDataUnsafe?.user;
-                const response = await fetch('https://ezh-dev.ru:3000/recom-remove', {
+                const response = await fetch('https://panel.ezh-dev.ru:53640/recom-remove', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
