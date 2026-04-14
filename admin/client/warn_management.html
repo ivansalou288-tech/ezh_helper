@@ -378,7 +378,7 @@
             }
 
             try {
-                const response = await fetch(`https://panel.ezh-dev.ru:53640/chat_warns/${chatId}`);
+                const response = await fetch(`https://ezhqpy.ru:3000/chat_warns/${chatId}`);
                 const data = await response.json();
 
                 const loadingState = document.getElementById('loadingState');
@@ -438,7 +438,7 @@
                             }
                             
                             try {
-                                const response = await fetch('https://panel.ezh-dev.ru:53640/snat_warn', {
+                                const response = await fetch('https://ezhqpy.ru:3000/snat_warn', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({

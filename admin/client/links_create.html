@@ -330,7 +330,7 @@
             if (!admin.admin_id) return;
 
             try {
-                const response = await fetch(`https://panel.ezh-dev.ru:53640/admin-chats/${admin.admin_id}`);
+                const response = await fetch(`https://ezhqpy.ru:3000/admin-chats/${admin.admin_id}`);
                 const data = await response.json();
 
                 if (data.status === 'success') {
@@ -533,7 +533,7 @@
             setUiState({ loading: true, status: 'Создаю ссылку…', link: '' });
 
             try {
-                const response = await fetch('https://panel.ezh-dev.ru:53640/links-create', {
+                const response = await fetch('https://ezhqpy.ru:3000/links-create', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
