@@ -113926,3 +113926,21 @@ INFO:     Stopping reloader process [1124]
 8:56:05.868262
 4:03:38.540871
 2:47:38.732089
+Traceback (most recent call last):
+  File "/var/www/panel.ezh-dev.ru/ezh_helper/main/main_bot.py", line 1, in <module>
+    from aiogram import types, F, Router, Dispatcher, Bot
+ModuleNotFoundError: No module named 'aiogram'
+Traceback (most recent call last):
+  File "/var/www/panel.ezh-dev.ru/ezh_helper/api.py", line 9, in <module>
+    from fastapi import FastAPI, HTTPException, Request
+ModuleNotFoundError: No module named 'fastapi'
+Received SIGTERM signal
+posting
+час 1
+3 days, 22:57:39.126883
+1:10:26.077644
+list index out of range
+5839781089
+[(5839781089, 'Lokkip22', 'Меллери', 14, 'weMELLERY', 5299881167, 'weMELLERY', 0, '16:21:08 14.04.2026', '20:09:51 30.11.2025', 5248)]
+Заместитель
+Заместитель
